@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strange Goose Productions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a09;
+    --near-black: #111110;
+    --surface: #161614;
+    --border: rgba(255,255,255,0.08);
+    --gold: #c9a96e;
+    --gold-dim: rgba(201,169,110,0.35);
+    --white: #f0ede6;
+    --muted: rgba(240,237,230,0.5);
+    --faint: rgba(240,237,230,0.2);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.028;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.75rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(10,10,9,0.95) 0%, transparent 100%);
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant', serif;
+    font-weight: 300;
+    font-size: 1.05rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .nav-cta {
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold-dim);
+    padding-bottom: 2px;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .nav-cta:hover { color: var(--white); border-color: rgba(240,237,230,0.4); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 8rem 4rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(201,169,110,0.055) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 40% at 15% 85%, rgba(201,169,110,0.025) 0%, transparent 50%);
+  }
+
+  .hero-eyebrow {
+    font-size: 0.68rem;
+    font-weight: 400;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeDown 0.8s ease forwards 0.4s;
+  }
+
+  .hero-title {
+    font-family: 'Cormorant', serif;
+    font-weight: 300;
+    font-size: clamp(4.5rem, 10vw, 9.5rem);
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.6s;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+    display: block;
+  }
+
+  .hero-divider {
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, var(--gold-dim), transparent);
+    margin: 0 auto 2.5rem;
+    opacity: 0;
+    animation: fadeIn 0.8s ease forwards 0.9s;
+  }
+
+  .hero-sub {
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.75;
+    max-width: 48ch;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 1s;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 3rem;
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 0.9rem 2.25rem;
+    transition: border-color 0.3s, color 0.3s;
+    opacity: 0;
+    animation: fadeUp 0.9s ease forwards 1.15s;
+  }
+  .hero-cta:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: fadeIn 1s ease forwards 1.5s;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--gold-dim), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+
+  .hero-scroll span {
+    font-size: 0.58rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  /* SECTIONS */
+  section { padding: 7rem 4rem; position: relative; }
+
+  .section-label {
+    font-size: 0.63rem;
+    font-weight: 400;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 3.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::after {
+    content: '';
+    display: block;
+    height: 1px;
+    width: 40px;
+    background: var(--gold-dim);
+  }
+
+  /* ABOUT */
+  .about { border-top: 1px solid var(--border); }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .about-headline {
+    font-family: 'Cormorant', serif;
+    font-weight: 300;
+    font-size: clamp(2.2rem, 3.5vw, 3.25rem);
+    line-height: 1.12;
+    color: var(--white);
+  }
+  .about-headline em { font-style: italic; color: var(--gold); }
+
+  .about-body {
+    font-size: 0.95rem;
+    line-height: 1.9;
+    color: var(--muted);
+    margin-bottom: 1.75rem;
+  }
+  .about-body:last-child { margin-bottom: 0; }
+
+  /* TEAM */
+  .team-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 5rem;
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
+  }
+
+  .team-member {
+    padding: 2rem;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .team-name {
+    font-family: 'Cormorant', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 0.3rem;
+  }
+
+  .team-role {
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* CREDENTIALS */
+  .credentials {
+    border-top: 1px solid var(--border);
+    background: var(--near-black);
+  }
+
+  .credentials-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .cred-item {
+    background: var(--surface);
+    padding: 2rem 2.5rem;
+    position: relative;
+  }
+
+  .cred-item.featured {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .cred-eyebrow {
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .cred-title {
+    font-family: 'Cormorant', serif;
+    font-size: clamp(1.6rem, 2.5vw, 2.25rem);
+    font-weight: 300;
+    color: var(--white);
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .cred-title em { font-style: italic; color: var(--gold); }
+
+  .cred-body {
+    font-size: 0.85rem;
+    line-height: 1.75;
+    color: var(--muted);
+  }
+
+  .award-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .award-list li {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .award-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 4px;
+    height: 1px;
+    background: var(--gold-dim);
+  }
+
+  .award-list li strong {
+    color: var(--white);
+    font-weight: 400;
+  }
+
+  /* WORK */
+  .work {
+    border-top: 1px solid var(--border);
+  }
+
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .work-item { position: relative; overflow: hidden; background: var(--surface); }
+  .work-item-1 { grid-column: 1 / 8; }
+  .work-item-2 { grid-column: 8 / 13; }
+  .work-item-3 { grid-column: 1 / 6; }
+  .work-item-4 { grid-column: 6 / 13; }
+
+  .work-img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .work-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .img-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .placeholder-cross {
+    width: 28px; height: 28px;
+    position: relative; opacity: 0.2;
+  }
+  .placeholder-cross::before,
+  .placeholder-cross::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0;
+    width: 100%; height: 1px;
+    background: var(--gold);
+  }
+  .placeholder-cross::before { transform: rotate(45deg); }
+  .placeholder-cross::after { transform: rotate(-45deg); }
+
+  .img-placeholder p {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .work-caption {
+    padding: 0.9rem 1.25rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .work-title {
+    font-family: 'Cormorant', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--white);
+  }
+
+  .work-tag {
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* CONTACT */
+  .contact { border-top: 1px solid var(--border); }
+
+  .contact-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+
+  .contact-headline {
+    font-family: 'Cormorant', serif;
+    font-weight: 300;
+    font-size: clamp(2.2rem, 3.5vw, 3.25rem);
+    line-height: 1.12;
+    color: var(--white);
+  }
+  .contact-headline em { font-style: italic; color: var(--gold); }
+
+  .contact-body {
+    font-size: 0.95rem;
+    line-height: 1.85;
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+  }
+
+  .contact-email {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Cormorant', serif;
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: var(--white);
+    text-decoration: none;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .contact-email:hover { color: var(--gold); border-color: var(--gold-dim); }
+  .contact-email span { color: var(--gold); display: inline-block; transition: transform 0.3s; }
+  .contact-email:hover span { transform: translate(3px,-3px); }
+
+  .contact-social {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .contact-social a {
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faint);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .contact-social a:hover { color: var(--gold); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-copy { font-size: 0.68rem; letter-spacing: 0.08em; color: var(--faint); }
+  .footer-logo {
+    font-family: 'Cormorant', serif;
+    font-weight: 300;
+    font-size: 0.85rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.85s ease, transform 0.85s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 1.5rem 2rem; }
+    .hero { padding: 7rem 2rem 5rem; }
+    section { padding: 5rem 2rem; }
+    .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .team-strip { grid-template-columns: 1fr; }
+    .credentials-grid { grid-template-columns: 1fr; }
+    .cred-item.featured { grid-template-columns: 1fr; gap: 2rem; }
+    .work-item-1, .work-item-2, .work-item-3, .work-item-4 { grid-column: 1 / -1; }
+    .contact-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+    footer { padding: 1.5rem 2rem; flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">Strange Goose</a>
+  <a href="#contact" class="nav-cta">Work with us</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <p class="hero-eyebrow">Strange Goose Productions &nbsp;·&nbsp; Edinburgh</p>
+  <h1 class="hero-title">
+    Proper film.
+    <em>Leaner process.</em>
+  </h1>
+  <div class="hero-divider"></div>
+  <p class="hero-sub">We're a professional production team — director, producer, cinematographer — making branded content with genuine craft at a pace traditional production companies can't offer.</p>
+  <a href="#contact" class="hero-cta">Work with us &nbsp;↗</a>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about">
+  <p class="section-label reveal">Who we are</p>
+  <div class="about-grid">
+    <div class="reveal">
+      <h2 class="about-headline">Not an agency.<br>Not a bedroom.<br><em>A film team.</em></h2>
+    </div>
+    <div class="reveal">
+      <p class="about-body">Strange Goose is a small, experienced production team based in Edinburgh. We've been making films — real ones, with crews, on locations, under pressure — for years. We know how to direct, how to shoot, how to cut, and how to make something that actually holds an audience.</p>
+      <p class="about-body">We've also built a production pipeline that lets us move faster and work leaner than a traditional company. For brands that need quality without a six-figure budget and a three-month timeline, that's a meaningful difference.</p>
+    </div>
+  </div>
+  <div class="team-strip reveal">
+    <div class="team-member">
+      <p class="team-name">Owen Coomber</p>
+      <p class="team-role">Director</p>
+    </div>
+    <div class="team-member">
+      <p class="team-name">Torya Winters</p>
+      <p class="team-role">Producer</p>
+    </div>
+    <div class="team-member">
+      <p class="team-name">Alex McNeill</p>
+      <p class="team-role">Cinematographer</p>
+    </div>
+  </div>
+</section>
+
+<!-- CREDENTIALS -->
+<section class="credentials">
+  <p class="section-label reveal">Track record</p>
+  <div class="credentials-grid reveal">
+
+    <!-- Fairytale Farm — featured -->
+    <div class="cred-item featured">
+      <div>
+        <p class="cred-eyebrow">Short film — international festival circuit</p>
+        <h3 class="cred-title"><em>Fairytale Farm</em></h3>
+        <p class="cred-body">Selected and awarded across five international film festivals, including Lift-Off Global Sessions. Our most-decorated short to date — and the clearest demonstration of what Strange Goose can do when given the space to make something properly.</p>
+      </div>
+      <ul class="award-list">
+        <li><strong>Best Micro Short</strong> — Birmingham Horror Festival</li>
+        <li><strong>Best Short</strong> — Holiday Horror Fest VIII</li>
+        <li><strong>Best Horror</strong> — Monza Film Fest</li>
+        <li><strong>Best Horror</strong> — Night of Shorts</li>
+        <li><strong>Best Horror</strong> — Reale Film Festival</li>
+        <li>Selected — Lift-Off Global Sessions</li>
+        <li>Selected — Geekapalooza &amp; Spook Screen</li>
+      </ul>
+    </div>
+
+    <!-- Aberdeen 2025 -->
+    <div class="cred-item">
+      <p class="cred-eyebrow">48hr Film Project — Aberdeen 2025</p>
+      <h3 class="cred-title"><em>Family Time</em></h3>
+      <p class="cred-body" style="margin-bottom:1.25rem;">Eight awards from a single competition — including Best Film, Best Directing, Best Actor, and the Braveheart Award. Made in a weekend.</p>
+      <ul class="award-list">
+        <li><strong>Best Film</strong></li>
+        <li><strong>Best Directing</strong></li>
+        <li><strong>Best Actor</strong></li>
+        <li><strong>Best Production Design</strong></li>
+        <li><strong>Best Song</strong></li>
+        <li><strong>Best Use of Genre</strong></li>
+        <li><strong>Best Use of Character</strong></li>
+        <li><strong>Braveheart Award</strong></li>
+      </ul>
+    </div>
+
+    <!-- Other work -->
+    <div class="cred-item">
+      <p class="cred-eyebrow">Other work</p>
+      <h3 class="cred-title">Seven competitions.<br><em>One commission.</em></h3>
+      <p class="cred-body">We've competed in 48hr film projects across Edinburgh, Inverness, Glasgow, and Aberdeen — collecting nominations and awards at every event. Most recently, we were commissioned to direct the music video for the winner of the Wild Song Songwriting Challenge 2026.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- WORK -->
+<section class="work">
+  <p class="section-label reveal">Selected work</p>
+  <div class="work-grid reveal">
+
+    <!-- Replace img-placeholder divs with <img src="filename.jpg" alt="..."> when stills are ready -->
+    <div class="work-item work-item-1">
+      <div class="work-img">
+        <div class="img-placeholder">
+          <div class="placeholder-cross"></div>
+          <p>Still image</p>
+        </div>
+      </div>
+      <div class="work-caption">
+        <span class="work-title">Fairytale Farm</span>
+        <span class="work-tag">Short film — festival circuit</span>
+      </div>
+    </div>
+
+    <div class="work-item work-item-2">
+      <div class="work-img">
+        <div class="img-placeholder">
+          <div class="placeholder-cross"></div>
+          <p>Still image</p>
+        </div>
+      </div>
+      <div class="work-caption">
+        <span class="work-title">Family Time</span>
+        <span class="work-tag">48hr — 8 awards</span>
+      </div>
+    </div>
+
+    <div class="work-item work-item-3">
+      <div class="work-img">
+        <div class="img-placeholder">
+          <div class="placeholder-cross"></div>
+          <p>Still image</p>
+        </div>
+      </div>
+      <div class="work-caption">
+        <span class="work-title">Still image</span>
+        <span class="work-tag">Short film</span>
+      </div>
+    </div>
+
+    <div class="work-item work-item-4">
+      <div class="work-img">
+        <div class="img-placeholder">
+          <div class="placeholder-cross"></div>
+          <p>Still image</p>
+        </div>
+      </div>
+      <div class="work-caption">
+        <span class="work-title">Still image</span>
+        <span class="work-tag">Short film</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div class="reveal">
+      <p class="section-label">Get in touch</p>
+      <h2 class="contact-headline">Let's make <em>something</em> worth watching.</h2>
+    </div>
+    <div class="reveal">
+      <p class="contact-body">If you're a brand that wants production with real craft behind it — without the timeline and budget of a traditional company — we'd like to hear from you.</p>
+      <a href="mailto:strangegooseproductions@gmail.com" class="contact-email">
+        strangegooseproductions@gmail.com
+        <span>↗</span>
+      </a>
+      <div class="contact-social">
+        <a href="https://www.instagram.com/strange_goose_productions" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.youtube.com/@strange_goose_productions" target="_blank" rel="noopener">YouTube</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p class="footer-copy">© 2025 Strange Goose Productions. Edinburgh, Scotland.</p>
+  <p class="footer-logo">Strange Goose</p>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
