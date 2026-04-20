@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SGP Production Budget Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0f0f;
+    --ink-mid: #444;
+    --ink-faint: #888;
+    --ink-ghost: #bbb;
+    --rule: #ddd;
+    --rule-light: #efefef;
+    --bg: #fafaf8;
+    --surface: #fff;
+    --accent: #0f0f0f;
+    --preprod-mark: #1a3a5c;
+    --prod-mark: #2d5a1b;
+    --post-mark: #5c2d1a;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* Header */
+  .header {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .header-left { }
+  .logo {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: var(--sans);
+    font-size: 28px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  /* Project config strip */
+  .config-strip {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+  }
+  .config-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 140px;
+  }
+  .config-field label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .config-field input, .config-field select {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 4px 0;
+    outline: none;
+    width: 100%;
+  }
+  .config-field input:focus, .config-field select:focus {
+    border-bottom-color: var(--ink);
+  }
+
+  /* Phase blocks */
+  .phase { margin-bottom: 40px; }
+
+  .phase-header {
+    display: grid;
+    grid-template-columns: 32px 1fr 90px 80px 60px 80px 40px;
+    gap: 0;
+    align-items: center;
+    padding: 8px 0 6px;
+    border-bottom: 1.5px solid var(--ink);
+    margin-bottom: 0;
+  }
+  .phase-header-label {
+    grid-column: 2;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .phase-header.preprod .phase-header-label { color: var(--preprod-mark); }
+  .phase-header.prod .phase-header-label { color: var(--prod-mark); }
+  .phase-header.post .phase-header-label { color: var(--post-mark); }
+
+  .col-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    text-align: right;
+  }
+  .col-label:nth-child(2) { text-align: left; }
+
+  /* Line rows */
+  .line-row {
+    display: grid;
+    grid-template-columns: 32px 1fr 90px 80px 60px 80px 40px;
+    gap: 0;
+    align-items: center;
+    border-bottom: 1px solid var(--rule-light);
+    min-height: 44px;
+    transition: background 0.1s;
+  }
+  .line-row:hover { background: #f5f5f2; }
+
+  .phase-tag {
+    width: 3px;
+    height: 28px;
+    border-radius: 2px;
+    justify-self: center;
+  }
+  .preprod .phase-tag { background: var(--preprod-mark); }
+  .prod .phase-tag { background: var(--prod-mark); }
+  .post .phase-tag { background: var(--post-mark); }
+
+  .line-name-wrap { padding: 8px 12px 8px 0; }
+  .line-name-input {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 2px 0;
+  }
+  .line-name-input:focus {
+    border-bottom: 1px dashed var(--ink-faint);
+  }
+  .line-source {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-ghost);
+    display: block;
+  }
+  .line-source a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .line-source a:hover { color: var(--ink-faint); text-decoration: underline; }
+
+  .line-cell {
+    text-align: right;
+    padding: 0 8px;
+  }
+  .line-cell input[type="number"] {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    outline: none;
+    width: 100%;
+    text-align: right;
+    padding: 3px 0;
+  }
+  .line-cell input[type="number"]:focus { border-bottom-color: var(--ink); }
+  .line-cell input[type="number"]::-webkit-outer-spin-button,
+  .line-cell input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .line-total {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    text-align: right;
+    padding: 0 8px;
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink-ghost);
+    font-size: 16px;
+    padding: 0 8px;
+    line-height: 1;
+    justify-self: center;
+    transition: color 0.1s;
+  }
+  .delete-btn:hover { color: #c0392b; }
+
+  /* Add line button */
+  .add-line-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px dashed var(--rule);
+    color: var(--ink-faint);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 9px 16px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.15s;
+    margin-top: 4px;
+  }
+  .add-line-btn:hover {
+    border-color: var(--ink-mid);
+    color: var(--ink-mid);
+    background: #f5f5f2;
+  }
+
+  /* Phase subtotal row */
+  .phase-subtotal {
+    display: grid;
+    grid-template-columns: 32px 1fr 90px 80px 60px 80px 40px;
+    gap: 0;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px solid var(--rule);
+    margin-top: 2px;
+  }
+  .phase-subtotal-label {
+    grid-column: 2 / 6;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    text-align: right;
+    padding-right: 8px;
+  }
+  .phase-subtotal-val {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    text-align: right;
+    padding-right: 8px;
+  }
+
+  /* Summary block */
+  .summary-block {
+    margin-top: 48px;
+    border-top: 2px solid var(--ink);
+    padding-top: 32px;
+  }
+
+  .summary-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 20px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .summary-cell {
+    background: var(--surface);
+    padding: 20px 20px 16px;
+  }
+  .summary-cell-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  .summary-cell-val {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .summary-cell-sub {
+    font-size: 11px;
+    color: var(--ink-ghost);
+    margin-top: 4px;
+  }
+
+  /* Contingency */
+  .contingency-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 12px 20px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+  }
+  .contingency-row label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+  input[type="range"] {
+    flex: 1;
+    accent-color: var(--ink);
+    height: 2px;
+  }
+  .contingency-row .range-val {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    min-width: 36px;
+    text-align: right;
+  }
+  .contingency-row .contingency-amount {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-mid);
+    min-width: 80px;
+    text-align: right;
+  }
+
+  /* Margin block */
+  .margin-section {
+    margin-top: 24px;
+    padding: 20px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+  }
+  .margin-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .margin-controls label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+  .margin-controls .range-val {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  .quote-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule);
+  }
+  .quote-label-group { }
+  .quote-main-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
+  }
+  .quote-breakdown {
+    font-size: 12px;
+    color: var(--ink-mid);
+  }
+  .quote-val {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .quote-profit {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+    text-align: right;
+    margin-top: 4px;
+  }
+
+  /* Sources */
+  .sources-section {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+  }
+  .sources-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+  }
+  .source-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .source-item {
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+  }
+  .source-item-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-mid);
+    min-width: 200px;
+    flex-shrink: 0;
+  }
+  .source-item-link {
+    font-size: 12px;
+    color: var(--ink-faint);
+    text-decoration: none;
+    word-break: break-all;
+  }
+  .source-item-link:hover { color: var(--ink); text-decoration: underline; }
+  .source-item-note {
+    font-size: 11px;
+    color: var(--ink-ghost);
+    margin-top: 2px;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-sgp {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-ghost);
+    line-height: 1.7;
+  }
+  .footer-sgp a { color: inherit; text-decoration: none; }
+  .footer-sgp a:hover { color: var(--ink-mid); }
+
+  /* Responsive */
+  @media (max-width: 680px) {
+    .page { padding: 24px 16px 60px; }
+    .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .header-meta { text-align: left; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    .phase-header, .line-row, .phase-subtotal {
+      grid-template-columns: 16px 1fr 70px 60px 50px 70px 32px;
+    }
+    .quote-display { flex-direction: column; gap: 12px; align-items: flex-start; }
+    .source-item { flex-direction: column; gap: 2px; }
+    .source-item-label { min-width: unset; }
+    h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">Strange Goose Productions</div>
+      <h1>Production Budget Tool</h1>
+    </div>
+    <div class="header-meta">
+      <span id="project-name-display">Untitled project</span><br>
+      Edinburgh / Glasgow rates<br>
+      APA · BECTU · Sept 2025
+    </div>
+  </div>
+
+  <div class="config-strip">
+    <div class="config-field">
+      <label>Project name</label>
+      <input type="text" id="proj-name" value="Trial project" oninput="document.getElementById('project-name-display').textContent=this.value||'Untitled project'">
+    </div>
+    <div class="config-field">
+      <label>Client</label>
+      <input type="text" id="proj-client" placeholder="—">
+    </div>
+    <div class="config-field">
+      <label>Shoot days</label>
+      <input type="number" id="proj-shoot-days" value="1" min="1">
+    </div>
+    <div class="config-field">
+      <label>Locations</label>
+      <input type="number" id="proj-locations" value="1" min="1">
+    </div>
+    <div class="config-field">
+      <label>Principal cast</label>
+      <input type="number" id="proj-cast" value="1" min="0">
+    </div>
+    <div class="config-field">
+      <label>Date</label>
+      <input type="date" id="proj-date">
+    </div>
+  </div>
+
+  <!-- PRE-PRODUCTION -->
+  <div class="phase" id="phase-preprod">
+    <div class="phase-header preprod">
+      <div></div>
+      <div class="phase-header-label">Pre-production</div>
+      <div class="col-label">rate (£)</div>
+      <div class="col-label">unit</div>
+      <div class="col-label">qty</div>
+      <div class="col-label">total</div>
+      <div></div>
+    </div>
+    <div class="lines" id="lines-preprod"></div>
+    <button class="add-line-btn" onclick="addLine('preprod')">+ Add line item</button>
+    <div class="phase-subtotal">
+      <span class="phase-subtotal-label">Pre-production subtotal</span>
+      <span class="phase-subtotal-val" id="subtotal-preprod">£0</span>
+      <div></div>
+    </div>
+  </div>
+
+  <!-- PRODUCTION -->
+  <div class="phase" id="phase-prod">
+    <div class="phase-header prod">
+      <div></div>
+      <div class="phase-header-label">Production — shoot day</div>
+      <div class="col-label">rate (£)</div>
+      <div class="col-label">unit</div>
+      <div class="col-label">qty</div>
+      <div class="col-label">total</div>
+      <div></div>
+    </div>
+    <div class="lines" id="lines-prod"></div>
+    <button class="add-line-btn" onclick="addLine('prod')">+ Add line item</button>
+    <div class="phase-subtotal">
+      <span class="phase-subtotal-label">Production subtotal</span>
+      <span class="phase-subtotal-val" id="subtotal-prod">£0</span>
+      <div></div>
+    </div>
+  </div>
+
+  <!-- POST-PRODUCTION -->
+  <div class="phase" id="phase-post">
+    <div class="phase-header post">
+      <div></div>
+      <div class="phase-header-label">Post-production</div>
+      <div class="col-label">rate (£)</div>
+      <div class="col-label">unit</div>
+      <div class="col-label">qty</div>
+      <div class="col-label">total</div>
+      <div></div>
+    </div>
+    <div class="lines" id="lines-post"></div>
+    <button class="add-line-btn" onclick="addLine('post')">+ Add line item</button>
+    <div class="phase-subtotal">
+      <span class="phase-subtotal-label">Post-production subtotal</span>
+      <span class="phase-subtotal-val" id="subtotal-post">£0</span>
+      <div></div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-block">
+    <div class="summary-title">Budget summary</div>
+
+    <div class="summary-grid">
+      <div class="summary-cell">
+        <div class="summary-cell-label">Pre-production</div>
+        <div class="summary-cell-val" id="sum-preprod">£0</div>
+      </div>
+      <div class="summary-cell">
+        <div class="summary-cell-label">Production</div>
+        <div class="summary-cell-val" id="sum-prod">£0</div>
+      </div>
+      <div class="summary-cell">
+        <div class="summary-cell-label">Post-production</div>
+        <div class="summary-cell-val" id="sum-post">£0</div>
+      </div>
+      <div class="summary-cell">
+        <div class="summary-cell-label">Subtotal (no contingency)</div>
+        <div class="summary-cell-val" id="sum-subtotal">£0</div>
+      </div>
+    </div>
+
+    <div class="contingency-row">
+      <label>Contingency</label>
+      <input type="range" id="contingency-slider" min="0" max="25" step="1" value="10" oninput="recalc()">
+      <span class="range-val" id="contingency-pct">10%</span>
+      <span class="contingency-amount" id="contingency-amt">£0</span>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:var(--surface);border:1px solid var(--rule);border-top:none;margin-bottom:0">
+      <span style="font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-faint)">Total hard cost (incl. contingency)</span>
+      <span style="font-family:var(--mono);font-size:18px;font-weight:500" id="sum-hardcost">£0</span>
+    </div>
+
+    <div class="margin-section">
+      <div class="margin-controls">
+        <label>SGP margin</label>
+        <input type="range" id="margin-slider" min="10" max="60" step="5" value="30" oninput="recalc()">
+        <span class="range-val" id="margin-pct">30%</span>
+      </div>
+      <div class="quote-display">
+        <div class="quote-label-group">
+          <div class="quote-main-label">Suggested client quote</div>
+          <div class="quote-breakdown" id="quote-breakdown"> </div>
+        </div>
+        <div style="text-align:right">
+          <div class="quote-val" id="quote-val">£0</div>
+          <div class="quote-profit" id="quote-profit"> </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOURCES -->
+  <div class="sources-section">
+    <div class="sources-title">Rate sources &amp; references</div>
+    <div class="source-list">
+      <div class="source-item">
+        <span class="source-item-label">APA crew terms (Sept 2025)</span>
+        <div>
+          <a class="source-item-link" href="https://www.a-p-a.net/content/uploads/2025/03/APA-Rate-Revision-September-2024-master-v3-1.pdf" target="_blank" rel="noopener">a-p-a.net — APA Recommended Crew Terms, Sept 2024 baseline</a>
+          <div class="source-item-note">4% increase applied Sept 2025 per APA/BECTU agreement. Gaffer, sound recordist, focus puller, camera op, MUA rates derived from this card. Scotland rates applied at ~10% below London APA equivalent.</div>
+        </div>
+      </div>
+      <div class="source-item">
+        <span class="source-item-label">BECTU Sparks — commercials</span>
+        <div>
+          <a class="source-item-link" href="https://sites.google.com/view/sparksbranch/rates-agreements/commercials" target="_blank" rel="noopener">sparksbranch.org — BECTU lighting technician commercials ratecard</a>
+          <div class="source-item-note">Gaffer/lighting tech shoot day rate confirmed at £512 (London, Sept 2025). Scotland adjusted to £460.</div>
+        </div>
+      </div>
+      <div class="source-item">
+        <span class="source-item-label">BECTU post-sound ratecard</span>
+        <div>
+          <a class="source-item-link" href="https://library.prospect.org.uk/download/2022/00426" target="_blank" rel="noopener">prospect.org.uk — BECTU post-sound rate card (2022/23, low budget band)</a>
+          <div class="source-item-note">FX editor / sound designer: £340/day (low budget band). Basis for post-production sound design rate. Apply ~3% annual uplift to current year.</div>
+        </div>
+      </div>
+      <div class="source-item">
+        <span class="source-item-label">Sound recordist APA day rate</span>
+        <div>
+          <a class="source-item-link" href="https://www.outwardsounds.com/rates-and-kit-hire" target="_blank" rel="noopener">outwardsounds.com — APA-rate sound recordist pricing</a>
+          <div class="source-item-note">APA commercial rate cited as £594/day + kit hire. Scotland adjusted to £560 + kit.</div>
+        </div>
+      </div>
+      <div class="source-item">
+        <span class="source-item-label">Freelance videographer day rate</span>
+        <div>
+          <a class="source-item-link" href="https://freelancerclub.net/resources/blog/post/freelance-rates-for-videographers-and-video-producers" target="_blank" rel="noopener">freelancerclub.net — UK freelance videographer rates</a>
+          <div class="source-item-note">Average UK freelance videographer day rate: £550. SGP team rates set above this baseline to reflect multi-role team + credentials.</div>
+        </div>
+      </div>
+      <div class="source-item">
+        <span class="source-item-label">UK corporate video market rates</span>
+        <div>
+          <a class="source-item-link" href="https://www.bearjam.co.uk/insights/how-much-does-corporate-video-production-cost-in-the-uk-2026-guide" target="_blank" rel="noopener">bearjam.co.uk — UK corporate video production cost guide 2026</a>
+          <div class="source-item-note">Market context: brand films across 1–2 shoot days typically land at £10,000–£25,000 for the client. Basis for margin benchmarking.</div>
+        </div>
+      </div>
+      <div class="source-item">
+        <span class="source-item-label">Music video UK budgets</span>
+        <div>
+          <a class="source-item-link" href="https://westream.uk/music-video-production" target="_blank" rel="noopener">westream.uk — music video production pricing UK</a>
+          <div class="source-item-note">UK music video budgets: simple performance £1,500–£5,000; moderate complexity £5,000–£20,000.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-sgp">
+      Strange Goose Productions &mdash; Edinburgh<br>
+      <a href="mailto:info@strangegoose.co.uk">info@strangegoose.co.uk</a> &middot;
+      <a href="https://www.strangegoose.co.uk" target="_blank" rel="noopener">strangegoose.co.uk</a>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--ink-ghost);text-align:right">
+      All figures excl. VAT<br>
+      Rates: APA/BECTU Sept 2025
+    </div>
+  </div>
+
+</div>
+
+<script>
+var lineCounter = 0;
+
+var defaultData = {
+  preprod: [
+    { name: 'Owen — director prep', source: 'SGP rate', sourceUrl: '', rate: 650, unit: 'day', qty: 3 },
+    { name: 'Torya — producer prep', source: 'SGP rate', sourceUrl: '', rate: 450, unit: 'day', qty: 4 },
+    { name: 'Location recce (travel + time)', source: 'Estimate', sourceUrl: '', rate: 200, unit: 'day', qty: 1 },
+    { name: 'Production insurance', source: 'Market rate', sourceUrl: '', rate: 350, unit: 'flat', qty: 1 },
+    { name: 'Casting admin', source: 'Estimate', sourceUrl: '', rate: 100, unit: 'flat', qty: 1 },
+  ],
+  prod: [
+    { name: 'Owen — director', source: 'SGP rate', sourceUrl: '', rate: 650, unit: 'day', qty: 1 },
+    { name: 'Alex — cinematographer', source: 'SGP rate', sourceUrl: '', rate: 600, unit: 'day', qty: 1 },
+    { name: 'Gaffer / lighting tech', source: 'APA/BECTU Sept 2025, Scotland', sourceUrl: 'https://sites.google.com/view/sparksbranch/rates-agreements/commercials', rate: 460, unit: 'day', qty: 1 },
+    { name: 'Sound recordist', source: 'APA Sept 2025, Scotland', sourceUrl: 'https://www.outwardsounds.com/rates-and-kit-hire', rate: 560, unit: 'day', qty: 1 },
+    { name: 'Sound kit hire', source: 'Standard allowance', sourceUrl: '', rate: 150, unit: 'day', qty: 1 },
+    { name: '1st AC / focus puller', source: 'APA Sept 2025, Scotland', sourceUrl: 'https://www.a-p-a.net/content/uploads/2025/03/APA-Rate-Revision-September-2024-master-v3-1.pdf', rate: 500, unit: 'day', qty: 1 },
+    { name: 'MUA / hair', source: 'BECTU / market rate, Scotland', sourceUrl: '', rate: 350, unit: 'day', qty: 1 },
+    { name: 'Runner', source: 'Market rate', sourceUrl: '', rate: 175, unit: 'day', qty: 1 },
+    { name: 'Principal cast (1 actor)', source: 'Equity minimum, commercial', sourceUrl: '', rate: 600, unit: 'day', qty: 1 },
+    { name: 'Camera / lighting kit hire', source: 'Market rate, Scotland', sourceUrl: '', rate: 400, unit: 'day', qty: 1 },
+    { name: 'Location fee', source: 'Estimate', sourceUrl: '', rate: 350, unit: 'flat', qty: 1 },
+    { name: 'Catering (10 people)', source: '£25/head', sourceUrl: '', rate: 250, unit: 'flat', qty: 1 },
+    { name: 'Transport / fuel / parking', source: 'Estimate', sourceUrl: '', rate: 150, unit: 'flat', qty: 1 },
+    { name: 'Consumables / art dept / misc', source: 'Estimate', sourceUrl: '', rate: 150, unit: 'flat', qty: 1 },
+  ],
+  post: [
+    { name: 'Owen — editing', source: 'SGP rate', sourceUrl: '', rate: 450, unit: 'day', qty: 5 },
+    { name: 'Sound design (freelance)', source: 'BECTU post-sound, low budget band', sourceUrl: 'https://library.prospect.org.uk/download/2022/00426', rate: 340, unit: 'day', qty: 2 },
+    { name: 'Music composition', source: 'Market rate, independent', sourceUrl: '', rate: 500, unit: 'day', qty: 3 },
+    { name: 'Colour grade (freelance)', source: 'Market rate, Scotland', sourceUrl: '', rate: 400, unit: 'day', qty: 2 },
+  ]
+};
+
+function fmt(n) {
+  return '£' + Math.round(n).toLocaleString('en-GB');
+}
+
+function buildLine(phase, item) {
+  lineCounter++;
+  var id = 'line-' + lineCounter;
+  var div = document.createElement('div');
+  div.className = 'line-row ' + phase;
+  div.dataset.id = id;
+  div.dataset.phase = phase;
+
+  var sourceHtml = item.sourceUrl
+    ? '<a href="' + item.sourceUrl + '" target="_blank" rel="noopener">' + escHtml(item.source) + '</a>'
+    : escHtml(item.source);
+
+  div.innerHTML =
+    '<div class="phase-tag"></div>' +
+    '<div class="line-name-wrap">' +
+      '<input class="line-name-input" type="text" value="' + escAttr(item.name) + '" placeholder="Line item name" oninput="recalc()">' +
+      '<span class="line-source">' + sourceHtml + '</span>' +
+    '</div>' +
+    '<div class="line-cell">' +
+      '<input type="number" min="0" step="1" value="' + item.rate + '" data-field="rate" onchange="recalc()" oninput="recalc()">' +
+    '</div>' +
+    '<div class="line-cell">' +
+      '<input type="text" style="font-family:var(--mono);font-size:11px;color:var(--ink-faint);background:transparent;border:none;border-bottom:1px solid var(--rule);outline:none;width:100%;text-align:right;padding:3px 0" value="' + escAttr(item.unit) + '" placeholder="unit" oninput="recalc()">' +
+    '</div>' +
+    '<div class="line-cell">' +
+      '<input type="number" min="0" step="0.5" value="' + item.qty + '" data-field="qty" onchange="recalc()" oninput="recalc()">' +
+    '</div>' +
+    '<div class="line-total" data-total>' + fmt(item.rate * item.qty) + '</div>' +
+    '<button class="delete-btn" onclick="removeLine(this)" title="Remove line">&#215;</button>';
+
+  return div;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function addLine(phase) {
+  var container = document.getElementById('lines-' + phase);
+  var item = { name: '', source: '', sourceUrl: '', rate: 0, unit: 'day', qty: 1 };
+  var row = buildLine(phase, item);
+  container.appendChild(row);
+  row.querySelector('.line-name-input').focus();
+  recalc();
+}
+
+function removeLine(btn) {
+  var row = btn.closest('.line-row');
+  row.remove();
+  recalc();
+}
+
+function phaseTotal(phase) {
+  var total = 0;
+  var rows = document.querySelectorAll('#lines-' + phase + ' .line-row');
+  rows.forEach(function(row) {
+    var rateEl = row.querySelector('input[data-field="rate"]');
+    var qtyEl = row.querySelector('input[data-field="qty"]');
+    var rate = parseFloat(rateEl ? rateEl.value : 0) || 0;
+    var qty = parseFloat(qtyEl ? qtyEl.value : 0) || 0;
+    var lineTotal = rate * qty;
+    total += lineTotal;
+    var totalEl = row.querySelector('[data-total]');
+    if (totalEl) totalEl.textContent = fmt(lineTotal);
+  });
+  return total;
+}
+
+function recalc() {
+  var pp = phaseTotal('preprod');
+  var pr = phaseTotal('prod');
+  var po = phaseTotal('post');
+  var subtotal = pp + pr + po;
+
+  var contingencyPct = (parseFloat(document.getElementById('contingency-slider').value) || 0) / 100;
+  var contingencyAmt = subtotal * contingencyPct;
+  var hardCost = subtotal + contingencyAmt;
+
+  var marginPct = (parseFloat(document.getElementById('margin-slider').value) || 30) / 100;
+  var quote = marginPct >= 1 ? hardCost * 2 : hardCost / (1 - marginPct);
+  var profit = quote - hardCost;
+
+  document.getElementById('subtotal-preprod').textContent = fmt(pp);
+  document.getElementById('subtotal-prod').textContent = fmt(pr);
+  document.getElementById('subtotal-post').textContent = fmt(po);
+  document.getElementById('sum-preprod').textContent = fmt(pp);
+  document.getElementById('sum-prod').textContent = fmt(pr);
+  document.getElementById('sum-post').textContent = fmt(po);
+  document.getElementById('sum-subtotal').textContent = fmt(subtotal);
+  document.getElementById('contingency-pct').textContent = Math.round(contingencyPct * 100) + '%';
+  document.getElementById('contingency-amt').textContent = fmt(contingencyAmt);
+  document.getElementById('sum-hardcost').textContent = fmt(hardCost);
+  document.getElementById('margin-pct').textContent = Math.round(marginPct * 100) + '%';
+  document.getElementById('quote-val').textContent = fmt(quote);
+  document.getElementById('quote-breakdown').textContent =
+    'Hard cost ' + fmt(hardCost) + ' + ' + Math.round(marginPct * 100) + '% margin';
+  document.getElementById('quote-profit').textContent =
+    'SGP profit: ' + fmt(profit);
+}
+
+function init() {
+  ['preprod','prod','post'].forEach(function(phase) {
+    var container = document.getElementById('lines-' + phase);
+    defaultData[phase].forEach(function(item) {
+      container.appendChild(buildLine(phase, item));
+    });
+  });
+  document.getElementById('proj-date').value = new Date().toISOString().split('T')[0];
+  recalc();
+}
+
+init();
+</script>
+</body>
+</html>
