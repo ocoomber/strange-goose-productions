@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commercial Production — Strange Goose Productions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0d0b;
+    --bg2: #161512;
+    --bg3: #1e1c18;
+    --text: #f0ebe3;
+    --text-muted: #8a8278;
+    --accent: #d4963a;
+    --accent-dim: rgba(212,150,58,0.15);
+    --border: rgba(240,235,227,0.07);
+    --border-accent: rgba(212,150,58,0.3);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── GRAIN OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.35;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: rgba(14,13,11,0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .nav-tagline {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 140px 48px 80px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .hero-eyebrow {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    max-width: 900px;
+    margin-bottom: 40px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--text-muted);
+    max-width: 560px;
+    line-height: 1.65;
+    margin-bottom: 48px;
+  }
+
+  .hero-scroll {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hero-scroll::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--text-muted);
+  }
+
+  /* ── SECTIONS ── */
+  section {
+    padding: 100px 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 56px;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(32px, 4vw, 52px);
+    line-height: 1.1;
+    margin-bottom: 32px;
+    max-width: 700px;
+  }
+
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .intro-text {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--text-muted);
+    max-width: 620px;
+    line-height: 1.7;
+    margin-bottom: 64px;
+  }
+
+  /* ── PROCESS STEPS ── */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0;
+    border: 1px solid var(--border);
+  }
+
+  .step {
+    padding: 40px 36px;
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+
+  .step:last-child { border-right: none; }
+
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 64px;
+    font-weight: 300;
+    line-height: 1;
+    color: rgba(240,235,227,0.06);
+    margin-bottom: 20px;
+    user-select: none;
+  }
+
+  .step-title {
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .step-body {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  /* ── DELIVERABLES ── */
+  .deliverables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    margin-top: 16px;
+  }
+
+  .del-card {
+    background: var(--bg2);
+    padding: 36px 32px;
+  }
+
+  .del-icon {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .del-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .del-body {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  /* ── CREDENTIALS ── */
+  .cred-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .cred-text p {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin-bottom: 24px;
+  }
+
+  .cred-text p strong {
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    align-self: start;
+  }
+
+  .stat {
+    background: var(--bg2);
+    padding: 32px 28px;
+  }
+
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* ── COMPARISON ── */
+  .comparison {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-top: 16px;
+  }
+
+  .comp-col {
+    background: var(--bg2);
+    padding: 36px 28px;
+  }
+
+  .comp-col.highlighted {
+    background: var(--accent-dim);
+    border: 1px solid var(--border-accent);
+    margin: -1px;
+  }
+
+  .comp-col-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .comp-col.highlighted .comp-col-label { color: var(--accent); }
+  .comp-col:not(.highlighted) .comp-col-label { color: var(--text-muted); }
+
+  .comp-item {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--text-muted);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.45;
+  }
+
+  .comp-item:last-child { border-bottom: none; }
+
+  .comp-col.highlighted .comp-item {
+    color: var(--text);
+  }
+
+  .tick {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+  }
+
+  /* ── CTA ── */
+  .cta-section {
+    padding: 120px 48px;
+    border-bottom: none;
+    text-align: center;
+  }
+
+  .cta-section h2 {
+    margin: 0 auto 24px;
+    text-align: center;
+    font-size: clamp(36px, 5vw, 64px);
+  }
+
+  .cta-section .cta-sub {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--text-muted);
+    max-width: 480px;
+    margin: 0 auto 56px;
+    line-height: 1.7;
+  }
+
+  .cta-email {
+    display: inline-block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-accent);
+    padding-bottom: 4px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .cta-email:hover {
+    color: var(--text);
+    border-color: var(--text);
+  }
+
+  .cta-note {
+    margin-top: 24px;
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 32px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer a {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.2s;
+  }
+
+  footer a:hover { color: var(--text); }
+
+  .footer-links { display: flex; gap: 28px; }
+
+  /* ── UTILITIES ── */
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: var(--accent);
+    margin: 0 0 48px;
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-tagline { display: none; }
+    .hero { padding: 120px 24px 64px; }
+    section { padding: 72px 24px; }
+    .steps { grid-template-columns: 1fr; }
+    .step { border-right: none; border-bottom: 1px solid var(--border); }
+    .step:last-child { border-bottom: none; }
+    .cred-layout { grid-template-columns: 1fr; gap: 48px; }
+    .comparison { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+    .footer-links { justify-content: center; }
+    .cta-section { padding: 80px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="https://www.strangegoose.co.uk" class="nav-logo">Strange Goose Productions</a>
+  <span class="nav-tagline">Proper film. Built differently.</span>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">Commercial Production — Edinburgh</p>
+  <h1>You need a video.<br><em>We handle everything</em><br>from brief to upload.</h1>
+  <p class="hero-sub">One conversation to start. A fixed price before anything is shot. Every format and length you need, labelled and ready to post — delivered in approximately two weeks.</p>
+  <p class="hero-scroll">How it works</p>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <p class="section-label">The process</p>
+  <h2>You don't need to<br><em>know anything about video.</em></h2>
+  <p class="intro-text">Most people who contact us have never commissioned a video before. That's fine. Our job is to make this easy — not to impress you with industry language.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <p class="step-title">One conversation</p>
+      <p class="step-body">Tell us what you're selling and what you're trying to achieve. That's it. We ask the questions. No briefs to fill in, no jargon to navigate.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <p class="step-title">We develop the idea</p>
+      <p class="step-body">We come back to you with a creative concept, a storyboard, and a fixed price. Nothing gets made until you've seen the plan and signed off on the cost.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <p class="step-title">We shoot it</p>
+      <p class="step-body">Our team — director, producer, cinematographer — handles the entire production day. You can be on set or not. Your call.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <p class="step-title">You get the files</p>
+      <p class="step-body">We edit and deliver every format and length you need, named by platform and ready to upload. Instagram Reel. YouTube pre-roll. TikTok. Stories. All of it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DELIVERABLES -->
+<section id="deliverables">
+  <p class="section-label">What you receive</p>
+  <h2>Every version you need.<br><em>Nothing you have to figure out.</em></h2>
+  <p class="intro-text">The files arrive named, sized, and ready. You don't need to know what 9:16 means or what a pre-roll is. We handle that.</p>
+  <div class="deliverables-grid">
+    <div class="del-card">
+      <p class="del-icon">Formats</p>
+      <p class="del-title">Every screen ratio</p>
+      <p class="del-body">Vertical for Instagram and TikTok. Square for feed posts. Widescreen for YouTube. All cut from the same shoot — no extra cost, no extra day.</p>
+    </div>
+    <div class="del-card">
+      <p class="del-icon">Lengths</p>
+      <p class="del-title">Short, shorter, shortest</p>
+      <p class="del-body">60 seconds for the full story. 30 seconds for an ad break. 10 seconds for a quick hit. Each one edited as its own piece — not just a trim.</p>
+    </div>
+    <div class="del-card">
+      <p class="del-icon">Labelling</p>
+      <p class="del-title">Named by platform</p>
+      <p class="del-body">Files arrive clearly named: "Instagram_Reel_60s", "YouTube_PreRoll_30s", "TikTok_15s". Open the folder. Upload the file. Done.</p>
+    </div>
+    <div class="del-card">
+      <p class="del-icon">Timeline</p>
+      <p class="del-title">~Two weeks, start to finish</p>
+      <p class="del-body">From first conversation to finished files, the typical turnaround is approximately two weeks. Faster is possible. We'll be straight with you about what's realistic.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section id="comparison">
+  <p class="section-label">Why Strange Goose</p>
+  <h2>Not a big agency.<br><em>Not a one-person operation.</em></h2>
+  <p class="intro-text">There are three options for a brand looking to make a video. Here's what each actually means in practice.</p>
+  <div class="comparison">
+    <div class="comp-col">
+      <p class="comp-col-label">London agency</p>
+      <div class="comp-item">Six-figure budget, easily</div>
+      <div class="comp-item">Three-month timeline, minimum</div>
+      <div class="comp-item">You're a small account</div>
+      <div class="comp-item">Layers of people between you and the director</div>
+      <div class="comp-item">Genuine cinematic craft</div>
+    </div>
+    <div class="comp-col highlighted">
+      <p class="comp-col-label">Strange Goose</p>
+      <div class="comp-item">Real-world budget, agreed in advance</div>
+      <div class="comp-item">Approximately two weeks</div>
+      <div class="comp-item">You deal directly with the director</div>
+      <div class="comp-item">One team, start to finish</div>
+      <div class="comp-item">Genuine cinematic craft</div>
+    </div>
+    <div class="comp-col">
+      <p class="comp-col-label">Social content shop</p>
+      <div class="comp-item">Low cost</div>
+      <div class="comp-item">Fast turnaround</div>
+      <div class="comp-item">Formats delivered</div>
+      <div class="comp-item">No creative development</div>
+      <div class="comp-item">Looks like everything else on the feed</div>
+    </div>
+  </div>
+</section>
+
+<!-- CREDENTIALS -->
+<section id="credentials">
+  <p class="section-label">Track record</p>
+  <div class="cred-layout">
+    <div class="cred-text">
+      <h2>Award-winning work.<br><em>Real budgets.</em></h2>
+      <div class="divider"></div>
+      <p>Strange Goose is a three-person film team based in Edinburgh — director Owen Coomber, producer Torya Winters, and cinematographer Alex McNeill. We make short films, music videos, and commercial content.</p>
+      <p>Our short film <em>Fairytale Farm</em> — shot for <strong>£50</strong> — won five festival awards and was selected for the Lift-Off Global Sessions. Our 48-hour competition films have accumulated wins and nominations across seven competitions in the past two years.</p>
+      <p>We tell you this not to impress you, but to make a practical point: <strong>we know how to get exceptional results on limited budgets, under real pressure, to a deadline.</strong> That's exactly what a commercial production needs to be.</p>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <p class="stat-num">5+</p>
+        <p class="stat-label">Festival wins for<br>Fairytale Farm alone</p>
+      </div>
+      <div class="stat">
+        <p class="stat-num">£50</p>
+        <p class="stat-label">Budget for our<br>most-awarded film</p>
+      </div>
+      <div class="stat">
+        <p class="stat-num">7</p>
+        <p class="stat-label">48-hour film<br>competitions entered</p>
+      </div>
+      <div class="stat">
+        <p class="stat-num">~2wk</p>
+        <p class="stat-label">Typical brief-to-delivery<br>turnaround</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Tell us what<br><em>you're after.</em></h2>
+  <p class="cta-sub">You don't need a brief prepared. You don't need to know what you need. Just send us an email and we'll take it from there.</p>
+  <a class="cta-email" href="mailto:info@strangegoose.co.uk">info@strangegoose.co.uk</a>
+  <p class="cta-note">Based in Edinburgh &nbsp;·&nbsp; Available across Scotland &nbsp;·&nbsp; <a href="https://www.strangegoose.co.uk" style="color:var(--text-muted); text-decoration:none;">strangegoose.co.uk</a></p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="https://www.strangegoose.co.uk">Strange Goose Productions &copy; 2025</a>
+  <div class="footer-links">
+    <a href="https://www.instagram.com/strange_goose_productions">Instagram</a>
+    <a href="https://www.youtube.com/@strange_goose_productions">YouTube</a>
+    <a href="mailto:info@strangegoose.co.uk">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>
