@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plain English Glossary — Strange Goose Productions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site/styles.css">
+<style>
+
+  /* ── HEADER ── */
+  .page-header {
+    padding: 72px 0 64px;
+    border-bottom: 1px solid rgba(20,18,15,0.1);
+  }
+  .page-header h1 {
+    font-size: clamp(44px, 6vw, 80px);
+    letter-spacing: -0.03em;
+    line-height: 0.96;
+    max-width: 16ch;
+    margin-bottom: 20px;
+  }
+  .page-header h1 .accent { color: var(--accent); }
+  .page-header .sub {
+    font-size: 17px;
+    color: var(--ink-2);
+    max-width: 56ch;
+    line-height: 1.65;
+  }
+
+  /* ── SEARCH + TABS ── */
+  .controls {
+    position: sticky;
+    top: 49px;
+    z-index: 30;
+    background: var(--paper);
+    border-bottom: 1px solid rgba(20,18,15,0.1);
+  }
+  .search-row {
+    padding: 16px 40px;
+    border-bottom: 1px solid rgba(20,18,15,0.06);
+  }
+  .search-wrap { position: relative; max-width: 400px; }
+  .search-icon {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-3);
+    pointer-events: none;
+    letter-spacing: 0;
+  }
+  #search {
+    width: 100%;
+    background: var(--paper-2);
+    border: 1px solid rgba(20,18,15,0.1);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 400;
+    padding: 10px 14px 10px 34px;
+    outline: none;
+    transition: border-color 0.15s;
+    border-radius: 2px;
+  }
+  #search::placeholder { color: var(--muted); }
+  #search:focus { border-color: var(--accent); }
+
+  .tabs-row {
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs-row::-webkit-scrollbar { display: none; }
+  .tab {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 14px 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── GLOSSARY BODY ── */
+  .glossary-body { padding: 0 40px 80px; }
+
+  .glossary-section { padding-top: 64px; }
+
+  .section-head {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-head::before { content: ''; width: 24px; height: 1px; background: var(--accent); }
+  .section-head::after { content: ''; flex: 1; max-width: 160px; height: 1px; background: rgba(20,18,15,0.1); }
+
+  /* ── TERM ROWS ── */
+  .term-list { display: flex; flex-direction: column; }
+
+  .term-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 48px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(20,18,15,0.08);
+    align-items: baseline;
+  }
+  .term-row:last-child { border-bottom: none; }
+  .term-row.hidden { display: none; }
+
+  .term-word {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .term-right { display: flex; flex-direction: column; gap: 5px; }
+
+  .term-plain {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.55;
+  }
+
+  .term-detail {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink-2);
+    line-height: 1.65;
+    max-width: 64ch;
+  }
+
+  .term-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 3px 8px;
+    margin-top: 4px;
+    align-self: start;
+    border-radius: 2px;
+  }
+
+  /* ── NO RESULTS ── */
+  .no-results {
+    display: none;
+    padding: 72px 0;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  @media (max-width: 800px) {
+    .search-row { padding: 14px 20px; }
+    .tabs-row { padding: 0 20px; }
+    .glossary-body { padding: 0 20px 64px; }
+    .term-row { grid-template-columns: 1fr; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <a href="index.html" class="brand"><span class="goose-glyph"></span>Strange Goose</a>
+  <div class="links">
+    <a href="work.html">Work</a>
+    <a href="commercial.html">Commercial</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html" class="active">Glossary</a>
+  </div>
+  <a href="contact.html" class="cta">Work with us →</a>
+</nav>
+
+<section class="page-header">
+  <div class="wrap">
+    <p class="eyebrow" style="margin-bottom:28px;"><span class="goose-glyph"></span>Plain English</p>
+    <h1>What does that<br><span class="accent">actually mean?</span></h1>
+    <p class="sub">Every term you'll encounter when commissioning a video — explained without the jargon. If someone says it to you and you're not sure what it means, it's probably in here.</p>
+  </div>
+</section>
+
+<div class="controls">
+  <div class="search-row">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search" placeholder="Search any term…" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+  <div class="tabs-row" id="tabs">
+    <button class="tab active" data-filter="all">All</button>
+    <button class="tab" data-filter="formats">Formats &amp; ratios</button>
+    <button class="tab" data-filter="platforms">Platforms</button>
+    <button class="tab" data-filter="lengths">Lengths &amp; versions</button>
+    <button class="tab" data-filter="production">Production process</button>
+    <button class="tab" data-filter="marketing">Marketing</button>
+  </div>
+</div>
+
+<div class="glossary-body">
+  <p class="no-results" id="no-results">No terms match your search.</p>
+
+  <!-- FORMATS & RATIOS -->
+  <div class="glossary-section" data-section="formats">
+    <p class="section-head">Formats &amp; ratios</p>
+    <div class="term-list">
+
+      <div class="term-row" data-category="formats" data-terms="16:9 widescreen landscape horizontal tv youtube">
+        <div class="term-word">16:9</div>
+        <div class="term-right">
+          <div class="term-plain">Widescreen. What a TV looks like.</div>
+          <div class="term-detail">The standard horizontal format — wider than it is tall. Used for YouTube, cinema screens, and anything designed to be watched on a laptop or TV. Not ideal for phones held upright.</div>
+          <span class="term-tag">Formats &amp; ratios</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="formats" data-terms="9:16 vertical portrait phone reels tiktok stories">
+        <div class="term-word">9:16</div>
+        <div class="term-right">
+          <div class="term-plain">Vertical. What your phone looks like when you hold it normally.</div>
+          <div class="term-detail">The format made for phones held upright. Used for Instagram Reels, TikTok, YouTube Shorts, and Stories. If you're making something primarily for social, this is likely your main format.</div>
+          <span class="term-tag">Formats &amp; ratios</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="formats" data-terms="1:1 square instagram feed">
+        <div class="term-word">1:1</div>
+        <div class="term-right">
+          <div class="term-plain">Square. Equal width and height.</div>
+          <div class="term-detail">Historically the Instagram format. Still used for feed posts. Takes up more screen space than widescreen when scrolling, which can help grab attention. Not quite as dominant now that vertical has taken over.</div>
+          <span class="term-tag">Formats &amp; ratios</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="formats" data-terms="4:5 portrait tall instagram feed">
+        <div class="term-word">4:5</div>
+        <div class="term-right">
+          <div class="term-plain">Slightly taller than square. The format that takes up the most space on an Instagram feed without being fully vertical.</div>
+          <div class="term-detail">A useful middle ground for Instagram feed posts — taller than 1:1, so it takes up more of the screen while scrolling, but not quite as extreme as full 9:16 vertical.</div>
+          <span class="term-tag">Formats &amp; ratios</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="formats" data-terms="4K 1080p resolution HD quality sharpness">
+        <div class="term-word">4K / 1080p</div>
+        <div class="term-right">
+          <div class="term-plain">How sharp the image is. 4K is sharper than 1080p. Both look fine on social media.</div>
+          <div class="term-detail">These are resolution standards. 1080p (Full HD) is the broadcast standard and looks crisp on any screen. 4K is four times the resolution — relevant if the footage will ever be used on a large screen or cinema. For Instagram or YouTube, the difference is rarely noticeable to viewers.</div>
+          <span class="term-tag">Formats &amp; ratios</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PLATFORMS -->
+  <div class="glossary-section" data-section="platforms">
+    <p class="section-head">Platforms</p>
+    <div class="term-list">
+
+      <div class="term-row" data-category="platforms" data-terms="instagram reel reels vertical discovery algorithm">
+        <div class="term-word">Instagram Reel</div>
+        <div class="term-right">
+          <div class="term-plain">Instagram's main short video format. Vertical, up to 90 seconds, shown to people who don't already follow you.</div>
+          <div class="term-detail">The primary way new people discover you on Instagram right now. The algorithm actively pushes Reels to non-followers, which makes it the most useful format for reach. Shot in 9:16.</div>
+          <span class="term-tag">Platforms</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="platforms" data-terms="instagram story stories 24 hours disappear followers">
+        <div class="term-word">Instagram Story</div>
+        <div class="term-right">
+          <div class="term-plain">A vertical clip that disappears after 24 hours, only shown to people who already follow you.</div>
+          <div class="term-detail">Stories appear at the top of the app for your existing followers. They're good for updates and reminders to people who already know you — not the format to use if you're trying to reach new people.</div>
+          <span class="term-tag">Platforms</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="platforms" data-terms="instagram feed post grid profile permanent">
+        <div class="term-word">Instagram feed post</div>
+        <div class="term-right">
+          <div class="term-plain">A video (or image) that sits permanently on your Instagram profile grid.</div>
+          <div class="term-detail">Unlike Stories, feed posts don't disappear. They live on your profile and can be found later. Less dominant for discovery than Reels, but still the thing people see when they land on your page.</div>
+          <span class="term-tag">Platforms</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="platforms" data-terms="tiktok vertical algorithm for you page discovery">
+        <div class="term-word">TikTok</div>
+        <div class="term-right">
+          <div class="term-plain">A vertical short-video platform with a very powerful algorithm for reaching new audiences.</div>
+          <div class="term-detail">TikTok's For You Page shows content to non-followers aggressively — a single video can reach millions of people who've never heard of you. Always vertical (9:16). A video made for Instagram Reels will usually work here too.</div>
+          <span class="term-tag">Platforms</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="platforms" data-terms="youtube pre-roll ad skippable 5 seconds before video">
+        <div class="term-word">YouTube pre-roll</div>
+        <div class="term-right">
+          <div class="term-plain">The advert that plays before a YouTube video. Viewers can skip it after 5 seconds.</div>
+          <div class="term-detail">Because most people skip at 5 seconds, the first few seconds are critical. Pre-roll ads are widescreen (16:9) and typically 15–30 seconds. You only pay (in advertising terms) if someone watches past the skip point.</div>
+          <span class="term-tag">Platforms</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="platforms" data-terms="youtube bumper 6 second non-skippable short">
+        <div class="term-word">YouTube bumper</div>
+        <div class="term-right">
+          <div class="term-plain">A 6-second YouTube ad that cannot be skipped.</div>
+          <div class="term-detail">Short and unavoidable. Because viewers can't skip, every second counts. Bumpers work well for brand recognition — a quick visual impression rather than a full story. Usually used alongside longer ads rather than on their own.</div>
+          <span class="term-tag">Platforms</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="platforms" data-terms="youtube shorts vertical under 60 seconds">
+        <div class="term-word">YouTube Shorts</div>
+        <div class="term-right">
+          <div class="term-plain">YouTube's vertical short-video format, equivalent to TikTok and Reels.</div>
+          <div class="term-detail">Vertical (9:16), under 60 seconds. If you're making a Reel, you usually have a Shorts version for free — same file, same cut. YouTube's algorithm is also pushing Shorts aggressively to new viewers.</div>
+          <span class="term-tag">Platforms</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="platforms" data-terms="in-feed ad paid sponsored social scroll">
+        <div class="term-word">In-feed ad</div>
+        <div class="term-right">
+          <div class="term-plain">A paid video that appears in someone's social media scroll, looking like normal content.</div>
+          <div class="term-detail">As opposed to a pre-roll (which plays before something else), in-feed ads appear in the main feed as people scroll. They blend in more than banner ads, which generally makes them more effective.</div>
+          <span class="term-tag">Platforms</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LENGTHS & VERSIONS -->
+  <div class="glossary-section" data-section="lengths">
+    <p class="section-head">Lengths &amp; versions</p>
+    <div class="term-list">
+
+      <div class="term-row" data-category="lengths" data-terms="hero film master full length version original">
+        <div class="term-word">Hero film / master</div>
+        <div class="term-right">
+          <div class="term-plain">The full-length version of the film. Everything else is edited down from this.</div>
+          <div class="term-detail">The master is the complete cut — usually 60–90 seconds for a commercial. All shorter versions (30s, 15s, 10s) are made by working from this original. You only need to shoot once to produce multiple lengths.</div>
+          <span class="term-tag">Lengths &amp; versions</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="lengths" data-terms="cut-down shorter version 30s 15s 10s edit">
+        <div class="term-word">Cut-down</div>
+        <div class="term-right">
+          <div class="term-plain">A shorter version of the main film, edited down for a specific use.</div>
+          <div class="term-detail">A 60-second hero film might have a 30-second cut-down for pre-roll and a 10-second cut-down for a bumper ad. Each one is edited as its own piece — not just a trim — to make sure it works at that length. You get all of these from a single shoot day.</div>
+          <span class="term-tag">Lengths &amp; versions</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="lengths" data-terms="deliverables files final output package formats">
+        <div class="term-word">Deliverables</div>
+        <div class="term-right">
+          <div class="term-plain">The files you receive at the end. All of them.</div>
+          <div class="term-detail">When a production company talks about deliverables, they mean the complete package of finished files — every format, every length, ready to use. A good deliverables package is named clearly so you know exactly what to upload where.</div>
+          <span class="term-tag">Lengths &amp; versions</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="lengths" data-terms="master file highest quality original archive keep">
+        <div class="term-word">Master file</div>
+        <div class="term-right">
+          <div class="term-plain">The highest quality version of the finished film. Keep this safe.</div>
+          <div class="term-detail">The master file is the full-resolution version of the final edit. You don't upload this anywhere — you upload the platform-optimised versions. But you keep the master in case you ever need to reformat for something new in future.</div>
+          <span class="term-tag">Lengths &amp; versions</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PRODUCTION PROCESS -->
+  <div class="glossary-section" data-section="production">
+    <p class="section-head">Production process</p>
+    <div class="term-list">
+
+      <div class="term-row" data-category="production" data-terms="brief briefing what you want commission document">
+        <div class="term-word">Brief</div>
+        <div class="term-right">
+          <div class="term-plain">What you tell the production company about what you want.</div>
+          <div class="term-detail">A brief can be a formal document, an email, or just a conversation. It covers what the video is for, who it's aimed at, what you want people to feel or do after watching it, and any practical requirements. The clearer the brief, the better the result — but you don't need to know all the answers upfront.</div>
+          <span class="term-tag">Production process</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="production" data-terms="treatment creative response director concept vision">
+        <div class="term-word">Treatment</div>
+        <div class="term-right">
+          <div class="term-plain">The director's written response to your brief — explains their creative idea before anything is made.</div>
+          <div class="term-detail">A treatment describes the tone, look, structure, and feel of what the director wants to make — before a camera is switched on. Reviewing and approving the treatment is how you make sure you and the director are making the same film.</div>
+          <span class="term-tag">Production process</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="production" data-terms="storyboard drawings visual plan shots scenes pre-production">
+        <div class="term-word">Storyboard</div>
+        <div class="term-right">
+          <div class="term-plain">A drawn or illustrated plan of what each shot in the film will look like.</div>
+          <div class="term-detail">Think of it like a comic strip version of the finished film. Each panel represents a shot, showing the framing, the action, and the sequence. Storyboards let you see the shape of the film before the shoot — useful for approving the idea and for the crew to work from on the day.</div>
+          <span class="term-tag">Production process</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="production" data-terms="shoot day filming on set production camera crew">
+        <div class="term-word">Shoot day</div>
+        <div class="term-right">
+          <div class="term-plain">The day (or days) when the filming actually happens.</div>
+          <div class="term-detail">Everything before this is pre-production (planning). Everything after is post-production (editing). The shoot day is when the camera rolls. For most commercial projects, this is one day — which is why preparation beforehand matters.</div>
+          <span class="term-tag">Production process</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="production" data-terms="rough cut first edit draft feedback review">
+        <div class="term-word">Rough cut</div>
+        <div class="term-right">
+          <div class="term-plain">The first edit. Not finished. Shown for feedback before the final version.</div>
+          <div class="term-detail">A rough cut has all the pieces in the right order but won't have final colour, music, or sound polish. It's shown to the client to check the story, pacing, and structure before the finishing work begins. This is the right moment for major feedback — not after picture lock.</div>
+          <span class="term-tag">Production process</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="production" data-terms="picture lock locked edit final no changes">
+        <div class="term-word">Picture lock</div>
+        <div class="term-right">
+          <div class="term-plain">The point at which the edit is final. No more changes to the cut.</div>
+          <div class="term-detail">Once picture is locked, the colourist and sound designer do their work on a fixed version. Asking for changes after picture lock means redoing that work — which costs time and usually money. This is why the rough cut stage matters.</div>
+          <span class="term-tag">Production process</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="production" data-terms="colour grade grading look feel post colour adjust">
+        <div class="term-word">Colour grade</div>
+        <div class="term-right">
+          <div class="term-plain">Adjusting how the footage looks in terms of colour, contrast, and tone. The difference between "filmed" and "finished."</div>
+          <div class="term-detail">Raw footage from a camera is intentionally flat so the colourist has maximum control. Grading is where the visual look of the film is created — warm or cold, bright or dark, filmic or clean. It's a significant creative step with a huge effect on the feel of the finished film.</div>
+          <span class="term-tag">Production process</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="production" data-terms="voiceover VO narration voice audio recorded">
+        <div class="term-word">Voiceover (VO)</div>
+        <div class="term-right">
+          <div class="term-plain">A voice heard over the film that isn't visible on screen.</div>
+          <div class="term-detail">Voiceover narration is recorded separately from the shoot and laid over the edit. It can be used to tell a story, explain something, or add a call to action. A professional VO artist can record remotely — no studio required.</div>
+          <span class="term-tag">Production process</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="production" data-terms="supers text on screen lower thirds overlay caption legal">
+        <div class="term-word">Supers</div>
+        <div class="term-right">
+          <div class="term-plain">Text that appears on screen over the video image.</div>
+          <div class="term-detail">From "superimposed text." This covers anything from a product name appearing on screen to the small legal disclaimer text that runs at the bottom of some adverts. Also includes lower thirds — the name/title captions you see in interview-style videos.</div>
+          <span class="term-tag">Production process</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="production" data-terms="GFX motion graphics animation titles animated logo">
+        <div class="term-word">GFX / motion graphics</div>
+        <div class="term-right">
+          <div class="term-plain">Animated graphics added to the film in post-production. Logos that fly in, animated titles, that kind of thing.</div>
+          <div class="term-detail">GFX covers anything created in a computer and added over the footage — animated logo reveals, kinetic text, transitions, or visual effects. These are created after the shoot, in post-production, and are often where a brand's visual identity gets applied to the film.</div>
+          <span class="term-tag">Production process</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MARKETING -->
+  <div class="glossary-section" data-section="marketing">
+    <p class="section-head">Marketing jargon</p>
+    <div class="term-list">
+
+      <div class="term-row" data-category="marketing" data-terms="CTA call to action button link next step response">
+        <div class="term-word">Call to action (CTA)</div>
+        <div class="term-right">
+          <div class="term-plain">The thing you want someone to do after watching. "Visit our website." "Book now." "Follow us."</div>
+          <div class="term-detail">Every piece of commercial video should have a clear answer to "and then what?" — that's the call to action. It might be a line of dialogue, a super on screen, a link in the caption, or all three. Without one, you're hoping people know what to do next.</div>
+          <span class="term-tag">Marketing</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="marketing" data-terms="organic free no paid natural algorithm following">
+        <div class="term-word">Organic</div>
+        <div class="term-right">
+          <div class="term-plain">Content posted without paying to promote it. It reaches whoever sees it naturally.</div>
+          <div class="term-detail">Organic reach depends on your existing following and whether the algorithm picks it up. Good organic content can spread widely — but there's no guarantee. The opposite of organic is paid or boosted, where you pay to put the content in front of a specific audience.</div>
+          <span class="term-tag">Marketing</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="marketing" data-terms="paid boosted promoted sponsored advertising budget audience">
+        <div class="term-word">Paid / boosted</div>
+        <div class="term-right">
+          <div class="term-plain">Content you've paid to show to a specific audience, beyond your existing followers.</div>
+          <div class="term-detail">Boosting a post means paying the platform to show it to more people — you choose who, based on age, location, interests, and so on. Paid advertising gives you control over reach that organic content can't guarantee.</div>
+          <span class="term-tag">Marketing</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="marketing" data-terms="reach how many people see unique viewers">
+        <div class="term-word">Reach</div>
+        <div class="term-right">
+          <div class="term-plain">How many individual people have seen your content.</div>
+          <div class="term-detail">Reach counts unique viewers — if the same person watches your video five times, that's still a reach of one. It's the measure of how wide your content has spread, as opposed to impressions, which count every individual view including repeats.</div>
+          <span class="term-tag">Marketing</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="marketing" data-terms="impressions views times seen total including repeat">
+        <div class="term-word">Impressions</div>
+        <div class="term-right">
+          <div class="term-plain">How many times your content has been seen in total, including repeat views.</div>
+          <div class="term-detail">If 100 people each watch your video twice, that's 100 reach and 200 impressions. Impressions are always equal to or higher than reach. High impressions relative to reach means people are watching more than once, which is usually a good sign.</div>
+          <span class="term-tag">Marketing</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="marketing" data-terms="engagement likes comments shares saves interactions active">
+        <div class="term-word">Engagement</div>
+        <div class="term-right">
+          <div class="term-plain">Any active response to your content — likes, comments, shares, saves.</div>
+          <div class="term-detail">Engagement measures how many people interacted with your content, not just watched it. High engagement signals to the algorithm that the content is worth showing to more people. Saves and shares are generally weighted more heavily than likes by most platforms.</div>
+          <span class="term-tag">Marketing</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="marketing" data-terms="brand awareness knowing you exist top of funnel discovery">
+        <div class="term-word">Brand awareness</div>
+        <div class="term-right">
+          <div class="term-plain">How many people know your brand exists.</div>
+          <div class="term-detail">Awareness-led content is designed to introduce you to new people — it's not trying to make a sale right now, it's trying to make sure that when someone needs what you offer, they've already heard of you. Most short-form commercial video is awareness work.</div>
+          <span class="term-tag">Marketing</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="marketing" data-terms="conversion buy click sign up goal achieved sale">
+        <div class="term-word">Conversion</div>
+        <div class="term-right">
+          <div class="term-plain">When someone does the thing you wanted them to do — buys, books, signs up, clicks.</div>
+          <div class="term-detail">Conversion is the end goal. A "conversion rate" is the percentage of people who saw your content and then did the thing. High-converting content typically needs a very clear call to action and is often aimed at people who already know who you are.</div>
+          <span class="term-tag">Marketing</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="marketing" data-terms="funnel marketing awareness consideration conversion journey stages">
+        <div class="term-word">The funnel</div>
+        <div class="term-right">
+          <div class="term-plain">The journey from someone not knowing you exist, to them buying from you.</div>
+          <div class="term-detail">The top of the funnel is awareness (lots of people). The middle is consideration (they're interested). The bottom is conversion (they buy). Most brands focus on the bottom and forget the top — but if no one knows you exist, there's no one to convert.</div>
+          <span class="term-tag">Marketing</span>
+        </div>
+      </div>
+
+      <div class="term-row" data-category="marketing" data-terms="above the fold visible first screen without scrolling hero">
+        <div class="term-word">Above the fold</div>
+        <div class="term-right">
+          <div class="term-plain">The part of a webpage visible without scrolling. What someone sees the moment they land.</div>
+          <div class="term-detail">Borrowed from print — broadsheet newspapers put the most important story above the physical fold. Online, it means the first screenful. If your video is embedded on a website, where it sits relative to the fold affects how many people will actually see it.</div>
+          <span class="term-tag">Marketing</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<footer class="site">
+  <div><span class="goose-glyph"></span>&nbsp; Strange Goose · © 2026</div>
+  <div class="links">
+    <a href="work.html">Work</a>
+    <a href="commercial.html">Commercial</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</footer>
+
+<script>
+  const searchInput = document.getElementById('search');
+  const tabs = document.querySelectorAll('.tab');
+  const noResults = document.getElementById('no-results');
+  let activeFilter = 'all';
+
+  function update() {
+    const query = searchInput.value.toLowerCase().trim();
+    const rows = document.querySelectorAll('.term-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const cat = row.dataset.category;
+      const terms = (row.dataset.terms || '') + ' ' + row.textContent;
+      const matchesFilter = activeFilter === 'all' || cat === activeFilter;
+      const matchesSearch = !query || terms.toLowerCase().includes(query);
+      const show = matchesFilter && matchesSearch;
+      row.classList.toggle('hidden', !show);
+      if (show) visibleCount++;
+    });
+
+    document.querySelectorAll('.glossary-section').forEach(section => {
+      const sectionFilter = section.dataset.section;
+      const filterMatch = activeFilter === 'all' || activeFilter === sectionFilter;
+      const hasVisible = section.querySelectorAll('.term-row:not(.hidden)').length > 0;
+      section.style.display = (filterMatch && hasVisible) ? '' : 'none';
+    });
+
+    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+  }
+
+  searchInput.addEventListener('input', update);
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeFilter = tab.dataset.filter;
+      update();
+    });
+  });
+</script>
+
+</body>
+</html>
