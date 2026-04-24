@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Strange Goose Productions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site/styles.css">
+<style>
+
+  .page-header {
+    padding: 72px 0 64px;
+    border-bottom: 1px solid rgba(20,18,15,0.1);
+  }
+  .page-header h1 {
+    font-size: clamp(44px, 6vw, 80px);
+    letter-spacing: -0.03em;
+    line-height: 0.96;
+    margin-bottom: 20px;
+  }
+  .page-header h1 .accent { color: var(--accent); }
+  .page-header .sub {
+    font-size: 17px;
+    color: var(--ink-2);
+    max-width: 56ch;
+    line-height: 1.65;
+  }
+
+  /* ── COMPANY BIO ── */
+  .company-bio {
+    padding: 72px 0;
+    border-bottom: 1px solid rgba(20,18,15,0.1);
+  }
+  .company-bio-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .company-bio h2 {
+    font-size: clamp(28px, 3.5vw, 44px);
+    letter-spacing: -0.025em;
+    margin-bottom: 24px;
+    line-height: 1.05;
+  }
+  .company-bio h2 .accent { color: var(--accent); }
+  .company-bio p {
+    font-size: 16px;
+    color: var(--ink-2);
+    line-height: 1.75;
+    margin-bottom: 20px;
+    max-width: 52ch;
+  }
+  .company-bio p strong { color: var(--ink); font-weight: 600; }
+
+  .positioning-block {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 40px;
+  }
+  .positioning-block p {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin-bottom: 24px;
+    max-width: none;
+    color: var(--paper);
+  }
+  .positioning-block .tagline {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0;
+    font-weight: 400;
+    font-size: 11px;
+  }
+
+  /* ── CREW ── */
+  .crew-section {
+    padding: 72px 0;
+    border-bottom: 1px solid rgba(20,18,15,0.1);
+  }
+  .crew-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(20,18,15,0.1);
+    border: 1px solid rgba(20,18,15,0.1);
+  }
+  .crew-card {
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+  }
+  .crew-photo {
+    aspect-ratio: 3/4;
+    background: var(--paper-3);
+    position: relative;
+    overflow: hidden;
+  }
+  .crew-photo::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      135deg,
+      rgba(20,18,15,0.03),
+      rgba(20,18,15,0.03) 6px,
+      rgba(20,18,15,0.06) 6px,
+      rgba(20,18,15,0.06) 12px
+    );
+  }
+  .crew-photo-label {
+    position: absolute;
+    bottom: 16px; left: 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    background: var(--paper);
+    padding: 4px 8px;
+    border-radius: 2px;
+  }
+  .crew-body {
+    padding: 28px 28px 32px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .crew-role {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .crew-name {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    line-height: 1.1;
+  }
+  .crew-bio {
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.7;
+    flex: 1;
+  }
+  .crew-contact {
+    margin-top: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+  }
+  .crew-contact a { color: var(--accent); transition: color 0.15s; }
+  .crew-contact a:hover { color: var(--ink); }
+
+  /* ── APPROACH ── */
+  .approach-section {
+    padding: 72px 0;
+    background: var(--paper-2);
+    border-bottom: 1px solid rgba(20,18,15,0.1);
+  }
+  .approach-section h2 {
+    font-size: clamp(28px,3.5vw,44px);
+    letter-spacing: -0.025em;
+    margin-bottom: 40px;
+  }
+  .approach-section h2 .accent { color: var(--accent); }
+  .approach-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(20,18,15,0.1);
+    border: 1px solid rgba(20,18,15,0.1);
+  }
+  .approach-card {
+    background: var(--paper);
+    padding: 32px 28px;
+  }
+  .approach-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .approach-card h3 {
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  .approach-card p {
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.65;
+  }
+
+  /* ── CTA ── */
+  .cta-end { padding: 96px 0; text-align: center; }
+  .cta-end h2 { font-size: clamp(36px,5vw,64px); letter-spacing:-0.03em; line-height:1; margin-bottom:16px; }
+  .cta-end h2 .accent { color: var(--accent); }
+  .cta-end p { color:var(--ink-2); max-width:44ch; margin:0 auto 32px; font-size:16px; line-height:1.65; }
+
+  @media (max-width: 800px) {
+    .company-bio-layout { grid-template-columns: 1fr; gap: 40px; }
+    .crew-grid { grid-template-columns: 1fr; }
+    .approach-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <a href="index.html" class="brand"><span class="goose-glyph"></span>Strange Goose</a>
+  <div class="links">
+    <a href="work.html">Work</a>
+    <a href="commercial.html">Commercial</a>
+    <a href="about.html" class="active">About</a>
+    <a href="glossary.html">Glossary</a>
+  </div>
+  <a href="contact.html" class="cta">Work with us →</a>
+</nav>
+
+<section class="page-header">
+  <div class="wrap">
+    <p class="eyebrow" style="margin-bottom:28px;"><span class="goose-glyph"></span>Strange Goose Productions</p>
+    <h1>A small team.<br><span class="accent">Serious work.</span></h1>
+    <p class="sub">We're a three-person film production company based in Edinburgh. Director, producer, cinematographer. We've been making things together since 2024.</p>
+  </div>
+</section>
+
+<!-- COMPANY BIO -->
+<section class="company-bio">
+  <div class="wrap">
+    <div class="company-bio-layout">
+      <div>
+        <h2>Not an agency.<br>Not a bedroom<br><span class="accent">operation.</span></h2>
+        <p>Strange Goose Productions was founded in Edinburgh in 2024. We make short films, music videos, and branded commercial content for clients who want something that looks like a real film — not a content package.</p>
+        <p>We work at the intersection of traditional filmmaking craft and a lean modern pipeline that lets us move faster and spend less than a conventional production company — without sacrificing the quality of the result.</p>
+        <p>Our 48-hour competition track record isn't a party trick. It's evidence of something that matters to clients: <strong>we can produce genuinely good work under extreme time and budget pressure.</strong> That's the same skill set every production job requires.</p>
+      </div>
+      <div>
+        <div class="positioning-block">
+          <p>"Short film. Music video. Brand commercial. Award-winning, whatever the deadline."</p>
+          <p class="tagline">Proper film. Built differently.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CREW -->
+<section class="crew-section">
+  <div class="wrap">
+    <p class="section-label">The team</p>
+    <div class="crew-grid">
+
+      <div class="crew-card">
+        <div class="crew-photo">
+          <span class="crew-photo-label">Owen Coomber — Headshot</span>
+        </div>
+        <div class="crew-body">
+          <p class="crew-role">Director</p>
+          <h3 class="crew-name">Owen Coomber</h3>
+          <p class="crew-bio">Owen directs and, when needed, operates camera. His work spans narrative short films, documentary-influenced content, and commercial production. He shot <em>Fairytale Farm</em> — SGP's most-decorated film — himself, on a £50 budget.</p>
+          <p class="crew-contact">
+            <a href="mailto:owen@strangegoose.co.uk">owen@strangegoose.co.uk</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="crew-card">
+        <div class="crew-photo">
+          <span class="crew-photo-label">Torya Winters — Headshot</span>
+        </div>
+        <div class="crew-body">
+          <p class="crew-role">Producer</p>
+          <h3 class="crew-name">Torya Winters</h3>
+          <p class="crew-bio">Torya keeps productions on time, on budget, and on track. She manages logistics, scheduling, client relationships, and the hundred practical problems that arise between a brief and a finished film.</p>
+          <p class="crew-contact">
+            <a href="mailto:torya@strangegoose.co.uk">torya@strangegoose.co.uk</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="crew-card">
+        <div class="crew-photo">
+          <span class="crew-photo-label">Alex McNeill — Headshot</span>
+        </div>
+        <div class="crew-body">
+          <p class="crew-role">Cinematographer</p>
+          <h3 class="crew-name">Alex McNeill</h3>
+          <p class="crew-bio">Alex is the Director of Photography on the majority of SGP productions. He has shot six of SGP's seven 48-hour competition entries, accumulating nominations in Best Cinematography and multiple craft categories across those films.</p>
+          <p class="crew-contact">&nbsp;</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- APPROACH -->
+<section class="approach-section">
+  <div class="wrap">
+    <p class="section-label">How we work</p>
+    <h2>Three things that make<br><span class="accent">us different.</span></h2>
+    <div class="approach-grid">
+      <div class="approach-card">
+        <p class="approach-num">01</p>
+        <h3>We're a team, not a freelancer</h3>
+        <p>Director, producer, and cinematographer who have worked together across every project since the company started. That continuity shows in the work.</p>
+      </div>
+      <div class="approach-card">
+        <p class="approach-num">02</p>
+        <h3>We work at real-world budgets</h3>
+        <p>Our most-awarded film cost £50. Our commercial work is priced for brands with a genuine marketing budget — not a six-figure production fund.</p>
+      </div>
+      <div class="approach-card">
+        <p class="approach-num">03</p>
+        <h3>We move fast without cutting corners</h3>
+        <p>Seven 48-hour competitions. Every one produced to a standard that earned nominations. Speed and quality aren't opposites — they require the same preparation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-end">
+  <div class="wrap-tight">
+    <h2>Let's make<br><span class="accent">something.</span></h2>
+    <p>Short film, music video, or commercial — get in touch and we'll take it from there.</p>
+    <a class="btn primary" href="mailto:info@strangegoose.co.uk">info@strangegoose.co.uk</a>
+  </div>
+</section>
+
+<footer class="site">
+  <div><span class="goose-glyph"></span>&nbsp; Strange Goose Productions · Edinburgh · © 2026</div>
+  <div class="links">
+    <a href="work.html">Work</a>
+    <a href="commercial.html">Commercial</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>
