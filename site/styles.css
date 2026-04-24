@@ -1,0 +1,237 @@
+/* Strange Goose — shared styles (Option A) */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --paper: #f5f2ec;
+  --paper-2: #ebe7dd;
+  --paper-3: #e3dfd3;
+  --ink: #14120f;
+  --ink-2: #2a2622;
+  --ink-3: #5a5449;
+  --muted: #8a8376;
+  --faint: #c7c1b3;
+  --accent: oklch(58% 0.14 45);
+  --accent-dim: oklch(58% 0.14 45 / 0.12);
+  --accent-strong: oklch(52% 0.16 45);
+  --sans: 'Inter Tight', -apple-system, system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+
+/* ── typography ── */
+h1, h2, h3, h4 { font-family: var(--sans); font-weight: 600; letter-spacing: -0.02em; line-height: 1; }
+.mono { font-family: var(--mono); letter-spacing: 0.08em; }
+.up { text-transform: uppercase; }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink-2);
+}
+.eyebrow::before {
+  content: '';
+  width: 28px; height: 1px;
+  background: currentColor;
+  opacity: 0.45;
+}
+
+/* ── layout ── */
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 40px; }
+.wrap-tight { max-width: 960px; margin: 0 auto; padding: 0 40px; }
+
+/* ── nav ── */
+nav.top {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--paper);
+  border-bottom: 1px solid rgba(20,18,15,0.08);
+  padding: 14px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+nav.top .brand {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+nav.top .links {
+  display: flex; gap: 28px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+nav.top .links a { transition: color 0.15s; }
+nav.top .links a:hover { color: var(--ink); }
+nav.top .links a.active { color: var(--ink); border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
+nav.top .cta {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 8px 14px;
+  border-radius: 2px;
+  transition: background 0.15s, color 0.15s;
+}
+nav.top .cta:hover { background: var(--accent); color: var(--paper); }
+
+/* ── goose glyph ── */
+.goose-glyph {
+  display: inline-block;
+  width: 18px; height: 18px;
+  position: relative;
+  vertical-align: -3px;
+}
+.goose-glyph::before {
+  content: ''; position: absolute;
+  top: 0; left: 9px; width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+}
+.goose-glyph::after {
+  content: ''; position: absolute;
+  top: 7px; left: 2px; width: 14px; height: 9px;
+  background: currentColor;
+  border-radius: 50% 60% 40% 70% / 60% 50% 70% 40%;
+}
+.goose-glyph.lg { width: 28px; height: 28px; }
+.goose-glyph.lg::before { left: 14px; width: 10px; height: 10px; }
+.goose-glyph.lg::after { top: 11px; left: 3px; width: 22px; height: 14px; }
+
+/* ── buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 18px;
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  border: 1px solid transparent;
+}
+.btn.primary { background: var(--accent); color: var(--paper); }
+.btn.primary:hover { background: var(--accent-strong); }
+.btn.ghost { border-color: var(--ink); color: var(--ink); background: transparent; }
+.btn.ghost:hover { background: var(--ink); color: var(--paper); }
+.btn.invert { background: var(--ink); color: var(--paper); }
+.btn.invert:hover { background: var(--accent); }
+
+/* ── placeholder imagery ── */
+.ph {
+  position: relative;
+  background: var(--paper-3);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+}
+.ph::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(20,18,15,0.035),
+    rgba(20,18,15,0.035) 6px,
+    rgba(20,18,15,0.07) 6px,
+    rgba(20,18,15,0.07) 12px
+  );
+  pointer-events: none;
+}
+.ph .ph-label {
+  position: relative;
+  z-index: 1;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper);
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+.ph.dark { background: #111110; color: var(--paper); }
+.ph.dark::before {
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(255,255,255,0.03),
+    rgba(255,255,255,0.03) 6px,
+    rgba(255,255,255,0.06) 6px,
+    rgba(255,255,255,0.06) 12px
+  );
+}
+.ph.dark .ph-label { background: #111110; color: var(--paper); border: 1px solid rgba(242,239,232,0.4); }
+
+/* ── footer ── */
+footer.site {
+  margin-top: 80px;
+  border-top: 1px solid rgba(20,18,15,0.1);
+  padding: 32px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+footer.site .links { display: flex; gap: 24px; }
+footer.site a:hover { color: var(--ink); }
+
+/* ── section shared ── */
+section { padding: 80px 0; }
+section.tight { padding: 48px 0; }
+.section-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-label::before {
+  content: '';
+  width: 28px; height: 1px; background: var(--accent);
+}
+
+/* ── tabular numbers ── */
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* responsive */
+@media (max-width: 800px) {
+  nav.top { padding: 12px 20px; }
+  nav.top .links { display: none; }
+  .wrap, .wrap-tight { padding: 0 20px; }
+  footer.site { flex-direction: column; padding: 24px 20px; text-align: center; }
+}
