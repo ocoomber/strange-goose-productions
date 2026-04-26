@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glossary — Strange Goose</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site/styles.css">
+<style>
+  .g-hero { padding: 64px 0 32px; }
+  .g-hero h1 { font-size: clamp(44px, 7vw, 80px); letter-spacing: -0.03em; line-height: 0.98; margin-bottom: 16px; max-width: 16ch; }
+  .g-hero h1 .accent { color: var(--accent); }
+  .g-hero p { color: var(--ink-2); font-size: 18px; max-width: 56ch; line-height: 1.6; }
+
+  .cats { display: flex; gap: 8px; padding: 24px 0; border-top: 1px solid rgba(20,18,15,0.15); border-bottom: 1px solid rgba(20,18,15,0.15); margin-top: 32px; flex-wrap: wrap; }
+  .cat { padding: 10px 18px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; border: 1px solid rgba(20,18,15,0.2); color: var(--ink-2); border-radius: 2px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; }
+  .cat .count { color: var(--ink-3); font-size: 10px; }
+  .cat.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .cat.active .count { color: var(--accent); }
+
+  .gloss { padding: 48px 0 80px; }
+  .gloss-grid { display: grid; grid-template-columns: 200px 1fr; gap: 56px; align-items: start; }
+  .gloss-sidebar { position: sticky; top: 80px; }
+  .gloss-sidebar h4 { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; color: var(--accent); margin-bottom: 14px; text-transform: uppercase; }
+  .gloss-sidebar .side-title { font-family: var(--sans); font-weight: 600; font-size: 24px; letter-spacing: -0.015em; color: var(--ink); margin-bottom: 10px; line-height: 1.1; }
+  .gloss-sidebar .side-desc { font-family: var(--sans); font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+  .gloss-list { display: flex; flex-direction: column; }
+  .gloss-row { display: grid; grid-template-columns: 200px 1fr 1fr; gap: 24px; padding: 24px 0; border-bottom: 1px solid rgba(20,18,15,0.1); align-items: baseline; }
+  .gloss-row:first-child { padding-top: 0; }
+  .gloss-term { font-weight: 600; font-size: 24px; letter-spacing: -0.015em; }
+  .gloss-term .pron { display: block; font-family: var(--mono); font-weight: 400; font-size: 10px; letter-spacing: 0.14em; color: var(--ink-3); text-transform: uppercase; margin-top: 4px; }
+  .gloss-def { font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+  .gloss-eg { font-family: var(--mono); font-size: 11.5px; line-height: 1.6; color: var(--accent); }
+  .gloss-eg::before { content: '↳ '; opacity: 0.6; }
+
+  @media (max-width: 900px) {
+    .gloss-grid { grid-template-columns: 1fr; }
+    .gloss-sidebar { position: static; }
+    .gloss-row { grid-template-columns: 1fr; gap: 6px; padding: 20px 0; }
+  }
+</style>
+</head>
+<body data-screen-label="04 Glossary">
+
+<nav class="top">
+  <a href="index.html" class="brand"><span class="goose-glyph"></span>Strange Goose</a>
+  <div class="links">
+    <a href="work.html">Previous Work</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html" class="active">Glossary</a>
+  </div>
+  <a href="/cdn-cgi/l/email-protection#7f161119103f0c0b0d1e11181a1810100c1a511c10510a14" class="cta">Get in touch →</a>
+</nav>
+
+<section class="g-hero">
+  <div class="wrap">
+    <p class="eyebrow" style="margin-bottom: 28px;"><span class="goose-glyph"></span>Plain-English glossary</p>
+    <h1>Not sure what any<br>of this <span class="accent">actually means?</span></h1>
+    <p>Aspect ratios, cut-downs, pre-roll, picture lock — plain-English explanations for every term you'll hit when commissioning a video. No jargon left unexplained.</p>
+    <div class="cats" id="cats">
+      <span class="cat active" data-cat="formats">Formats <span class="count">/ 7</span></span>
+      <span class="cat" data-cat="process">Process <span class="count">/ 6</span></span>
+      <span class="cat" data-cat="files">Files &amp; delivery <span class="count">/ 5</span></span>
+      <span class="cat" data-cat="money">Money &amp; rights <span class="count">/ 4</span></span>
+    </div>
+  </div>
+</section>
+
+<section class="gloss">
+  <div class="wrap">
+
+    <div class="gloss-grid gloss-section" data-cat="formats">
+      <div class="gloss-sidebar">
+        <h4>Category · 01 / 04</h4>
+        <div class="side-title">Formats</div>
+        <div class="side-desc">The shapes and qualities of video files. If a platform asks for something, it's in here.</div>
+      </div>
+      <div class="gloss-list">
+        <div class="gloss-row">
+          <div class="gloss-term">9:16<span class="pron">vertical</span></div>
+          <div class="gloss-def">Vertical video. The shape of your phone held normally. Used by Reels, TikTok, Stories.</div>
+          <div class="gloss-eg">Every client gets a 9:16 cut from the same shoot, at no extra cost.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">16:9<span class="pron">widescreen</span></div>
+          <div class="gloss-def">Widescreen. Standard for YouTube, broadcast, and anything that lives on a monitor.</div>
+          <div class="gloss-eg">YouTube pre-roll and hero videos are 16:9.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">1:1<span class="pron">square</span></div>
+          <div class="gloss-def">A square frame. Instagram feed posts and some LinkedIn content still want this.</div>
+          <div class="gloss-eg">Square cuts sit alongside photos in a feed better than widescreen.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Aspect ratio</div>
+          <div class="gloss-def">The shape of the frame — width to height. 16:9 is widescreen, 1:1 is square, 9:16 is vertical.</div>
+          <div class="gloss-eg">We cut one shoot into every ratio you need.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">4K</div>
+          <div class="gloss-def">A resolution — very sharp, roughly 4000 pixels across. Looks good on every screen, now and later.</div>
+          <div class="gloss-eg">We shoot 4K as standard. Future-proof.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Frame rate<span class="pron">fps</span></div>
+          <div class="gloss-def">How many still images per second make up the video. 24fps looks cinematic, 60fps looks real.</div>
+          <div class="gloss-eg">We'll pick the right one for what you're making.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Safe area</div>
+          <div class="gloss-def">The part of the frame nothing important can live outside of — because captions, chrome, or a swipe-up button might cover it.</div>
+          <div class="gloss-eg">Stories reserve a chunk at the top and bottom; we compose for it.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gloss-grid gloss-section" data-cat="process" style="display:none;">
+      <div class="gloss-sidebar">
+        <h4>Category · 02 / 04</h4>
+        <div class="side-title">Process</div>
+        <div class="side-desc">The stages of making a video, in the order they happen.</div>
+      </div>
+      <div class="gloss-list">
+        <div class="gloss-row">
+          <div class="gloss-term">Brief</div>
+          <div class="gloss-def">A short document describing what you want. If you don't have one we'll build it from one conversation.</div>
+          <div class="gloss-eg">We write the brief based on what you tell us on the first call.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Treatment</div>
+          <div class="gloss-def">Our creative response — what the video will feel like, look like, and say. Usually 1–3 pages.</div>
+          <div class="gloss-eg">Delivered before anything shoots. You sign off first.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Storyboard</div>
+          <div class="gloss-def">A series of rough drawings showing each shot in order. Confirms what we'll actually film.</div>
+          <div class="gloss-eg">Helps you see the video before we make it. No surprises later.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Picture lock</div>
+          <div class="gloss-def">The edit is final. No more changes to the cut. After this we do sound and colour.</div>
+          <div class="gloss-eg">Usually week 3 of a 4-week project.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Grade / colour</div>
+          <div class="gloss-def">Adjusting the colour of the finished edit — contrast, warmth, skin tones. What makes something feel cinematic.</div>
+          <div class="gloss-eg">Done after picture lock. Changes the mood without changing the cut.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Mix</div>
+          <div class="gloss-def">Balancing the sound — dialogue, music, effects — so it works on every speaker, from phone to cinema.</div>
+          <div class="gloss-eg">Last step before delivery.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gloss-grid gloss-section" data-cat="files" style="display:none;">
+      <div class="gloss-sidebar">
+        <h4>Category · 03 / 04</h4>
+        <div class="side-title">Files &amp; delivery</div>
+        <div class="side-desc">What actually lands in your inbox at the end.</div>
+      </div>
+      <div class="gloss-list">
+        <div class="gloss-row">
+          <div class="gloss-term">Cut-down</div>
+          <div class="gloss-def">A shorter version of the main film — 30 seconds or 15 seconds cut from a 60-second master.</div>
+          <div class="gloss-eg">We edit each one as its own piece, not just a trim.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Deliverable</div>
+          <div class="gloss-def">Any file we hand over at the end — the master, cut-downs, stills, subtitled versions.</div>
+          <div class="gloss-eg">Named by platform. Upload-ready. No renaming needed.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Pre-roll</div>
+          <div class="gloss-def">An ad that plays before the thing someone came to watch — usually on YouTube.</div>
+          <div class="gloss-eg">Typically 15 or 30 seconds, often skippable after 5.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Master file</div>
+          <div class="gloss-def">The full-quality original of the final video. Everything else is made from it.</div>
+          <div class="gloss-eg">Kept on our drives. Available to you on request, forever.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">MP4</div>
+          <div class="gloss-def">The standard video file format. Works on every platform. This is what you upload.</div>
+          <div class="gloss-eg">Every deliverable is an MP4 unless you need something else.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gloss-grid gloss-section" data-cat="money" style="display:none;">
+      <div class="gloss-sidebar">
+        <h4>Category · 04 / 04</h4>
+        <div class="side-title">Money &amp; rights</div>
+        <div class="side-desc">The practical bits about cost, use, and what you own.</div>
+      </div>
+      <div class="gloss-list">
+        <div class="gloss-row">
+          <div class="gloss-term">Fixed quote</div>
+          <div class="gloss-def">A single price for the whole job, agreed before we shoot. Doesn't change unless the brief does.</div>
+          <div class="gloss-eg">Agreed up front. No surprise invoices.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Usage rights</div>
+          <div class="gloss-def">Where and how long you can use the finished video. We keep it simple: as long as you want, everywhere.</div>
+          <div class="gloss-eg">Some agencies charge more for TV vs. web. We don't.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">Music licensing</div>
+          <div class="gloss-def">Paying to use a specific piece of music legally. Needed for anything that isn't original.</div>
+          <div class="gloss-eg">We'll recommend cleared tracks, or write something custom.</div>
+        </div>
+        <div class="gloss-row">
+          <div class="gloss-term">50 / 50</div>
+          <div class="gloss-def">Our payment terms: half up front on agreement, half on final delivery.</div>
+          <div class="gloss-eg">No retainer. No monthly fees. One project at a time.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site">
+  <div><span class="goose-glyph"></span>&nbsp; Strange Goose · © 2026</div>
+  <div class="links">
+    <a href="work.html">Previous Work</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
+    <a href="/cdn-cgi/l/email-protection#d3babdb5bc93a0a7a1b2bdb4b6b4bcbca0b6fdb0bcfda6b8">Email</a>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  const cats = document.getElementById('cats');
+  cats.addEventListener('click', (e) => {
+    const c = e.target.closest('.cat');
+    if (!c) return;
+    cats.querySelectorAll('.cat').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+    const key = c.dataset.cat;
+    document.querySelectorAll('.gloss-section').forEach(s => {
+      s.style.display = (s.dataset.cat === key) ? '' : 'none';
+    });
+  });
+</script>
+
+</body>
+</html>
