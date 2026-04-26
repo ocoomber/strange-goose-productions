@@ -1,0 +1,344 @@
+<!DOCTYPE html><html lang="en"><head>
+
+
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strange Goose Productions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site/styles.css">
+<style>
+  .hero-c {
+    padding: 80px 0 40px;
+  }
+  .hero-c h1 {
+    font-size: clamp(56px, 8vw, 104px);
+    line-height: 0.96;
+    letter-spacing: -0.035em;
+    max-width: 16ch;
+    margin-bottom: 24px;
+  }
+  .hero-c h1 .accent { color: var(--accent); }
+  .hero-c .sub {
+    font-size: 18px;
+    color: var(--ink-2);
+    max-width: 58ch;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+  .hero-c .meta {
+    display: flex; gap: 32px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .hero-c .meta b { color: var(--ink); font-weight: 500; display: block; }
+
+  .spine { padding: 40px 0 80px; }
+  .spine h2 {
+    font-size: 44px;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .spine h2 .accent { color: var(--accent); }
+  .spine .sub {
+    color: var(--ink-3);
+    max-width: 56ch;
+    margin-bottom: 48px;
+  }
+
+  .timeline {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 0;
+  }
+  .step {
+    display: contents;
+  }
+  .step-rail {
+    position: relative;
+    padding-top: 32px;
+  }
+  .step-rail .num {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+  }
+  .step-rail .days {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+  .step-body {
+    padding: 32px 32px 48px;
+    border-left: 1px solid rgba(20,18,15,0.2);
+    position: relative;
+  }
+  .step-body::before {
+    content: '';
+    position: absolute;
+    left: -5px; top: 38px;
+    width: 9px; height: 9px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .step-body h3 {
+    font-size: 26px;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .step-body p {
+    color: var(--ink-2);
+    max-width: 60ch;
+    line-height: 1.6;
+    margin-bottom: 18px;
+  }
+  .step-out {
+    display: inline-flex;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--paper-2);
+    border: 1px solid rgba(20,18,15,0.1);
+    border-radius: 2px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .step-out b { color: var(--accent); font-weight: 500; }
+
+  .compare {
+    background: var(--paper-2);
+    padding: 80px 0;
+  }
+  .compare h2 {
+    font-size: 40px;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .compare .sub { color: var(--ink-3); margin-bottom: 40px; max-width: 56ch; }
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .col {
+    background: var(--paper);
+    padding: 28px 24px;
+    border-radius: 2px;
+    border: 1px solid rgba(20,18,15,0.08);
+  }
+  .col.featured {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .col.featured .col-meta { color: rgba(242,239,232,0.7); }
+  .col-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 12px;
+  }
+  .col.featured .col-label { color: var(--accent); }
+  .col h3 {
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+  }
+  .col ul { list-style: none; }
+  .col ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(20,18,15,0.08);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .col.featured ul li { border-color: rgba(242,239,232,0.1); }
+  .col ul li:last-child { border-bottom: none; }
+
+  .cta-end {
+    padding: 96px 0;
+    text-align: center;
+  }
+  .cta-end h2 {
+    font-size: clamp(40px, 6vw, 72px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .cta-end .accent { color: var(--accent); }
+  .cta-end p {
+    color: var(--ink-2);
+    max-width: 44ch;
+    margin: 0 auto 32px;
+  }
+
+  @media (max-width: 800px) {
+    .timeline { grid-template-columns: 80px 1fr; }
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body data-screen-label="01 Home">
+
+<nav class="top">
+  <a href="index.html" class="brand"><span class="goose-glyph"></span>Strange Goose</a>
+  <div class="links">
+    <a href="work.html">Previous Work</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
+  </div>
+  <a href="/cdn-cgi/l/email-protection#cca5a2aaa38cbfb8beada2aba9aba3a3bfa9e2afa3e2b9a7" class="cta">Get in touch →</a>
+</nav>
+
+<section class="hero-c">
+  <div class="wrap">
+    <p class="eyebrow" style="margin-bottom:28px;"><span class="goose-glyph"></span>For brands</p>
+    <h1 style="" data-cc-id="cc-2">You need a video.<br><span class="accent">We handle everything.</span></h1>
+    <p class="sub">One conversation to start. A fixed price before anything is shot. Every format and length you need, labelled and ready to post — a fraction of the time a traditional agency takes.</p>
+    <div class="meta">
+      <div><b>£ fixed</b>Agreed upfront</div>
+      <div><b>2–4 weeks</b>Brief to delivery</div>
+      <div><b>One team</b>You talk to the director</div>
+    </div>
+  </div>
+</section>
+
+<section class="spine">
+  <div class="wrap">
+    <p class="section-label">The process</p>
+    <h2>You don't need to<br><span class="accent">know anything about video.</span></h2>
+    <p class="sub">Most people who contact us have never commissioned a video before. That's fine. Our job is to make this easy — not to impress you with industry language.</p>
+
+    <div class="timeline">
+
+      <div class="step">
+        <div class="step-rail">
+          <div class="num">01</div>
+          <div class="days">Day 0</div>
+        </div>
+        <div class="step-body">
+          <h3>One conversation</h3>
+          <p>Tell us what you're selling and what you're trying to achieve. That's it. We ask the questions. No briefs to fill in, no jargon to navigate.</p>
+          <div class="step-out"><b>You give us →</b> What you're selling, to whom, by when</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-rail">
+          <div class="num">02</div>
+          <div class="days">Day 2–4</div>
+        </div>
+        <div class="step-body">
+          <h3>We develop the idea</h3>
+          <p>We come back to you with a creative concept, a storyboard, and a fixed price. Nothing gets made until you've seen the plan and signed off on the cost.</p>
+          <div class="step-out"><b>You get →</b> Concept · storyboard · fixed quote</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-rail">
+          <div class="num">03</div>
+          <div class="days">1 shoot day</div>
+        </div>
+        <div class="step-body" data-cc-id="cc-6">
+          <h3>We shoot it</h3>
+          <p>Our team — director, producer, cinematographer — handles the entire production day. You can be on set or not. Your call.</p>
+          <div class="step-out"><b>We bring →</b> Crew · cameras · lighting · locations</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-rail">
+          <div class="num">04</div>
+          <div class="days">Week 3–4</div>
+        </div>
+        <div class="step-body">
+          <h3>You get the files</h3>
+          <p>We edit and deliver every format and length you need, named by platform and ready to upload. Instagram Reel. YouTube pre-roll. TikTok. Stories. All of it.</p>
+          <div class="step-out" style="" data-cc-id="cc-5"><b>You receive →</b> 9:16 · 16:9 · 1:1 · 60s · 30s · 15s</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="compare" data-cc-id="cc-4">
+  <div class="wrap">
+    <p class="section-label">Why Strange Goose</p>
+    <h2>Three ways to<br>make a video.</h2>
+    <p class="sub">Here's what each actually means in practice.</p>
+    <div class="compare-grid">
+      <div class="col">
+        <div class="col-label">Option A</div>
+        <h3>London agency</h3>
+        <ul>
+          <li>Six-figure budget, easily</li>
+          <li>Three-month timeline, minimum</li>
+          <li>You're a small account</li>
+          <li>Layers of people between you and the director</li>
+          <li>Genuine cinematic craft</li>
+        </ul>
+      </div>
+      <div class="col featured">
+        <div class="col-label">Option B · Us</div>
+        <h3>Strange Goose</h3>
+        <ul>
+          <li>Real-world budget, agreed in advance</li>
+          <li>Two to four weeks, typically</li>
+          <li>You deal directly with the director</li>
+          <li>One team, start to finish</li>
+          <li>Genuine cinematic craft</li>
+        </ul>
+      </div>
+      <div class="col">
+        <div class="col-label">Option C</div>
+        <h3>Social content shop</h3>
+        <ul>
+          <li style="" data-cc-id="cc-1">Cheap</li>
+          <li style="" data-cc-id="cc-2">Fast turnaround</li>
+          <li style="" data-cc-id="cc-3">Questionable quality</li>
+          <li>No creative development</li>
+          <li>Looks like everything else on the feed</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-end">
+  <div class="wrap-tight">
+    <h2>Tell us what<br><span class="accent">you're after.</span></h2>
+    <p>You don't need a brief prepared. You don't need to know what you need. Send us an email and we'll take it from there.</p>
+    <a class="btn primary" href="/cdn-cgi/l/email-protection#31585f575e71424543505f5654565e5e42541f525e1f445a">Start a conversation →</a>
+    <p style="margin-top:24px; font-family:var(--mono); font-size:11px; letter-spacing:0.14em; color:var(--ink-3);">Or email · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="650c0b030a25161117040b0200020a0a16004b060a4b100e">[email&#160;protected]</a></p>
+  </div>
+</section>
+
+<footer class="site">
+  <div><span class="goose-glyph"></span>&nbsp; Strange Goose · © 2026</div>
+  <div class="links">
+    <a href="work.html">Previous Work</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
+    <a href="/cdn-cgi/l/email-protection#1b72757d745b686f697a757c7e7c7474687e357874356e70">Email</a>
+  </div>
+</footer>
+
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body></html>

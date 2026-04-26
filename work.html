@@ -1,0 +1,271 @@
+<!DOCTYPE html><html lang="en"><head>
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work — Strange Goose</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site/styles.css">
+<style>
+  .work-hero { padding: 64px 0 32px; }
+  .work-hero h1 {
+    font-size: clamp(48px, 7vw, 88px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .work-hero p {
+    color: var(--ink-2);
+    max-width: 52ch;
+    font-size: 17px;
+  }
+  .filters {
+    display: flex;
+    gap: 8px;
+    padding: 20px 0;
+    border-top: 1px solid rgba(20,18,15,0.15);
+    border-bottom: 1px solid rgba(20,18,15,0.15);
+    margin-top: 40px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .filter-group {
+    display: flex; gap: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .filter-group .chip {
+    padding: 6px 12px;
+    border: 1px solid rgba(20,18,15,0.2);
+    color: var(--ink-2);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  .filter-group .chip.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .filter-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px 20px;
+    padding: 40px 0 80px;
+  }
+  .item { display: flex; flex-direction: column; gap: 12px; }
+  .item a { color: inherit; display: flex; flex-direction: column; gap: 12px; }
+  .item .ph { aspect-ratio: 4/3; border-radius: 2px; transition: transform 0.2s; overflow: hidden; position: relative; padding: 0; background: #000; }
+  .item .ph::before { display: none; }
+  .item .ph img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+  .item:hover .ph img { transform: scale(1.03); }
+  .item:hover .ph { transform: translateY(-2px); }
+  .item-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .item-title {
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: -0.015em;
+  }
+  .item-sub {
+    color: var(--ink-3);
+    font-size: 13px;
+    margin-top: 2px;
+  }
+  .item-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .item-awards {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .item-awards span { padding: 2px 6px; border: 1px solid var(--accent); border-radius: 2px; }
+
+  /* column spans */
+  .c12 { grid-column: span 12; }
+  .c8 { grid-column: span 8; }
+  .c6 { grid-column: span 6; }
+  .c4 { grid-column: span 4; }
+  .c4 .ph { aspect-ratio: 4/3; }
+  .c6 .ph { aspect-ratio: 16/10; }
+  .c8 .ph { aspect-ratio: 21/9; }
+
+  .foot-note {
+    padding: 32px 0 60px;
+    border-top: 1px solid rgba(20,18,15,0.15);
+    color: var(--ink-3);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 900px) {
+    .c12, .c8, .c6, .c4 { grid-column: span 12; }
+  }
+</style>
+</head>
+<body data-screen-label="03 Work" style="cursor: crosshair;" data-cc-id="cc-1">
+
+<nav class="top">
+  <a href="index.html" class="brand"><span class="goose-glyph"></span>Strange Goose</a>
+  <div class="links">
+    <a href="work.html" class="active">Previous Work</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
+  </div>
+  <a href="/cdn-cgi/l/email-protection#a0c9cec6cfe0d3d4d2c1cec7c5c7cfcfd3c58ec3cf8ed5cb" class="cta">Get in touch →</a>
+</nav>
+
+<section class="work-hero">
+  <div class="wrap">
+    <p class="eyebrow" style="margin-bottom: 28px;" data-cc-id="cc-2"><span class="goose-glyph"></span>Selected work · 2024–2026</p>
+    <h1>Short films. Music videos.<br>Brand commercials.</h1>
+    <p>A selection of recent shorts, music videos, and festival pieces.</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="grid">
+
+    <div class="item c8">
+      <a href="#">
+        <div class="ph"><img src="uploads/fairytale%20farm.jpg" alt="Fairytale Farm" loading="lazy"></div>
+        <div class="item-meta">
+          <div>
+            <div class="item-title">Fairytale Farm</div>
+            <div class="item-sub">2025 · 5 festival wins</div>
+          </div>
+          <div class="item-tag">Short</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="item c4">
+      <a href="#">
+        <div class="ph"><img src="uploads/family%20time.jpg" alt="Family Time" loading="lazy"></div>
+        <div class="item-meta">
+          <div>
+            <div class="item-title">Family Time</div>
+            <div class="item-sub">2025 · Aberdeen 48hr Overall Winner</div>
+          </div>
+          <div class="item-tag">48hr</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="item c4">
+      <a href="#">
+        <div class="ph"><img src="uploads/getting%20over.jpg" alt="Getting Over Going Under" loading="lazy"></div>
+        <div class="item-meta">
+          <div>
+            <div class="item-title">Getting Over Going Under</div>
+            <div class="item-sub">2025 · Music video</div>
+          </div>
+          <div class="item-tag">Music</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="item c4">
+      <a href="#">
+        <div class="ph"><img src="uploads/subject%201410.jpg" alt="Subject 1410" loading="lazy"></div>
+        <div class="item-meta">
+          <div>
+            <div class="item-title">Subject 1410</div>
+            <div class="item-sub">2024</div>
+          </div>
+          <div class="item-tag">Short</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="item c4">
+      <a href="#">
+        <div class="ph"><img src="uploads/crossfire.jpg" alt="Crossfire" loading="lazy"></div>
+        <div class="item-meta">
+          <div>
+            <div class="item-title">Crossfire</div>
+            <div class="item-sub">2025</div>
+          </div>
+          <div class="item-tag">Short</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="item c4">
+      <a href="#">
+        <div class="ph"><img src="uploads/roadtripppin.jpg" alt="Roadtrippin'" loading="lazy"></div>
+        <div class="item-meta">
+          <div>
+            <div class="item-title">Roadtrippin'</div>
+            <div class="item-sub">2025</div>
+          </div>
+          <div class="item-tag">Short</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="item c4">
+      <a href="#">
+        <div class="ph"><img src="uploads/the%20journeyman.jpg" alt="The Journeyman" loading="lazy"></div>
+        <div class="item-meta">
+          <div>
+            <div class="item-title">The Journeyman</div>
+            <div class="item-sub">2025</div>
+          </div>
+          <div class="item-tag">Short</div>
+        </div>
+      </a>
+    </div>
+
+    <div class="item c4">
+      <a href="#">
+        <div class="ph"><img src="uploads/where%20ball.jpg" alt="Where Ball?" loading="lazy"></div>
+        <div class="item-meta">
+          <div>
+            <div class="item-title">Where Ball?</div>
+            <div class="item-sub">Expresso 90 Film Festival</div>
+          </div>
+          <div class="item-tag">Festival</div>
+        </div>
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site">
+  <div><span class="goose-glyph"></span>&nbsp; Strange Goose · © 2026</div>
+  <div class="links">
+    <a href="work.html">Previous Work</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
+    <a href="/cdn-cgi/l/email-protection#51383f373e11222523303f3634363e3e22347f323e7f243a">Email</a>
+  </div>
+</footer>
+
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body></html>

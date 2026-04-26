@@ -1,0 +1,234 @@
+<!DOCTYPE html><html lang="en"><head>
+
+
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Strange Goose</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site/styles.css">
+<style>
+  .about-hero { padding: 64px 0 40px; }
+  .about-hero h1 {
+    font-size: clamp(48px, 7vw, 88px);
+    letter-spacing: -0.03em;
+    line-height: 0.98;
+    margin-bottom: 20px;
+    max-width: 16ch;
+  }
+  .about-hero h1 .accent { color: var(--accent); }
+  .about-hero p {
+    color: var(--ink-2);
+    font-size: 18px;
+    max-width: 56ch;
+    line-height: 1.6;
+  }
+
+  .team {
+    padding: 40px 0 80px;
+  }
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .member {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .member .ph { aspect-ratio: 3/4; overflow: hidden; padding: 0; background: #000; }
+  .member .ph::before { display: none; }
+  .member .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .member h3 {
+    font-size: 24px;
+    letter-spacing: -0.015em;
+    font-weight: 600;
+  }
+  .member .role {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .member .bio {
+    color: var(--ink-2);
+    line-height: 1.6;
+    font-size: 14.5px;
+  }
+  .member .credits {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid rgba(20,18,15,0.1);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    line-height: 1.7;
+  }
+  .member .credits b { color: var(--ink); font-weight: 500; }
+
+  .manifesto {
+    padding: 80px 0;
+    background: var(--paper-2);
+  }
+  .manifesto-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .manifesto h2 {
+    font-size: 44px;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    font-weight: 600;
+  }
+  .manifesto h2 .accent { color: var(--accent); }
+  .manifesto-body {
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--ink-2);
+  }
+  .manifesto-body p { margin-bottom: 18px; }
+  .manifesto-body p:last-child { margin-bottom: 0; }
+  .manifesto-body b { color: var(--ink); font-weight: 500; }
+
+  .facts {
+    padding: 64px 0;
+  }
+  .facts-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid rgba(20,18,15,0.12);
+    border-radius: 2px;
+  }
+  .fact {
+    padding: 24px 20px;
+    border-right: 1px solid rgba(20,18,15,0.08);
+  }
+  .fact:last-child { border-right: none; }
+  .fact-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+  }
+  .fact-value {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .cta-end {
+    padding: 80px 0;
+    text-align: center;
+  }
+  .cta-end h2 {
+    font-size: 48px;
+    letter-spacing: -0.025em;
+    margin-bottom: 16px;
+  }
+  .cta-end .accent { color: var(--accent); }
+  .cta-end p { color: var(--ink-2); max-width: 44ch; margin: 0 auto 28px; }
+
+  @media (max-width: 900px) {
+    .team-grid { grid-template-columns: 1fr; }
+    .manifesto-grid { grid-template-columns: 1fr; gap: 32px; }
+    .facts-grid { grid-template-columns: 1fr 1fr; }
+    .fact { border-right: none; border-bottom: 1px solid rgba(20,18,15,0.08); }
+    .fact:nth-child(odd) { border-right: 1px solid rgba(20,18,15,0.08); }
+  }
+</style>
+</head>
+<body data-screen-label="04 About" style="cursor: crosshair;" data-cc-id="cc-1">
+
+<nav class="top">
+  <a href="index.html" class="brand"><span class="goose-glyph"></span>Strange Goose</a>
+  <div class="links">
+    <a href="work.html">Previous Work</a>
+    <a href="about.html" class="active">About</a>
+    <a href="glossary.html">Glossary</a>
+  </div>
+  <a href="/cdn-cgi/l/email-protection#1a73747c755a696e687b747d7f7d7575697f347975346f71" class="cta">Get in touch →</a>
+</nav>
+
+<section class="about-hero" data-cc-id="cc-4">
+  <div class="wrap">
+    <p class="eyebrow" style="margin-bottom: 28px;" data-cc-id="cc-2"><span class="goose-glyph"></span>About</p>
+    <h1>Not an agency.<br>Not a bedroom prompter.<br><span class="accent">A film team.</span></h1>
+    <p style="" data-cc-id="cc-3">A team in Edinburgh, making short films, music videos, and commercial content.</p>
+  </div>
+</section>
+
+<section class="team">
+  <div class="wrap">
+    <div class="team-grid" data-cc-id="cc-7">
+
+      <div class="member">
+        <div class="ph"><img src="uploads/owen_headshot.jpg" alt="Owen Coomber" loading="lazy"></div>
+        <h3>Owen Coomber</h3>
+        <div class="role">Director</div>
+        <p class="bio">Writes and directs the pieces. Spends a lot of time thinking about what a shot is actually saying before agreeing to light it.</p>
+      </div>
+
+      <div class="member">
+        <div class="ph"><img src="uploads/torya_headshot.avif" alt="Torya Winters" loading="lazy"></div>
+        <h3>Torya Winters</h3>
+        <div class="role">Producer</div>
+        <p class="bio">Runs the shoot. Keeps the day on rails. The reason we hit deadlines and budgets on projects that have no business hitting either.</p>
+      </div>
+
+      <div class="member">
+        <div class="ph"><span class="ph-label">Alex · portrait</span></div>
+        <h3>Alex McNeill</h3>
+        <div class="role">Cinematographer</div>
+        <p class="bio">Behind the camera. Lights everything. Insists on one more take of the thing that ends up in the trailer.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="manifesto">
+  <div class="wrap">
+    <div class="manifesto-grid">
+      <h2>How we got<br><span class="accent">good at this.</span></h2>
+      <div class="manifesto-body">
+        <p>We started by making horror shorts nobody paid us for. On fifty quid. For the fun of it.</p>
+        <p>One of those shorts went on to win international festival awards. On top of that we've made short films as part of a 48hr film making challenge and won multiple awards as well as the entire competition for the city of Aberdeen. The lessons we learned — what you actually need vs. what productions pretend you need, how to make one shoot day produce ten deliverables, how to hit a deadline that a bigger team would miss — have turned into a way of working.</p>
+        <p>Now, when a brand comes to us with a real-world budget and a tight timeline, <b>we already know how to make it work</b>. Because we've been making it work for ourselves for years.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="cta-end">
+  <div class="wrap-tight">
+    <h2>Think we might be<br><span class="accent">a good fit?</span></h2>
+    <p>Have a look at the work or drop us a line. We reply within a working day.</p>
+    <a class="btn primary" href="/cdn-cgi/l/email-protection#e1888f878ea1929593808f8684868e8e9284cf828ecf948a">Start a conversation →</a>
+  </div>
+</section>
+
+<footer class="site">
+  <div><span class="goose-glyph"></span>&nbsp; Strange Goose · © 2026</div>
+  <div class="links">
+    <a href="work.html">Previous Work</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
+    <a href="/cdn-cgi/l/email-protection#b9d0d7dfd6f9cacdcbd8d7dedcded6d6cadc97dad697ccd2">Email</a>
+  </div>
+</footer>
+
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body></html>
