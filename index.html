@@ -6,118 +6,443 @@
 <title>Strange Goose Productions</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;1,300&family=Outfit:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site/styles.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { display: flex; flex-direction: column; min-height: 100vh; transition: background 0.4s, color 0.4s; }
+  main { flex: 1; }
 
-  :root {
-    --black: #0a0a09;
-    --gold: #c9a96e;
-    --gold-dim: rgba(201,169,110,0.3);
-    --white: #f0ede6;
-    --muted: rgba(240,237,230,0.45);
+  .stage { padding: 96px 0 64px; }
+
+  .who h1 {
+    font-size: clamp(48px, 9vw, 132px);
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    font-weight: 600;
+    max-width: 14ch;
+    margin-bottom: 56px;
   }
+  .who h1 .accent { color: var(--accent); transition: color 0.4s; }
 
-  body {
-    background: var(--black);
-    color: var(--white);
-    font-family: 'Outfit', sans-serif;
-    font-weight: 300;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 2rem;
+  .what {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 64px;
+    padding-top: 56px;
+    border-top: 1px solid rgba(20,18,15,0.12);
   }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-    opacity: 0.028;
-    pointer-events: none;
+  .what p {
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 52ch;
   }
+  .what p + p { margin-top: 18px; }
+  .what p .accent { color: var(--accent); }
 
-  .wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
-    opacity: 0;
-    animation: fadeUp 1s ease forwards 0.3s;
+  .nav-list {
+    margin-top: 88px;
+    border-top: 1px solid rgba(20,18,15,0.12);
   }
-
-  .eyebrow {
-    font-size: 0.65rem;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--gold);
+  .nav-list a {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 24px;
+    align-items: baseline;
+    padding: 28px 0;
+    border-bottom: 1px solid rgba(20,18,15,0.12);
+    transition: color 0.15s, padding 0.2s;
   }
-
-  .divider {
-    width: 1px;
-    height: 40px;
-    background: linear-gradient(to bottom, var(--gold-dim), transparent);
+  .nav-list a:hover { color: var(--accent); padding-left: 8px; }
+  .nav-list .num {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--ink-3);
   }
-
-  h1 {
-    font-family: 'Cormorant', serif;
-    font-weight: 300;
-    font-size: clamp(2.5rem, 8vw, 5.5rem);
+  .nav-list .label {
+    font-size: clamp(28px, 4.5vw, 48px);
+    letter-spacing: -0.02em;
+    font-weight: 600;
     line-height: 1;
-    letter-spacing: -0.01em;
-    color: var(--white);
   }
-
-  h1 em {
-    font-style: italic;
-    color: var(--gold);
-  }
-
-  .tagline {
-    font-size: 0.85rem;
-    color: var(--muted);
-    letter-spacing: 0.06em;
-    line-height: 1.7;
-  }
-
-  .email {
-    font-family: 'Cormorant', serif;
-    font-size: 1.1rem;
-    font-weight: 300;
-    color: var(--white);
-    text-decoration: none;
-    border-bottom: 1px solid var(--gold-dim);
-    padding-bottom: 4px;
-    transition: color 0.3s, border-color 0.3s;
-  }
-
-  .email:hover { color: var(--gold); border-color: var(--gold); }
-
-  .location {
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
+  .nav-list .desc {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(240,237,230,0.18);
+    color: var(--ink-3);
+    text-align: right;
+  }
+  .nav-list a:hover .desc { color: var(--accent); }
+
+  .contact-line {
+    margin-top: 88px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 24px;
+  }
+  .contact-line .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .contact-line a.email {
+    font-size: clamp(22px, 3vw, 32px);
+    letter-spacing: -0.01em;
+    border-bottom: 1px solid rgba(20,18,15,0.25);
+    padding-bottom: 4px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .contact-line a.email:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ─────────────────────────────────────
+     MOOD: cinema (dark, grainy, spotlight)
+  ─────────────────────────────────────── */
+  body.mood-cinema {
+    background: #0a0908;
+    color: #efe9dd;
+    --ink: #efe9dd;
+    --ink-2: rgba(239,233,221,0.72);
+    --ink-3: rgba(239,233,221,0.5);
+    --paper: #0a0908;
+    --paper-2: #131210;
+    --paper-3: #1c1a17;
+    --accent: oklch(72% 0.16 55);
+  }
+  body.mood-cinema::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 90% 70% at 32% 28%, rgba(255,200,140,0.08), transparent 60%),
+      radial-gradient(ellipse 100% 80% at 70% 90%, rgba(140,80,40,0.08), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    mix-blend-mode: screen;
+  }
+  body.mood-cinema::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 0.94  0 0 0 0 0.85  0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: overlay;
+  }
+  body.mood-cinema main, body.mood-cinema nav.top, body.mood-cinema footer.site { position: relative; z-index: 2; }
+  body.mood-cinema nav.top { background: rgba(10,9,8,0.85); backdrop-filter: blur(8px); border-bottom-color: rgba(239,233,221,0.08); }
+  body.mood-cinema nav.top .cta { color: var(--accent); border-color: var(--accent); }
+  body.mood-cinema nav.top .cta:hover { background: var(--accent); color: #0a0908; }
+  body.mood-cinema .what,
+  body.mood-cinema .nav-list,
+  body.mood-cinema .nav-list a { border-color: rgba(239,233,221,0.1); }
+  body.mood-cinema .who h1 { font-weight: 500; }
+  body.mood-cinema .contact-line a.email { border-bottom-color: rgba(239,233,221,0.25); }
+  body.mood-cinema footer.site { border-top-color: rgba(239,233,221,0.1); }
+
+  /* ─────────────────────────────────────
+     MOOD: editorial (bone-white, no warm accent)
+  ─────────────────────────────────────── */
+  body.mood-editorial {
+    background: #fafaf7;
+    --paper: #fafaf7;
+    --paper-2: #f1f1ed;
+    --ink: #0d0d0c;
+    --ink-2: #2d2d2a;
+    --ink-3: #76746e;
+    --accent: #0d0d0c;
+  }
+  body.mood-editorial .who h1 { font-family: 'Fraunces', Georgia, serif; font-weight: 600; letter-spacing: -0.04em; }
+  body.mood-editorial .who h1 .accent { font-style: italic; font-weight: 400; }
+  body.mood-editorial .nav-list .label { font-family: 'Fraunces', Georgia, serif; font-weight: 600; }
+  body.mood-editorial .what p .accent { background: #ffe8a8; padding: 1px 4px; }
+
+  /* ─────────────────────────────────────
+     LAYOUT: marquee
+  ─────────────────────────────────────── */
+  body.layout-marquee .nav-list { border: none; margin-top: 80px; }
+  body.layout-marquee .nav-list a {
+    display: block;
+    padding: 0;
+    border: none;
+    border-top: 1px solid rgba(20,18,15,0.12);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  body.layout-marquee .nav-list a:last-child { border-bottom: 1px solid rgba(20,18,15,0.12); }
+  body.layout-marquee .nav-list a:hover { padding-left: 0; }
+  body.layout-marquee .nav-list .num,
+  body.layout-marquee .nav-list .desc { display: none; }
+  body.layout-marquee .nav-list .label {
+    display: inline-block;
+    font-size: clamp(54px, 11vw, 152px);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    padding: 18px 0;
+    transition: transform 0.6s cubic-bezier(.2,.8,.2,1);
+    transform: translateX(0);
+  }
+  body.layout-marquee .nav-list a:hover .label {
+    transform: translateX(-4%);
+    color: var(--accent);
+  }
+  body.layout-marquee.mood-cinema .nav-list a,
+  body.layout-marquee.mood-cinema .nav-list a:last-child { border-color: rgba(239,233,221,0.1); }
+
+  /* ─────────────────────────────────────
+     LAYOUT: index (grid tiles)
+  ─────────────────────────────────────── */
+  body.layout-index .nav-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    border: none;
+    margin-top: 80px;
+  }
+  body.layout-index .nav-list a {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 0;
+    padding: 32px;
+    border: 1px solid rgba(20,18,15,0.15);
+    border-radius: 2px;
+    aspect-ratio: 5/3;
+    background: rgba(20,18,15,0.02);
+    transition: background 0.2s, transform 0.2s, color 0.2s, border-color 0.2s;
+  }
+  body.layout-index .nav-list a:hover {
+    background: var(--ink); color: var(--paper); border-color: var(--ink);
+    padding-left: 32px;
+    transform: translateY(-2px);
+  }
+  body.layout-index .nav-list a:hover .num,
+  body.layout-index .nav-list a:hover .desc { color: var(--accent); }
+  body.layout-index .nav-list .num { color: var(--accent); }
+  body.layout-index .nav-list .label {
+    font-size: clamp(28px, 3.6vw, 44px);
+    margin-top: auto;
+  }
+  body.layout-index .nav-list .desc { text-align: left; margin-top: 14px; }
+  body.layout-index.mood-cinema .nav-list a { border-color: rgba(239,233,221,0.15); background: rgba(239,233,221,0.02); }
+  body.layout-index.mood-cinema .nav-list a:hover { background: var(--accent); color: #0a0908; border-color: var(--accent); }
+  body.layout-index.mood-cinema .nav-list a:hover .num,
+  body.layout-index.mood-cinema .nav-list a:hover .desc { color: #0a0908; }
+
+  /* ─────────────────────────────────────
+     HEADLINE: manifesto + initials
+  ─────────────────────────────────────── */
+  .who[data-headline="manifesto"] h1 {
+    font-size: clamp(56px, 11vw, 168px);
+    line-height: 0.86;
+    letter-spacing: -0.045em;
+    font-weight: 700;
+    max-width: 12ch;
+  }
+  .who[data-headline="manifesto"] h1 em {
+    font-style: normal;
+    color: var(--accent);
+    display: block;
+  }
+  .who[data-headline="initials"] {
+    display: flex;
+    align-items: flex-end;
+    gap: 32px;
+    flex-wrap: wrap;
+    margin-bottom: 56px;
+  }
+  .who[data-headline="initials"] .monogram {
+    font-size: clamp(140px, 26vw, 360px);
+    line-height: 0.78;
+    letter-spacing: -0.06em;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .who[data-headline="initials"] .monogram span { color: var(--accent); }
+  .who[data-headline="initials"] .tag {
+    font-size: clamp(20px, 2.4vw, 32px);
+    line-height: 1.1;
+    max-width: 18ch;
+    padding-bottom: 18px;
+    color: var(--ink-2);
+    letter-spacing: -0.015em;
   }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  body.mood-editorial .who[data-headline="manifesto"] h1,
+  body.mood-editorial .who[data-headline="initials"] .monogram { font-family: 'Fraunces', Georgia, serif; }
+
+  @media (max-width: 800px) {
+    .stage { padding: 56px 0 40px; }
+    .who h1 { margin-bottom: 36px; }
+    .what { grid-template-columns: 1fr; gap: 24px; padding-top: 32px; }
+    .what p { font-size: 17px; }
+    .nav-list { margin-top: 56px; }
+    .nav-list a { grid-template-columns: 40px 1fr; gap: 14px; padding: 22px 0; }
+    .nav-list a:hover { padding-left: 0; }
+    .nav-list .desc { display: none; }
+    .contact-line { margin-top: 56px; flex-direction: column; align-items: flex-start; gap: 8px; }
+    body.layout-index .nav-list { grid-template-columns: 1fr; }
+    body.layout-index .nav-list a { aspect-ratio: auto; padding: 24px; }
   }
 </style>
 </head>
-<body>
-  <div class="wrap">
-    <p class="eyebrow">Edinburgh, Scotland</p>
-    <h1>Strange Goose <em>Productions</em></h1>
-    <p class="tagline">Short film. Music video. Brand commercial.<br>Award-winning, whatever the deadline.</p>
-    <div class="divider"></div>
-    <a href="mailto:info@strangegoose.co.uk" class="email">info@strangegoose.co.uk</a>
-    <p class="location">Proper film. Built differently.</p>
+<body data-screen-label="01 Home">
+
+<nav class="top">
+  <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose</span></a>
+  <div class="links">
+    <a href="work.html">Previous Work</a>
+    <a href="commercial.html">Hire Us</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
   </div>
+  <a href="mailto:info@strangegoose.co.uk" class="cta"><span class="cta-text">Get in touch →</span></a>
+</nav>
+
+<main>
+<section class="stage">
+  <div class="wrap">
+
+    <div class="who" id="who" data-headline="statement">
+      <p class="eyebrow" style="margin-bottom: 32px;"><span class="goose-glyph"></span>Strange Goose Productions · Edinburgh</p>
+      <div id="headline-slot">
+        <h1>Proper film.<br><span class="accent">Built differently.</span></h1>
+      </div>
+    </div>
+
+    <div class="what">
+      <p class="section-label" style="margin-bottom: 0;">What we do</p>
+      <div>
+        <p>A three-person film team (director, producer, cinematographer) making short films, music videos, and brand commercials out of Edinburgh.</p>
+        <p>Real cinematic craft, made by a small team that moves quickly. <span class="accent">Awarded shorts. Working brands. One conversation away.</span></p>
+      </div>
+    </div>
+
+    <nav class="nav-list" aria-label="Site sections">
+      <a href="work.html">
+        <span class="num">01</span>
+        <span class="label">Previous Work</span>
+        <span class="desc">Shorts · Music · Commercial</span>
+      </a>
+      <a href="commercial.html">
+        <span class="num">02</span>
+        <span class="label">Hire Us</span>
+        <span class="desc">For brands</span>
+      </a>
+      <a href="about.html">
+        <span class="num">03</span>
+        <span class="label">About</span>
+        <span class="desc">Who we are</span>
+      </a>
+      <a href="glossary.html">
+        <span class="num">04</span>
+        <span class="label">Glossary</span>
+        <span class="desc">Plain-English video terms</span>
+      </a>
+    </nav>
+
+    <div class="contact-line">
+      <span class="label">Say hello</span>
+      <a class="email" href="mailto:info@strangegoose.co.uk">info@strangegoose.co.uk &nbsp;↗</a>
+    </div>
+
+  </div>
+</section>
+</main>
+
+<footer class="site">
+  <div><span class="goose-glyph"></span>&nbsp; Strange Goose · © 2026</div>
+  <div class="links">
+    <a href="work.html">Previous Work</a>
+    <a href="commercial.html">Hire Us</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
+    <a href="mailto:info@strangegoose.co.uk">Email</a>
+  </div>
+</footer>
+
+<!-- Tweaks -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel">
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "mood": "paper",
+    "layout": "list",
+    "headline": "statement"
+  }/*EDITMODE-END*/;
+
+  const HEADLINES = {
+    statement: `<h1>Proper film.<br><span class="accent">Built differently.</span></h1>`,
+    manifesto: `<h1>Films<br>worth<br><em>making.</em></h1>`,
+    initials:  `<div class="monogram">SG<span>P</span></div><div class="tag">Strange Goose Productions. A film team in Edinburgh.</div>`
+  };
+
+  function HomeTweaks() {
+    const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+    React.useEffect(() => {
+      const body = document.body;
+      [...body.classList].forEach(c => { if (c.startsWith('mood-') || c.startsWith('layout-')) body.classList.remove(c); });
+      body.classList.add('mood-' + tweaks.mood);
+      body.classList.add('layout-' + tweaks.layout);
+
+      const who = document.getElementById('who');
+      const slot = document.getElementById('headline-slot');
+      who.dataset.headline = tweaks.headline;
+      slot.innerHTML = HEADLINES[tweaks.headline];
+    }, [tweaks.mood, tweaks.layout, tweaks.headline]);
+
+    return (
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Mood">
+          <TweakRadio
+            value={tweaks.mood}
+            onChange={(v) => setTweak('mood', v)}
+            options={[
+              { value: 'paper', label: 'Paper' },
+              { value: 'cinema', label: 'Cinema' },
+              { value: 'editorial', label: 'Editorial' },
+            ]}
+          />
+        </TweakSection>
+        <TweakSection label="Link layout">
+          <TweakRadio
+            value={tweaks.layout}
+            onChange={(v) => setTweak('layout', v)}
+            options={[
+              { value: 'list', label: 'List' },
+              { value: 'marquee', label: 'Marquee' },
+              { value: 'index', label: 'Index' },
+            ]}
+          />
+        </TweakSection>
+        <TweakSection label="Headline">
+          <TweakRadio
+            value={tweaks.headline}
+            onChange={(v) => setTweak('headline', v)}
+            options={[
+              { value: 'statement', label: 'Statement' },
+              { value: 'manifesto', label: 'Manifesto' },
+              { value: 'initials', label: 'Initials' },
+            ]}
+          />
+        </TweakSection>
+      </TweaksPanel>
+    );
+  }
+
+  const root = document.createElement('div');
+  document.body.appendChild(root);
+  ReactDOM.createRoot(root).render(<HomeTweaks />);
+</script>
+
 </body>
 </html>
