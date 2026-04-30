@@ -3,7 +3,7 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Work — Strange Goose</title>
+<title>Work · Strange Goose</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
@@ -65,7 +65,23 @@
   .item a { color: inherit; display: flex; flex-direction: column; gap: 12px; }
   .item .ph { aspect-ratio: 4/3; border-radius: 2px; transition: transform 0.2s; overflow: hidden; position: relative; padding: 0; background: #000; }
   .item .ph::before { display: none; }
-  .item .ph img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
+  .item .ph img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease, opacity 0.3s ease; }
+  .item .ph::after {
+    content: '▶';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 22px;
+    background: rgba(10,9,8,0.35);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+  .item a[target="_blank"]:hover .ph::after { opacity: 1; }
+  .item a[target="_blank"]:hover .ph img { opacity: 0.85; }
   .item:hover .ph img { transform: scale(1.03); }
   .item:hover .ph { transform: translateY(-2px); }
   .item-meta {
@@ -129,13 +145,14 @@
 <body data-screen-label="03 Work" style="cursor: crosshair;" data-cc-id="cc-1">
 
 <nav class="top">
-  <a href="index.html" class="brand"><span class="goose-glyph"></span>Strange Goose</a>
+  <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose</span></a>
   <div class="links">
     <a href="work.html" class="active">Previous Work</a>
+    <a href="commercial.html">Hire Us</a>
     <a href="about.html">About</a>
     <a href="glossary.html">Glossary</a>
   </div>
-  <a href="/cdn-cgi/l/email-protection#a0c9cec6cfe0d3d4d2c1cec7c5c7cfcfd3c58ec3cf8ed5cb" class="cta">Get in touch →</a>
+  <a href="mailto:info@strangegoose.co.uk" class="cta"><span class="cta-text">Get in touch →</span></a>
 </nav>
 
 <section class="work-hero">
@@ -150,7 +167,7 @@
   <div class="grid">
 
     <div class="item c8">
-      <a href="#">
+      <a href="https://www.youtube.com/watch?v=M8qZY5vbkZU" target="_blank" rel="noopener">
         <div class="ph"><img src="uploads/fairytale%20farm.jpg" alt="Fairytale Farm" loading="lazy"></div>
         <div class="item-meta">
           <div>
@@ -176,7 +193,7 @@
     </div>
 
     <div class="item c4">
-      <a href="#">
+      <a href="https://www.youtube.com/watch?v=Jft-DIJjCy4" target="_blank" rel="noopener">
         <div class="ph"><img src="uploads/getting%20over.jpg" alt="Getting Over Going Under" loading="lazy"></div>
         <div class="item-meta">
           <div>
@@ -189,7 +206,7 @@
     </div>
 
     <div class="item c4">
-      <a href="#">
+      <a href="https://www.youtube.com/watch?v=Bt1LFJmsHWM" target="_blank" rel="noopener">
         <div class="ph"><img src="uploads/subject%201410.jpg" alt="Subject 1410" loading="lazy"></div>
         <div class="item-meta">
           <div>
@@ -202,7 +219,7 @@
     </div>
 
     <div class="item c4">
-      <a href="#">
+      <a href="https://www.youtube.com/watch?v=MiGWIg5WinU" target="_blank" rel="noopener">
         <div class="ph"><img src="uploads/crossfire.jpg" alt="Crossfire" loading="lazy"></div>
         <div class="item-meta">
           <div>
@@ -215,7 +232,7 @@
     </div>
 
     <div class="item c4">
-      <a href="#">
+      <a href="https://www.youtube.com/watch?v=AN9-Np6hoGc" target="_blank" rel="noopener">
         <div class="ph"><img src="uploads/roadtripppin.jpg" alt="Roadtrippin'" loading="lazy"></div>
         <div class="item-meta">
           <div>
@@ -228,7 +245,7 @@
     </div>
 
     <div class="item c4">
-      <a href="#">
+      <a href="https://www.youtube.com/watch?v=LfrdeH2ybHQ" target="_blank" rel="noopener">
         <div class="ph"><img src="uploads/the%20journeyman.jpg" alt="The Journeyman" loading="lazy"></div>
         <div class="item-meta">
           <div>
@@ -260,12 +277,13 @@
   <div><span class="goose-glyph"></span>&nbsp; Strange Goose · © 2026</div>
   <div class="links">
     <a href="work.html">Previous Work</a>
+    <a href="commercial.html">Hire Us</a>
     <a href="about.html">About</a>
     <a href="glossary.html">Glossary</a>
-    <a href="/cdn-cgi/l/email-protection#51383f373e11222523303f3634363e3e22347f323e7f243a">Email</a>
+    <a href="mailto:info@strangegoose.co.uk">Email</a>
   </div>
 </footer>
 
 
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body></html>
+</body></html>
