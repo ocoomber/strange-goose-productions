@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Production · Strange Goose</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site/styles.css">
+<style>
+  body { display: flex; flex-direction: column; min-height: 100vh; transition: background 0.4s, color 0.4s; }
+  main { flex: 1; }
+
+  /* ── hero ───────────────────────────── */
+  .hero-ai {
+    padding: 80px 0 56px;
+  }
+  .hero-ai .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    border: 1px solid rgba(20,18,15,0.18);
+    padding: 8px 12px 8px 10px;
+    border-radius: 2px;
+    margin-bottom: 36px;
+  }
+  .hero-ai h1 {
+    font-size: clamp(52px, 9.5vw, 140px);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    font-weight: 600;
+    max-width: 14ch;
+    margin-bottom: 28px;
+  }
+  .hero-ai h1 .accent { color: var(--accent); }
+  .hero-ai h1 .strike {
+    position: relative;
+    display: inline-block;
+    color: var(--ink-3);
+  }
+  .hero-ai h1 .strike::after {
+    content: '';
+    position: absolute;
+    left: -2%; right: -2%;
+    top: 54%;
+    height: 0.09em;
+    background: var(--accent);
+    transform: rotate(-3deg);
+  }
+  .hero-ai .deck {
+    font-size: 19px;
+    color: var(--ink-2);
+    max-width: 56ch;
+    line-height: 1.55;
+  }
+  .hero-ai .deck .accent { color: var(--accent); }
+
+  /* ── compare pair (same scene, two tools) ─── */
+  .compare-pair {
+    padding: 64px 0;
+    border-top: 1px solid rgba(20,18,15,0.12);
+  }
+  .pair-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .pair-head .ttl {
+    font-size: clamp(22px, 2.6vw, 32px);
+    letter-spacing: -0.02em;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .pair-head .ttl .accent { color: var(--accent); }
+  .pair-head .meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .pair-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .pair-cell {
+    position: relative;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    background: var(--paper-3);
+  }
+  .pair-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .pair-cell .tag {
+    position: absolute;
+    top: 14px; left: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 6px 10px;
+    border-radius: 2px;
+  }
+  .pair-cell .tag .dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .pair-cell .cap {
+    position: absolute;
+    bottom: 14px; left: 14px; right: 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--paper);
+    background: rgba(10,9,8,0.78);
+    backdrop-filter: blur(4px);
+    padding: 10px 12px;
+    border-radius: 2px;
+    max-width: 36ch;
+  }
+  .pair-cell .cap b { color: var(--paper); font-weight: 500; }
+
+  /* ── workflow grid (Why us) ──────── */
+  .workflow {
+    margin-top: 40px;
+    display: grid;
+    gap: 8px;
+  }
+  .work-cell {
+    position: relative;
+    overflow: hidden;
+    background: var(--paper-3);
+  }
+  .work-cell.feature { aspect-ratio: 21/9; }
+  .work-cell.landscape { aspect-ratio: 21/9; }
+  .work-cell.portrait { aspect-ratio: 9/16; }
+  .work-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .work-cell .tag {
+    position: absolute;
+    top: 14px; left: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 6px 10px;
+    border-radius: 2px;
+  }
+  .work-cell .tag .dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .work-cell .cap {
+    position: absolute;
+    bottom: 14px; left: 14px; right: 14px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--paper);
+    background: rgba(10,9,8,0.78);
+    backdrop-filter: blur(4px);
+    padding: 10px 12px;
+    border-radius: 2px;
+    max-width: 38ch;
+  }
+  .work-cell .cap b { color: var(--paper); font-weight: 500; }
+  .landscape-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ugc-pair { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+  /* ── pipeline section (nodes + storyboards) ─── */
+  .pipeline {
+    padding: 8px 0 64px;
+  }
+  .pipeline-stack {
+    display: grid;
+    gap: 8px;
+  }
+  .pipeline-nodes {
+    position: relative;
+    aspect-ratio: 21/9;
+    overflow: hidden;
+    background: var(--paper-3);
+  }
+  .pipeline-nodes img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .storyboard-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .storyboard-cell {
+    position: relative;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    background: var(--paper-3);
+  }
+  .storyboard-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .pipeline-nodes .tag {
+    position: absolute;
+    top: 14px; left: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 6px 10px;
+    border-radius: 2px;
+  }
+  .pipeline-nodes .tag .dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+
+  /* ── reality (the pitch) ──────────────── */
+  .reality {
+    padding: 64px 0;
+    border-top: 1px solid rgba(20,18,15,0.12);
+  }
+  .reality-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.7fr;
+    gap: 64px;
+  }
+  .reality h2 {
+    font-size: clamp(32px, 4vw, 48px);
+    letter-spacing: -0.025em;
+    line-height: 1;
+  }
+  .reality h2 .accent { color: var(--accent); }
+  .reality-body {
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--ink-2);
+  }
+  .reality-body p + p { margin-top: 18px; }
+  .reality-body b { color: var(--ink); font-weight: 500; }
+  .reality-body .accent { color: var(--accent); }
+
+  .myths {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .myth {
+    background: var(--paper-2);
+    border: 1px solid rgba(20,18,15,0.08);
+    padding: 20px;
+    border-radius: 2px;
+  }
+  .myth .claim {
+    font-size: 15.5px;
+    line-height: 1.45;
+    color: var(--ink);
+    text-decoration: line-through;
+    text-decoration-color: rgba(20,18,15,0.35);
+    text-decoration-thickness: 1px;
+    margin-bottom: 8px;
+  }
+  .myth .truth {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .myth .truth b { color: var(--ink); font-weight: 500; }
+
+  /* ── covered: list layout (default) ──── */
+  .covered {
+    padding: 80px 0;
+    border-top: 1px solid rgba(20,18,15,0.12);
+  }
+  .covered .head {
+    margin-bottom: 56px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: end;
+  }
+  .covered h2 {
+    font-size: clamp(36px, 5vw, 64px);
+    letter-spacing: -0.03em;
+    line-height: 0.96;
+  }
+  .covered h2 .accent { color: var(--accent); }
+  .covered .head-meta {
+    font-size: 16px;
+    color: var(--ink-3);
+    line-height: 1.6;
+    max-width: 40ch;
+  }
+
+  /* layout: list (default) */
+  .covered-items {
+    border-top: 1px solid rgba(20,18,15,0.12);
+  }
+  .item {
+    display: grid;
+    grid-template-columns: 56px 1.2fr 2fr;
+    gap: 32px;
+    align-items: baseline;
+    padding: 28px 0;
+    border-bottom: 1px solid rgba(20,18,15,0.12);
+    transition: padding 0.2s, color 0.15s;
+  }
+  .item:hover { padding-left: 8px; }
+  .item .num {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--ink-3);
+  }
+  .item .ttl {
+    font-size: clamp(22px, 2.6vw, 30px);
+    letter-spacing: -0.015em;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .item .body {
+    color: var(--ink-2);
+    font-size: 15.5px;
+    line-height: 1.6;
+  }
+
+  /* ── credentials ────────────────────── */
+  .creds {
+    padding: 80px 0;
+    background: var(--paper-2);
+  }
+  .creds-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+  .creds h2 {
+    font-size: clamp(36px, 5vw, 60px);
+    letter-spacing: -0.03em;
+    line-height: 0.98;
+    margin-bottom: 20px;
+  }
+  .creds h2 .accent { color: var(--accent); }
+  .creds p {
+    font-size: 17px;
+    color: var(--ink-2);
+    line-height: 1.65;
+    max-width: 52ch;
+  }
+  .creds p + p { margin-top: 16px; }
+  .creds .stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: rgba(20,18,15,0.12);
+    border: 1px solid rgba(20,18,15,0.12);
+  }
+  .creds .stat {
+    background: var(--paper);
+    padding: 28px 24px;
+  }
+  .creds .stat .v {
+    font-size: clamp(36px, 4.5vw, 56px);
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .creds .stat .v .accent { color: var(--accent); }
+  .creds .stat .k {
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+
+  /* ── what we don't ─────────────────── */
+  .nots {
+    padding: 80px 0;
+  }
+  .nots .head {
+    margin-bottom: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: end;
+  }
+  .nots h2 {
+    font-size: clamp(32px, 4vw, 52px);
+    letter-spacing: -0.025em;
+    line-height: 1;
+  }
+  .nots h2 .accent { color: var(--accent); }
+  .nots .head-meta {
+    color: var(--ink-3);
+    max-width: 40ch;
+  }
+  .nots-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid rgba(20,18,15,0.12);
+    border-bottom: 1px solid rgba(20,18,15,0.12);
+  }
+  .nots-list .no {
+    padding: 28px 24px 28px 0;
+    border-right: 1px solid rgba(20,18,15,0.12);
+  }
+  .nots-list .no:last-child { border-right: none; padding-right: 0; }
+  .nots-list .no:nth-child(n+2) { padding-left: 24px; }
+  .nots-list .x {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nots-list .x::before {
+    content: '×';
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1;
+  }
+  .nots-list .no h4 {
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .nots-list .no p {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  /* ── CTA ───────────────────────────── */
+  .cta-ai {
+    padding: 96px 0 112px;
+    text-align: center;
+    border-top: 1px solid rgba(20,18,15,0.12);
+  }
+  .cta-ai .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .cta-ai .label::before, .cta-ai .label::after {
+    content: ''; width: 28px; height: 1px; background: var(--accent);
+  }
+  .cta-ai h2 {
+    font-size: clamp(40px, 6.5vw, 84px);
+    letter-spacing: -0.035em;
+    line-height: 0.96;
+    margin-bottom: 20px;
+    max-width: 16ch;
+    margin-left: auto; margin-right: auto;
+  }
+  .cta-ai h2 .accent { color: var(--accent); }
+  .cta-ai p {
+    color: var(--ink-2);
+    max-width: 50ch;
+    margin: 0 auto 32px;
+    font-size: 16.5px;
+    line-height: 1.6;
+  }
+  .cta-ai .row {
+    display: inline-flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .cta-ai .small {
+    margin-top: 24px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  /* responsive */
+  @media (max-width: 920px) {
+    .hero-ai { padding: 56px 0 40px; }
+    .pair-grid { grid-template-columns: 1fr; }
+    .landscape-pair { grid-template-columns: 1fr; }
+    .ugc-pair { grid-template-columns: 1fr 1fr 1fr; }
+    .storyboard-pair { grid-template-columns: 1fr; }
+    .reality-grid { grid-template-columns: 1fr; gap: 28px; }
+    .myths { grid-template-columns: 1fr; }
+    .covered .head { grid-template-columns: 1fr; gap: 24px; }
+    .item { grid-template-columns: 40px 1fr; gap: 14px; padding: 22px 0; }
+    .item .body { grid-column: 2; }
+    .item:hover { padding-left: 0; }
+    .creds-grid { grid-template-columns: 1fr; gap: 32px; }
+    .nots .head { grid-template-columns: 1fr; gap: 16px; }
+    .nots-list { grid-template-columns: 1fr 1fr; }
+    .nots-list .no:nth-child(2) { border-right: none; }
+    .nots-list .no:nth-child(-n+2) { border-bottom: 1px solid rgba(20,18,15,0.12); }
+    .cta-ai { padding: 64px 0 80px; }
+  }
+  @media (max-width: 540px) {
+    .nots-list { grid-template-columns: 1fr; }
+    .nots-list .no { border-right: none !important; border-bottom: 1px solid rgba(20,18,15,0.12); padding: 24px 0 !important; }
+    .nots-list .no:last-child { border-bottom: none; }
+  }
+</style>
+</head>
+<body data-screen-label="04 AI Production">
+
+<nav class="top">
+  <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose</span></a>
+  <div class="links">
+    <a href="work.html">Previous Work</a>
+    <a href="commercial.html">Hire Us</a>
+    <a href="ai.html" class="active">AI Production</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
+  </div>
+  <a href="mailto:info@strangegoose.co.uk" class="cta"><span class="cta-text">Get in touch →</span></a>
+</nav>
+
+<main>
+
+<section class="hero-ai">
+  <div class="wrap">
+    <span class="stamp">AI PRODUCTION CONSULTANCY</span>
+    <h1>AI video is <span class="strike">free</span><br>and <span class="strike">instant</span>.<br><span class="accent">Neither is true.</span></h1>
+    <p class="deck">The internet will tell you AI video is free, instant, and indistinguishable from real film. <span class="accent">It isn't.</span> High-quality AI video costs real money, takes real craft, and requires the same creative decisions as any other filmmaking — it just replaces some of the tools.</p>
+  </div>
+</section>
+
+<section class="pipeline">
+  <div class="wrap">
+    <div class="pair-head">
+      <div class="ttl">From <span class="accent">sketch to screen.</span></div>
+    </div>
+    <div class="pipeline-stack">
+      <div class="pipeline-nodes">
+        <img src="site/img/pipeline-nodes.jpg" alt="AI production pipeline — node graph from prompt to finished frame">
+        <span class="tag"><span class="dot"></span>Pipeline</span>
+      </div>
+      <div class="storyboard-pair">
+        <div class="storyboard-cell">
+          <img src="site/img/storyboard-handdrawn.jpg" alt="Hand-drawn storyboard — Scene 12, six panels">
+        </div>
+        <div class="storyboard-cell">
+          <img src="site/img/storyboard-cinematic.jpg" alt="AI-generated cinematic storyboard — Scene 12 rendered">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="reality">
+  <div class="wrap">
+    <div class="reality-grid">
+      <div>
+        <p class="section-label">The reality</p>
+        <h2>If you're trying to figure out what AI <span class="accent">can actually do</span> for your project;</h2>
+      </div>
+      <div class="reality-body">
+        <p>- and what it'll actually cost, we can help.</p>
+        <p><b>Strange Goose has been building and running AI-assisted production pipelines since the technology became viable.</b> We use it in our own work. Production documents. Previs. Character development. Content generation. We know <span class="accent">where it delivers and where it falls flat.</span></p>
+        <div class="myths">
+          <div class="myth">
+            <div class="claim">"It's free."</div>
+            <div class="truth"><b>It isn't.</b> Tooling, compute, iteration, and the senior creative time to direct it all add up. Less than a London shoot. More than a stock licence.</div>
+          </div>
+          <div class="myth">
+            <div class="claim">"It's instant."</div>
+            <div class="truth"><b>Faster, not instant.</b> A finished spot still wants storyboarding, art direction, generation cycles, and proper grade and edit.</div>
+          </div>
+          <div class="myth">
+            <div class="claim">"It's indistinguishable from real film."</div>
+            <div class="truth">For some shots, yes. For others, audiences clock it inside a second. Knowing when to use it is key.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="creds">
+  <div class="wrap">
+    <div class="creds-body">
+      <p class="section-label">Why us</p>
+      <h2>We use this<br>in <span class="accent">our own films.</span></h2>
+      <p>Not as a demo. As a tool. Previs for shorts that ended up shot for real. Generated reference for art department. VFX plates the audience never noticed, UGC that looks like the real thing.</p>
+      <p>No software to sell you. No course. No affiliate links. Just a straight conversation with people who do this for real.</p>
+    </div>
+    <div class="workflow">
+      <div class="landscape-pair">
+        <div class="work-cell landscape">
+          <img src="site/img/ai-landscape-1.jpg" alt="AI-generated cinematic landscape — Highland glen at dawn, modern village">
+        </div>
+        <div class="work-cell landscape">
+          <img src="site/img/ai-landscape-2.jpg" alt="AI-generated cinematic landscape — Highland glen at dawn, historical croft village">
+        </div>
+      </div>
+      <div class="ugc-pair">
+        <div class="work-cell portrait">
+          <img src="site/img/ugc-1.jpg" alt="UGC-style content example, vertical reel">
+        </div>
+        <div class="work-cell portrait">
+          <img src="site/img/ugc-2.jpg" alt="UGC-style content example, vertical reel">
+        </div>
+        <div class="work-cell portrait">
+          <img src="site/img/deep-cuts-coffee.jpg" alt="Deepcuts Coffee — Instagram reel spec advert still">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="covered">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <p class="section-label">A consultation</p>
+        <h2>What it<br><span class="accent">actually covers.</span></h2>
+      </div>
+    </div>
+    <div class="covered-items">
+      <div class="item">
+        <span class="num">01</span>
+        <span class="ttl">What AI production actually costs</span>
+        <span class="body">Honestly, not optimistically. Real numbers from real jobs — tooling, compute, supervision time, post — at the quality bar you're aiming for.</span>
+      </div>
+      <div class="item">
+        <span class="num">02</span>
+        <span class="ttl">The right tools for your specific project</span>
+        <span class="body">The technology is developing fast. We tell you what we'd reach for, today, for this brief — and what we'd refuse to touch.</span>
+      </div>
+      <div class="item">
+        <span class="num">03</span>
+        <span class="ttl">What's achievable on your budget and timeline</span>
+        <span class="body">A frank read on what the money buys, what the calendar allows, and what corners you're being asked to cut without realising.</span>
+      </div>
+      <div class="item">
+        <span class="num">04</span>
+        <span class="ttl">How to integrate AI into an existing workflow</span>
+        <span class="body">Where it slots into pre-pro, production, and post without breaking what already works. Where it costs you more time than it saves.</span>
+      </div>
+      <div class="item">
+        <span class="num">05</span>
+        <span class="ttl">What to ignore</span>
+        <span class="body">The launches, the hype cycles, the LinkedIn demos. What's a real tool. What's a thirty-second highlight reel and a wall of failed renders.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="compare-pair">
+  <div class="wrap">
+    <div class="pair-head">
+      <div class="ttl">Same scene. <span class="accent">A variety of tools.</span></div>
+    </div>
+    <div class="pair-grid">
+      <div class="pair-cell">
+        <img src="site/img/costume-reference.jpg" alt="AI-generated costume reference sheet">
+      </div>
+      <div class="pair-cell">
+        <img src="site/img/ugc-reference.jpg" alt="Talent and look reference sheet">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="nots">
+  <div class="wrap">
+    <div class="head">
+      <div>
+        <p class="section-label">What this isn't</p>
+        <h2>The things we<br><span class="accent">don't do.</span></h2>
+      </div>
+      <div class="head-meta">
+        Worth saying out loud, so nobody wastes anyone's time.
+      </div>
+    </div>
+    <div class="nots-list">
+      <div class="no">
+        <div class="x">No</div>
+        <h4>Selling software</h4>
+        <p>No reseller deals, no preferred platforms. We discuss what fits the job.</p>
+      </div>
+      <div class="no">
+        <div class="x">No</div>
+        <h4>A course or cohort</h4>
+        <p>If you want a curriculum, there are plenty. We do one-to-one consultancy.</p>
+      </div>
+      <div class="no">
+        <div class="x">No</div>
+        <h4>Speculative bidding</h4>
+        <p>We don't put forward AI for jobs that genuinely need a camera. We'll say so.</p>
+      </div>
+      <div class="no">
+        <div class="x">No</div>
+        <h4>Magic answers</h4>
+        <p>The technology is changing weekly. Anyone offering certainty is selling something.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-ai">
+  <div class="wrap-tight">
+    <span class="label">Book a consultation</span>
+    <h2>Tell us what<br>you're <span class="accent">trying to make.</span></h2>
+    <div class="row">
+      <a class="btn primary" href="mailto:info@strangegoose.co.uk?subject=AI%20Production%20Consultation">Book a consultation →</a>
+    </div>
+    <p class="small">90 minutes · Edinburgh / remote</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div><span class="goose-glyph"></span>&nbsp; Strange Goose · © 2026</div>
+  <div class="links">
+    <a href="work.html">Previous Work</a>
+    <a href="commercial.html">Hire Us</a>
+    <a href="ai.html">AI Production</a>
+    <a href="about.html">About</a>
+    <a href="glossary.html">Glossary</a>
+    <a href="mailto:info@strangegoose.co.uk">Email</a>
+  </div>
+</footer>
+
+</body>
+</html>
