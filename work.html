@@ -125,6 +125,11 @@
   .c6 .ph { aspect-ratio: 16/10; }
   .c8 .ph { aspect-ratio: 21/9; }
 
+  /* portrait reel cell: c4 width, spans 2 rows of the grid so a 9/16 still reads naturally
+     and pairs with stacked landscape items on the right */
+  .item.portrait { grid-row: span 2; }
+  .item.portrait .ph { aspect-ratio: 9/16; }
+
   .foot-note {
     padding: 32px 0 60px;
     border-top: 1px solid rgba(20,18,15,0.15);
@@ -139,6 +144,8 @@
 
   @media (max-width: 900px) {
     .c12, .c8, .c6, .c4 { grid-column: span 12; }
+    .item.portrait { grid-row: auto; }
+    .item.portrait .ph { aspect-ratio: 4/5; }
   }
 </style>
 </head>
@@ -153,7 +160,7 @@
     <a href="about.html">About</a>
     <a href="glossary.html">Glossary</a>
   </div>
-  <a href="mailto:info@strangegoose.co.uk" class="cta"><span class="cta-text">Get in touch →</span></a>
+  <a href="/cdn-cgi/l/email-protection#a3cacdc5cce3d0d7d1c2cdc4c6c4ccccd0c68dc0cc8dd6c8" class="cta"><span class="cta-text">Get in touch →</span></a>
 </nav>
 
 <section class="work-hero">
@@ -165,7 +172,19 @@
 </section>
 
 <div class="wrap">
+
   <div class="grid">
+
+    <div class="item c4 portrait">
+      <div class="ph"><img src="uploads/deep%20cuts%20coffee.jpg" alt="Deep Cuts Coffee" loading="lazy"></div>
+      <div class="item-meta">
+        <div>
+          <div class="item-title">Deep Cuts Coffee</div>
+          <div class="item-sub">2026 · Instagram Reel advert</div>
+        </div>
+        <div class="item-tag">Reel</div>
+      </div>
+    </div>
 
     <div class="item c8">
       <a href="https://www.youtube.com/watch?v=M8qZY5vbkZU" target="_blank" rel="noopener">
@@ -278,10 +297,10 @@
     <a href="ai.html">AI Production</a>
     <a href="about.html">About</a>
     <a href="glossary.html">Glossary</a>
-    <a href="mailto:info@strangegoose.co.uk">Email</a>
+    <a href="/cdn-cgi/l/email-protection#0e676068614e7d7a7c6f60696b6961617d6b206d61207b65">Email</a>
   </div>
 </footer>
 
 
 
-</body></html>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body></html>
