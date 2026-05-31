@@ -1,12 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
+
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Production · Strange Goose</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site/styles.css">
 <style>
   body { display: flex; flex-direction: column; min-height: 100vh; transition: background 0.4s, color 0.4s; }
@@ -263,12 +263,19 @@
     grid-template-columns: 1fr 1.7fr;
     gap: 64px;
   }
-  .reality h2 {
+  .reality h2, .regulation h2 {
     font-size: clamp(32px, 4vw, 48px);
     letter-spacing: -0.025em;
     line-height: 1;
   }
-  .reality h2 .accent { color: var(--accent); }
+  .reality h2 .accent, .regulation h2 .accent { color: var(--accent); }
+
+  /* ── regulation (the regulatory picture) ─── */
+  .regulation {
+    padding: 64px 0;
+    border-top: 1px solid rgba(20,18,15,0.12);
+  }
+  .regulation .reality-body p { font-size: 19px; }
   .reality-body {
     font-size: 18px;
     line-height: 1.7;
@@ -281,7 +288,7 @@
   .myths {
     margin-top: 40px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
   .myth {
@@ -536,6 +543,7 @@
     .ugc-pair { grid-template-columns: 1fr 1fr 1fr; }
     .storyboard-pair { grid-template-columns: 1fr; }
     .reality-grid { grid-template-columns: 1fr; gap: 28px; }
+    .regulation .reality-grid { grid-template-columns: 1fr; gap: 24px; }
     .myths { grid-template-columns: 1fr; }
     .covered .head { grid-template-columns: 1fr; gap: 24px; }
     .item { grid-template-columns: 40px 1fr; gap: 14px; padding: 22px 0; }
@@ -544,8 +552,9 @@
     .creds-grid { grid-template-columns: 1fr; gap: 32px; }
     .nots .head { grid-template-columns: 1fr; gap: 16px; }
     .nots-list { grid-template-columns: 1fr 1fr; }
-    .nots-list .no:nth-child(2) { border-right: none; }
-    .nots-list .no:nth-child(-n+2) { border-bottom: 1px solid rgba(20,18,15,0.12); }
+    .nots-list .no { border-bottom: 1px solid rgba(20,18,15,0.12); }
+    .nots-list .no:nth-child(2n) { border-right: none; }
+    .nots-list .no:last-child { border-bottom: none; }
     .cta-ai { padding: 64px 0 80px; }
   }
   @media (max-width: 540px) {
@@ -555,7 +564,7 @@
   }
 </style>
 </head>
-<body data-screen-label="04 AI Production">
+<body data-screen-label="04 AI Production" style="">
 
 <nav class="top">
   <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose</span></a>
@@ -566,7 +575,7 @@
     <a href="about.html">About</a>
     <a href="glossary.html">Glossary</a>
   </div>
-  <a href="mailto:info@strangegoose.co.uk" class="cta"><span class="cta-text">Get in touch →</span></a>
+  <a href="/cdn-cgi/l/email-protection#4c25222a230c3f383e2d222b292b23233f29622f23623927" class="cta"><span class="cta-text">Get in touch →</span></a>
 </nav>
 
 <main>
@@ -574,7 +583,7 @@
 <section class="hero-ai">
   <div class="wrap">
     <span class="stamp">INDEPENDENT CONSULTANCY</span>
-    <h1>AI video is <span class="strike">free</span><br>and <span class="strike">instant</span>.<br><span class="accent">Neither is true.</span></h1>
+    <h1>AI video is <span class="strike">free</span>, <span class="strike">instant</span> and <span class="strike">unregulated</span>.<br><span class="accent">None of that is true.</span></h1>
     <p class="deck">The market is loud, the demos are misleading, and the tooling shifts every week. We help you cut through it. A straight conversation with working filmmakers. No software to sell you, no platform we're tied to. Just an honest read on what AI can do for your specific project, what it'll cost, and where it'll let you down.</p>
   </div>
 </section>
@@ -625,7 +634,25 @@
             <div class="claim">"It's indistinguishable from real film."</div>
             <div class="truth">For some shots, yes. For others, audiences clock it inside a second. <b>Knowing when to use it</b> is most of what you're paying for.</div>
           </div>
+          <div class="myth">
+            <div class="claim">"It's unregulated."</div>
+            <div class="truth"><b>Not anymore.</b> The EU AI Act is live. Synthetic media needs labelling and C2PA metadata in the pipeline before delivery, not bolted on after.</div>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="regulation">
+  <div class="wrap">
+    <div class="reality-grid">
+      <div>
+        <p class="section-label">The regulatory picture</p>
+        <h2>Disclosure isn't optional. <span class="accent">It's a workflow problem.</span></h2>
+      </div>
+      <div class="reality-body">
+        <p>The <b>EU AI Act</b> is live. Synthetic media needs labelling, <b>C2PA metadata</b> needs to be in the pipeline before delivery, and broadcasters and advertisers distributing into EU markets need to know what applies to them. <span class="accent">We know the workflow from the inside.</span></p>
       </div>
     </div>
   </div>
@@ -694,6 +721,11 @@
         <span class="ttl">What to ignore</span>
         <span class="body">The launches, the hype cycles, the LinkedIn demos. What's a real tool. What's a highlight reel and a wall of failed renders.</span>
       </div>
+      <div class="item">
+        <span class="num">06</span>
+        <span class="ttl">Disclosure obligations and workflow compliance</span>
+        <span class="body">The EU AI Act is live. Synthetic media needs labelling. C2PA metadata needs to be in the pipeline, not retrofitted. We know where AI enters production and what needs to travel with the file.</span>
+      </div>
     </div>
   </div>
 </section>
@@ -725,7 +757,7 @@
         Worth saying out loud, so nobody wastes anyone's time.
       </div>
     </div>
-    <div class="nots-list">
+    <div class="nots-list" style="grid-template-columns: repeat(5, 1fr);">
       <div class="no">
         <div class="x">No</div>
         <h4>Selling software</h4>
@@ -746,6 +778,11 @@
         <h4>Magic answers</h4>
         <p>The technology is changing weekly. Anyone offering certainty is selling something.</p>
       </div>
+      <div class="no">
+        <div class="x">No</div>
+        <h4>Legal advice</h4>
+        <p>We handle the workflow side. We're filmmakers, not lawyers.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -755,7 +792,7 @@
     <span class="label">Get in touch</span>
     <h2>Tell us what<br>you're <span class="accent">trying to make.</span></h2>
     <div class="row">
-      <a class="btn primary" href="mailto:info@strangegoose.co.uk?subject=AI%20Production%20Enquiry">Start a conversation →</a>
+      <a class="btn primary" href="/cdn-cgi/l/email-protection#741d1a121b34070006151a1311131b1b07115a171b5a011f4b0701161e11170049353d51464424061b100117001d1b1a514644311a05011d060d">Start a conversation →</a>
     </div>
   </div>
 </section>
@@ -770,9 +807,10 @@
     <a href="ai.html">AI Production</a>
     <a href="about.html">About</a>
     <a href="glossary.html">Glossary</a>
-    <a href="mailto:info@strangegoose.co.uk">Email</a>
+    <a href="/cdn-cgi/l/email-protection#e28b8c848da2919690838c8587858d8d9187cc818dcc9789">Email</a>
   </div>
 </footer>
 
-</body>
-</html>
+
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body></html>
