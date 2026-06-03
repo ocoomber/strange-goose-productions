@@ -4,6 +4,17 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Actor Showreels — Strange Goose Productions</title>
+<meta name="description" content="Professional actor showreel services from Strange Goose Productions, an award-winning Edinburgh film team. Edit & assemble from your footage, or a directed monologue shoot & edit." />
+<link rel="canonical" href="https://strangegoose.co.uk/showreels.html" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://strangegoose.co.uk/showreels.html" />
+<meta property="og:title" content="Actor Showreels — Strange Goose Productions" />
+<meta property="og:description" content="Professional actor showreel services from an award-winning Edinburgh film team. Your best work, cut properly." />
+<meta property="og:image" content="https://strangegoose.co.uk/uploads/crossfire.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Actor Showreels — Strange Goose Productions" />
+<meta name="twitter:description" content="Professional actor showreel services from an award-winning Edinburgh film team. Your best work, cut properly." />
+<meta name="twitter:image" content="https://strangegoose.co.uk/uploads/crossfire.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Archivo:wght@500;600;700;800&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -48,21 +59,14 @@
     position: relative;
   }
 
-  /* ── film grain ───────────────────────────────── */
-  .grain {
-    position: fixed; inset: 0; z-index: 9998; pointer-events: none;
-    opacity: 0; transition: opacity .4s ease; mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-  }
-  .page[data-grain="on"] .grain { opacity: .05; }
-
   /* ── layout ───────────────────────────────────── */
   .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 32px; }
   section { position: relative; }
 
-  /* reveal */
+  /* reveal (progressive enhancement — visible without JS) */
   [data-reveal] { opacity: 0; transform: translateY(22px); transition: opacity .9s cubic-bezier(.2,.6,.2,1), transform .9s cubic-bezier(.2,.6,.2,1); }
   [data-reveal].in { opacity: 1; transform: none; }
+  html:not(.js) [data-reveal] { opacity: 1 !important; transform: none !important; }
   @media (prefers-reduced-motion: reduce) {
     [data-reveal] { opacity: 1 !important; transform: none !important; transition: none; }
   }
@@ -134,15 +138,6 @@
     letter-spacing: .06em; color: rgba(255,255,255,.82); text-transform: uppercase;
   }
   .still .ratio { position: absolute; right: 16px; bottom: 14px; z-index: 2; font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: rgba(255,255,255,.55); }
-  .play {
-    width: 78px; height: 78px; border-radius: 50%;
-    border: 1.5px solid var(--ink-45);
-    display: flex; align-items: center; justify-content: center;
-    transition: transform .3s ease, border-color .3s ease, background .3s ease;
-  }
-  .still:hover .play { transform: scale(1.08); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
-  .play .tri { width: 0; height: 0; margin-left: 5px; border-style: solid; border-width: 13px 0 13px 22px; border-color: transparent transparent transparent var(--ink); transition: border-left-color .3s ease; }
-  .still:hover .play .tri { border-left-color: var(--accent); }
 
   /* ── section heading rhythm ───────────────────── */
   .sec { padding: clamp(64px, 11vh, 130px) 0; }
@@ -213,8 +208,6 @@
   .page[data-dir="marquee"] .led-item .a-name { font-weight: 700; text-transform: uppercase; font-size: clamp(15px, 1.4vw, 18px); letter-spacing: -0.005em; }
   .led-item.act .a-name { color: var(--accent); }
   .led-item .a-meta { font-family: var(--grot); font-size: 12px; color: var(--ink-45); letter-spacing: .02em; }
-  .led-legend { font-family: var(--grot); font-size: 11.5px; letter-spacing: .04em; color: var(--ink-45); margin: 20px 0 0; display: inline-flex; align-items: center; gap: 9px; }
-  .led-legend i { width: 9px; height: 9px; background: var(--accent); transform: rotate(45deg); flex: none; }
   .pullquote {
     font-family: var(--display); font-style: italic; font-weight: 400;
     font-size: clamp(30px, 4.4vw, 54px); line-height: 1.12; margin: 0;
@@ -237,19 +230,6 @@
   .step.in .bar::before { width: 38px; }
   .step .s-title { font-family: var(--display); font-weight: 500; font-size: clamp(18px, 1.7vw, 22px); line-height: 1.18; margin: 0; letter-spacing: -0.01em; }
   .step .s-sub { font-family: var(--grot); font-size: 13.5px; color: var(--ink-45); margin: 8px 0 0; line-height: 1.5; }
-
-  /* ── filmstrip motif ──────────────────────────── */
-  .filmstrip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: clamp(40px, 7vh, 80px); padding: 12px 0; position: relative; }
-  .filmstrip::before, .filmstrip::after {
-    content: ""; position: absolute; left: 0; right: 0; height: 8px;
-    background-image: repeating-linear-gradient(90deg, var(--ink-25) 0 7px, transparent 7px 20px);
-  }
-  .filmstrip::before { top: -2px; } .filmstrip::after { bottom: -2px; }
-  .frame { aspect-ratio: 4/3; background-color: var(--surface); border: 1px solid var(--line);
-    background-image: repeating-linear-gradient(135deg, transparent 0 12px, color-mix(in srgb, var(--ink) 6%, transparent) 12px 13px);
-    position: relative; }
-  .frame span { position: absolute; left: 8px; bottom: 7px; font-family: ui-monospace, Menlo, monospace; font-size: 9.5px; color: var(--ink-25); letter-spacing: .04em; }
-  @media (max-width: 620px) { .filmstrip { grid-template-columns: repeat(2, 1fr); } }
 
   /* ── CTA ──────────────────────────────────────── */
   .cta { border-top: var(--rule) solid var(--line); padding: clamp(80px, 14vh, 170px) 0; text-align: center; }
@@ -275,366 +255,261 @@
 </style>
 </head>
 <body>
-<div id="root"></div>
 
-<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<div class="page" data-dir="programme" data-grain="off" style="--bg:#f4f1e8; --surface:#fffdf7; --surface-2:#ebe7da; --ink:#1b1714; --ink-70:rgba(27,23,20,.72); --ink-45:rgba(27,23,20,.48); --ink-25:rgba(27,23,20,.22); --line:rgba(27,23,20,.14); --line-strong:rgba(27,23,20,.30); --rule:1px; --hl-transform:none; --hl-spacing:-0.018em; --hl-weight:500; --display:var(--grot); --accent:#5d80b0; --accent-ink:#fbf8f2; --radius:10px;">
 
+  <header class="topbar">
+    <a class="brand" href="mailto:info@strangegoose.co.uk?subject=Showreel%20enquiry">
+      <span class="goose-glyph"></span>
+      <span class="name">Strange Goose<span>Productions</span></span>
+    </a>
+    <a class="nav-mail" href="mailto:info@strangegoose.co.uk?subject=Showreel%20enquiry">Get in touch</a>
+  </header>
 
-<script type="text/babel">
+  <main>
 
-
-
-const { useState, useEffect, useRef } = React;
-
-const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
-  "direction": "programme",
-  "accent": "#5d80b0",
-  "headline": "grotesque",
-  "grain": false,
-  "corners": "soft"
-}/*EDITMODE-END*/;
-
-// Direction presets → CSS variable bundles.
-const DIRECTIONS = {
-  noir: {
-    "--bg": "#0c0b0c", "--surface": "#161416", "--surface-2": "#1f1c1f",
-    "--ink": "#f1ede6", "--ink-70": "rgba(241,237,230,.70)", "--ink-45": "rgba(241,237,230,.45)",
-    "--ink-25": "rgba(241,237,230,.22)", "--line": "rgba(241,237,230,.14)", "--line-strong": "rgba(241,237,230,.28)",
-    "--rule": "1px", "--hl-transform": "none", "--hl-spacing": "-0.015em", "--hl-weight": "500",
-    "--display": "var(--serif)"
-  },
-  programme: {
-    "--bg": "#f4f1e8", "--surface": "#fffdf7", "--surface-2": "#ebe7da",
-    "--ink": "#1b1714", "--ink-70": "rgba(27,23,20,.72)", "--ink-45": "rgba(27,23,20,.48)",
-    "--ink-25": "rgba(27,23,20,.22)", "--line": "rgba(27,23,20,.14)", "--line-strong": "rgba(27,23,20,.30)",
-    "--rule": "1px", "--hl-transform": "none", "--hl-spacing": "-0.018em", "--hl-weight": "500",
-    "--display": "var(--serif)"
-  },
-  marquee: {
-    "--bg": "#efece3", "--surface": "#fbf9f2", "--surface-2": "#e6e1d4",
-    "--ink": "#121110", "--ink-70": "rgba(18,17,16,.74)", "--ink-45": "rgba(18,17,16,.50)",
-    "--ink-25": "rgba(18,17,16,.24)", "--line": "rgba(18,17,16,.20)", "--line-strong": "rgba(18,17,16,.42)",
-    "--rule": "2px", "--hl-transform": "uppercase", "--hl-spacing": "-0.02em", "--hl-weight": "800",
-    "--display": "var(--grot)"
-  }
-};
-
-const ACCENTS = ["#d8a23f", "#c1492f", "#5f8c63", "#5d80b0"];
-
-// readable ink on an accent fill
-function readableInk(hex) {
-  const h = hex.replace("#", "");
-  const r = parseInt(h.slice(0, 2), 16),g = parseInt(h.slice(2, 4), 16),b = parseInt(h.slice(4, 6), 16);
-  return r * 299 + g * 587 + b * 114 > 138000 ? "#15110a" : "#fbf8f2";
-}
-
-function useReveal() {
-  useEffect(() => {
-    const els = Array.from(document.querySelectorAll("[data-reveal], .step"));
-    const revealAll = () => els.forEach((e) => e.classList.add("in"));
-    if (!("IntersectionObserver" in window)) {revealAll();return;}
-
-    // Reveal above-the-fold immediately so the page is never blank.
-    els.forEach((e) => {const r = e.getBoundingClientRect();if (r.top < window.innerHeight * 0.92) e.classList.add("in");});
-
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {if (e.isIntersecting) {e.target.classList.add("in");io.unobserve(e.target);}});
-    }, { threshold: 0.08, rootMargin: "0px 0px -6% 0px" });
-    els.forEach((e) => io.observe(e));
-
-    // Fail-safe: if IO is throttled/never fires in this environment, reveal
-    // everything after a short delay so content can never stay hidden.
-    const fallback = setTimeout(revealAll, 1200);
-    window.addEventListener("load", revealAll, { once: true });
-    return () => {io.disconnect();clearTimeout(fallback);};
-  }, []);
-}
-
-const MAIL = "mailto:info@strangegoose.co.uk?subject=Showreel%20enquiry";
-
-function TopBar() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-  return (
-    <header className={"topbar" + (scrolled ? " scrolled" : "")}>
-      <a className="brand" href={MAIL}>
-        <span className="goose-glyph"></span>
-        <span className="name">Strange Goose<span>Productions</span></span>
-      </a>
-      <a className="nav-mail" href={MAIL}>Get in touch</a>
-    </header>);
-
-}
-
-const HERO_STILLS = [
-{ src: "uploads/crossfire.jpg", cap: "Crossfire · 2025" },
-{ src: "uploads/subject%201410.jpg", cap: "Subject 1410 · 2024" },
-{ src: "uploads/the%20journeyman.jpg", cap: "The Journeyman · 2025" },
-{ src: "uploads/getting%20over.jpg", cap: "Getting Over Going Under" },
-{ src: "uploads/family%20time.jpg", cap: "Family Time · 48hr Winner" },
-{ src: "uploads/unravelling.jpg", cap: "Unravelling · 48hr" },
-{ src: "uploads/roadtripppin.jpg", cap: "Roadtripppin'" }];
-
-
-function Hero() {
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % HERO_STILLS.length), 4600);
-    return () => clearInterval(t);
-  }, []);
-  return (
-    <section className="hero">
-      <div className="wrap">
+    <section class="hero">
+      <div class="wrap">
         <div data-reveal>
-          <span className="eyebrow">Edinburgh · Showreels for actors</span>
+          <span class="eyebrow">Edinburgh · Showreels for actors</span>
         </div>
         <h1 data-reveal>Actor Showreels</h1>
-        <p className="tagline" data-reveal>Your best work. Cut properly.</p>
-        <div className="still" data-reveal>
-          {HERO_STILLS.map((s, i) =>
-          <img key={s.src} className={"still-media" + (i === idx ? " is-on" : "")} src={s.src} alt="" />
-          )}
-          <span className="ph-label">{HERO_STILLS[idx].cap}</span>
-          <span className="ratio"></span>
+        <p class="tagline" data-reveal>Your best work. Cut properly.</p>
+        <div class="still" data-reveal>
+          <img class="still-media is-on" src="uploads/crossfire.jpg" alt="" />
+          <img class="still-media" src="uploads/subject%201410.jpg" alt="" />
+          <img class="still-media" src="uploads/the%20journeyman.jpg" alt="" />
+          <img class="still-media" src="uploads/getting%20over.jpg" alt="" />
+          <img class="still-media" src="uploads/family%20time.jpg" alt="" />
+          <img class="still-media" src="uploads/unravelling.jpg" alt="" />
+          <img class="still-media" src="uploads/roadtripppin.jpg" alt="" />
+          <span class="ph-label">Crossfire · 2025</span>
         </div>
       </div>
-    </section>);
+    </section>
 
-}
-
-function Lead() {
-  return (
-    <section className="lead">
-      <div className="wrap">
-        <div className="grid">
+    <section class="lead">
+      <div class="wrap">
+        <div class="grid">
           <div data-reveal>
-            <span className="eyebrow">Who we are</span>
-            <div className="meta" style={{ marginTop: 22 }}>
-              <p style={{ margin: "0 0 18px" }}><span className="k">Based</span>Edinburgh, Scotland</p>
-              <p style={{ margin: "0 0 18px" }}><span className="k">Discipline</span>Direction, cinematography &amp; editing</p>
-              <p style={{ margin: 0 }}><span className="k">For</span>Working &amp; emerging actors</p>
+            <span class="eyebrow">Who we are</span>
+            <div class="meta" style="margin-top:22px;">
+              <p style="margin:0 0 18px;"><span class="k">Based</span>Edinburgh, Scotland</p>
+              <p style="margin:0 0 18px;"><span class="k">Discipline</span>Direction, cinematography &amp; editing</p>
+              <p style="margin:0;"><span class="k">For</span>Working &amp; emerging actors</p>
             </div>
           </div>
           <p data-reveal>
-            Strange Goose Productions offers professional showreel services for actors. We’re an award-winning Edinburgh film team, not a generic editing service. We understand performance, we understand what casting directors are looking for.
+            Strange Goose Productions offers professional showreel services for actors. We're an award-winning Edinburgh film team, not a generic editing service. We understand performance, we understand what casting directors are looking for.
           </p>
         </div>
       </div>
-    </section>);
+    </section>
 
-}
-
-const SERVICES = [
-{
-  name: "Edit & Assemble", price: "£180", tag: null,
-  desc: "You send us your footage. We cut it into a focused, well-paced reel that puts your best work front and centre.",
-  incl: ["A consultation to plan the reel", "One round of revisions", "Delivery as a web-ready file"]
-},
-{
-  name: "Monologue Shoot & Edit", price: "£350", tag: "Shot in Edinburgh",
-  desc: "You bring the monologue. We direct, shoot, and edit. A clean, professionally lit performance piece that looks like it belongs in a proper production — because it was made by one.",
-  incl: ["We direct, shoot & light the piece", "The fully edited monologue", "Assembly into a completed reel if you have existing footage to add"]
-}];
-
-
-function Services() {
-  return (
-    <section className="sec services" id="services">
-      <div className="wrap">
-        <div className="sec-top" data-reveal>
-          <h2 className="sec-h">Two ways to work with us</h2>
-          <span className="sec-num">01 — Services</span>
+    <section class="sec services" id="services">
+      <div class="wrap">
+        <div class="sec-top" data-reveal>
+          <h2 class="sec-h">Two ways to work with us</h2>
+          <span class="sec-num">01 — Services</span>
         </div>
-        <div className="svc-grid" data-reveal>
-          {SERVICES.map((s) =>
-          <article className="svc" key={s.name}>
-              <div className="svc-top">
-                <h3>{s.name}</h3>
-                <span className="price">{s.price}</span>
-              </div>
-              {s.tag && <span className="tag-pill">{s.tag}</span>}
-              <p className="desc">{s.desc}</p>
-              <ul className="incl">
-                {s.incl.map((i) => <li key={i}>{i}</li>)}
-              </ul>
-              <a className="svc-cta" href={MAIL}>Enquire<span className="arr">→</span></a>
-            </article>
-          )}
+        <div class="svc-grid" data-reveal>
+          <article class="svc">
+            <div class="svc-top">
+              <h3>Edit &amp; Assemble</h3>
+              <span class="price">£180</span>
+            </div>
+            <p class="desc">You send us your footage. We cut it into a focused, well-paced reel that puts your best work front and centre.</p>
+            <ul class="incl">
+              <li>A consultation to plan the reel</li>
+              <li>One round of revisions</li>
+              <li>Delivery as a web-ready file</li>
+            </ul>
+            <a class="svc-cta" href="mailto:info@strangegoose.co.uk?subject=Showreel%20enquiry">Enquire<span class="arr">→</span></a>
+          </article>
+          <article class="svc">
+            <div class="svc-top">
+              <h3>Monologue Shoot &amp; Edit</h3>
+              <span class="price">£350</span>
+            </div>
+            <span class="tag-pill">Shot in Edinburgh</span>
+            <p class="desc">You bring the monologue. We direct, shoot, and edit. A clean, professionally lit performance piece that looks like it belongs in a proper production — because it was made by one.</p>
+            <ul class="incl">
+              <li>We direct, shoot &amp; light the piece</li>
+              <li>The fully edited monologue</li>
+              <li>Assembly into a completed reel if you have existing footage to add</li>
+            </ul>
+            <a class="svc-cta" href="mailto:info@strangegoose.co.uk?subject=Showreel%20enquiry">Enquire<span class="arr">→</span></a>
+          </article>
         </div>
       </div>
-    </section>);
+    </section>
 
-}
-
-// act:true flags performance awards — the proof an actor cares about.
-const LEDGER = [
-{
-  label: "Competition Wins", note: "48 Hour Film Project",
-  items: [
-  { name: "Best Film", meta: "Aberdeen 2025" },
-  { name: "Best Directing", meta: "Aberdeen 2025" },
-  { name: "Best Actor", meta: "Aberdeen 2025", act: true }]
-
-},
-{
-  label: "Festival Wins", note: "Short film",
-  items: [
-  { name: "Best Micro Short", meta: "Birmingham Horror Film Festival · UK" },
-  { name: "Best Short", meta: "Holiday Horror Fest VIII · USA" },
-  { name: "Best Horror", meta: "Monza Film Fest · Italy" },
-  { name: "Best Horror", meta: "Night of Shorts · Italy" },
-  { name: "Best Horror", meta: "Reale Film Festival · Italy" }]
-
-},
-{
-  label: "Nominations", note: "48 Hour Film Project",
-  items: [
-  { name: "Best Directing", meta: "Glasgow 2024 · Edinburgh 2025" },
-  { name: "Best Actress", meta: "Glasgow 2024 · Aberdeen 2025", act: true },
-  { name: "Best Actor", meta: "Inverness 2025", act: true },
-  { name: "Best Acting Ensemble", meta: "Aberdeen 2025", act: true },
-  { name: "Best Editing", meta: "Aberdeen 2025 · Edinburgh 2024" }]
-
-}];
-
-
-function Honours() {
-  return (
-    <section className="sec honours" id="why">
-      <div className="wrap">
-        <div className="sec-top" data-reveal>
-          <span className="sec-num" style={{ order: 2 }}>02 — Why SGP</span>
-          <h2 className="sec-h" style={{ maxWidth: "20ch" }}>The performances win awards. So does the direction.</h2>
+    <section class="sec honours" id="why">
+      <div class="wrap">
+        <div class="sec-top" data-reveal>
+          <span class="sec-num" style="order:2;">02 — Why SGP</span>
+          <h2 class="sec-h" style="max-width:20ch;">The performances win awards. So does the direction.</h2>
         </div>
-        <div className="grid">
+        <div class="grid">
           <div data-reveal>
-            <p className="pullquote">
-              We direct.<br />We don’t <em>just</em> cut.
+            <p class="pullquote">
+              We direct.<br />We don't <em>just</em> cut.
             </p>
-            <p className="why-body">
+            <p class="why-body">
               We direct for performance — and juries notice. Across the 48 Hour Film Project our films have taken <strong>Best Film</strong>, <strong>Best Directing</strong> and <strong>Best Actor</strong>, with nominations for <strong>Best Actress</strong> and <strong>Best Acting Ensemble</strong> — alongside festival wins in the UK, USA and Italy. The same eye goes into your reel.
             </p>
-            <p className="why-tag">8 wins · UK · USA · Italy</p>
+            <p class="why-tag">8 wins · UK · USA · Italy</p>
           </div>
-          <div className="ledger" data-reveal>
-            {LEDGER.map((col) =>
-            <div className="led-col" key={col.label}>
-                <h4 className="led-h">{col.label}<span>{col.note}</span></h4>
-                <ul className="led-list">
-                  {col.items.map((it, i) =>
-                <li className={"led-item" + (it.act ? " act" : "")} key={col.label + i}>
-                      <span className="a-name">{it.name}</span>
-                      <span className="a-meta">{it.meta}</span>
-                    </li>
-                )}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>);
-
-}
-
-const STEPS = [
-{ n: "01", t: "Get in touch", s: "Send an email and tell us a little about you." },
-{ n: "02", t: "Short consultation", s: "What you have, what you need — we plan the reel." },
-{ n: "03", t: "Send us your footage", s: "Drop us the raw files however suits you." },
-{ n: "04", t: "First cut", s: "A first cut back to you within 5 working days." },
-{ n: "05", t: "Revisions & delivery", s: "One round of changes, then final delivery." }];
-
-
-function Process() {
-  return (
-    <section className="sec process" id="process">
-      <div className="wrap">
-        <div className="sec-top" data-reveal>
-          <h2 className="sec-h">How the edit service works</h2>
-          <span className="sec-num">03 — Process</span>
-        </div>
-        <div className="steps">
-          {STEPS.map((st) =>
-          <div className="step" key={st.n}>
-              <div className="n">{st.n}</div>
-              <div className="bar"></div>
-              <p className="s-title">{st.t}</p>
-              <p className="s-sub">{st.s}</p>
+          <div class="ledger" data-reveal>
+            <div class="led-col">
+              <h4 class="led-h">Competition Wins<span>48 Hour Film Project</span></h4>
+              <ul class="led-list">
+                <li class="led-item"><span class="a-name">Best Film</span><span class="a-meta">Aberdeen 2025</span></li>
+                <li class="led-item"><span class="a-name">Best Directing</span><span class="a-meta">Aberdeen 2025</span></li>
+                <li class="led-item act"><span class="a-name">Best Actor</span><span class="a-meta">Aberdeen 2025</span></li>
+              </ul>
             </div>
-          )}
+            <div class="led-col">
+              <h4 class="led-h">Festival Wins<span>Short film</span></h4>
+              <ul class="led-list">
+                <li class="led-item"><span class="a-name">Best Micro Short</span><span class="a-meta">Birmingham Horror Film Festival · UK</span></li>
+                <li class="led-item"><span class="a-name">Best Short</span><span class="a-meta">Holiday Horror Fest VIII · USA</span></li>
+                <li class="led-item"><span class="a-name">Best Horror</span><span class="a-meta">Monza Film Fest · Italy</span></li>
+                <li class="led-item"><span class="a-name">Best Horror</span><span class="a-meta">Night of Shorts · Italy</span></li>
+                <li class="led-item"><span class="a-name">Best Horror</span><span class="a-meta">Reale Film Festival · Italy</span></li>
+              </ul>
+            </div>
+            <div class="led-col">
+              <h4 class="led-h">Nominations<span>48 Hour Film Project</span></h4>
+              <ul class="led-list">
+                <li class="led-item"><span class="a-name">Best Directing</span><span class="a-meta">Glasgow 2024 · Edinburgh 2025</span></li>
+                <li class="led-item act"><span class="a-name">Best Actress</span><span class="a-meta">Glasgow 2024 · Aberdeen 2025</span></li>
+                <li class="led-item act"><span class="a-name">Best Actor</span><span class="a-meta">Inverness 2025</span></li>
+                <li class="led-item act"><span class="a-name">Best Acting Ensemble</span><span class="a-meta">Aberdeen 2025</span></li>
+                <li class="led-item"><span class="a-name">Best Editing</span><span class="a-meta">Aberdeen 2025 · Edinburgh 2024</span></li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
-    </section>);
+    </section>
 
-}
+    <section class="sec process" id="process">
+      <div class="wrap">
+        <div class="sec-top" data-reveal>
+          <h2 class="sec-h">How the edit service works</h2>
+          <span class="sec-num">03 — Process</span>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="n">01</div>
+            <div class="bar"></div>
+            <p class="s-title">Get in touch</p>
+            <p class="s-sub">Send an email and tell us a little about you.</p>
+          </div>
+          <div class="step">
+            <div class="n">02</div>
+            <div class="bar"></div>
+            <p class="s-title">Short consultation</p>
+            <p class="s-sub">What you have, what you need — we plan the reel.</p>
+          </div>
+          <div class="step">
+            <div class="n">03</div>
+            <div class="bar"></div>
+            <p class="s-title">Send us your footage</p>
+            <p class="s-sub">Drop us the raw files however suits you.</p>
+          </div>
+          <div class="step">
+            <div class="n">04</div>
+            <div class="bar"></div>
+            <p class="s-title">First cut</p>
+            <p class="s-sub">A first cut back to you within 5 working days.</p>
+          </div>
+          <div class="step">
+            <div class="n">05</div>
+            <div class="bar"></div>
+            <p class="s-title">Revisions &amp; delivery</p>
+            <p class="s-sub">One round of changes, then final delivery.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-function CTA() {
-  return (
-    <section className="cta" id="contact">
-      <div className="wrap">
-        <span className="eyebrow" data-reveal>Ready when you are</span>
+    <section class="cta" id="contact">
+      <div class="wrap">
+        <span class="eyebrow" data-reveal>Ready when you are</span>
         <h2 data-reveal>Get in touch</h2>
         <div data-reveal>
-          <a className="mail" href={MAIL}>info@strangegoose.co.uk<span>→</span></a>
+          <a class="mail" href="mailto:info@strangegoose.co.uk?subject=Showreel%20enquiry">info@strangegoose.co.uk<span>→</span></a>
         </div>
-        <p className="sub" data-reveal>Strange Goose Productions · Edinburgh</p>
+        <p class="sub" data-reveal>Strange Goose Productions · Edinburgh</p>
       </div>
-    </section>);
+    </section>
 
-}
+  </main>
 
-function Footer() {
-  return (
-    <footer>
-      <div className="wrap">
-        <div className="row">
-          <span>© 2026 Strange Goose Productions</span>
-          <span>Award-winning film team <span className="dot">·</span> Edinburgh, Scotland</span>
-          <a href={MAIL}>info@strangegoose.co.uk</a>
-        </div>
+  <footer>
+    <div class="wrap">
+      <div class="row">
+        <span>© 2026 Strange Goose Productions</span>
+        <span>Award-winning film team <span class="dot">·</span> Edinburgh, Scotland</span>
+        <a href="mailto:info@strangegoose.co.uk?subject=Showreel%20enquiry">info@strangegoose.co.uk</a>
       </div>
-    </footer>);
+    </div>
+  </footer>
 
-}
+</div>
 
-function App() {
-  useReveal();
+<script>
+  // Mark JS available so reveal animations engage (content stays visible without JS).
+  document.documentElement.classList.add("js");
 
-  // Baked-in production look — Programme direction, grotesque headlines,
-  // soft corners, steel-blue accent, film grain off.
-  const styleVars = {
-    ...DIRECTIONS.programme,
-    "--display": "var(--grot)",
-    "--accent": "#5d80b0",
-    "--accent-ink": "#fbf8f2",
-    "--radius": "10px"
-  };
+  // Sticky top-bar border on scroll.
+  (function () {
+    var bar = document.querySelector(".topbar");
+    if (!bar) return;
+    function onScroll() { bar.classList.toggle("scrolled", window.scrollY > 12); }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  })();
 
-  return (
-    <div className="page" data-dir="programme" data-grain="off" style={styleVars}>
-      <TopBar />
-      <main>
-        <Hero />
-        <Lead />
-        <Services />
-        <Honours />
-        <Process />
-        <CTA />
-      </main>
-      <Footer />
-    </div>);
+  // Reveal-on-scroll (progressive enhancement).
+  (function () {
+    var els = Array.prototype.slice.call(document.querySelectorAll("[data-reveal], .step"));
+    function revealAll() { els.forEach(function (e) { e.classList.add("in"); }); }
+    if (!("IntersectionObserver" in window)) { revealAll(); return; }
+    els.forEach(function (e) { var r = e.getBoundingClientRect(); if (r.top < window.innerHeight * 0.92) e.classList.add("in"); });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+    }, { threshold: 0.08, rootMargin: "0px 0px -6% 0px" });
+    els.forEach(function (e) { io.observe(e); });
+    window.addEventListener("load", revealAll, { once: true });
+  })();
 
-}
-
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-
-
+  // Hero still carousel — crossfade through the film stills.
+  (function () {
+    var still = document.querySelector(".still");
+    if (!still) return;
+    var imgs = Array.prototype.slice.call(still.querySelectorAll(".still-media"));
+    var label = still.querySelector(".ph-label");
+    var caps = [
+      "Crossfire · 2025",
+      "Subject 1410 · 2024",
+      "The Journeyman · 2025",
+      "Getting Over Going Under",
+      "Family Time · 48hr Winner",
+      "Unravelling · 48hr",
+      "Roadtripppin'"
+    ];
+    if (imgs.length < 2) return;
+    var idx = 0;
+    setInterval(function () {
+      imgs[idx].classList.remove("is-on");
+      idx = (idx + 1) % imgs.length;
+      imgs[idx].classList.add("is-on");
+      if (label) label.textContent = caps[idx] || "";
+    }, 4600);
+  })();
 </script>
 
 </body>
