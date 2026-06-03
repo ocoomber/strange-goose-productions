@@ -78,7 +78,9 @@
   }
   .topbar.scrolled { border-bottom-color: var(--line); background: color-mix(in srgb, var(--bg) 78%, transparent); }
   .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
-  .brand .bug { width: 13px; height: 13px; background: var(--accent); transform: rotate(45deg); flex: none; }
+  .brand .goose-glyph { display: inline-block; width: 16px; height: 16px; position: relative; flex: none; color: var(--accent); }
+  .brand .goose-glyph::before { content: ""; position: absolute; top: 0; left: 8px; width: 5.5px; height: 5.5px; border-radius: 50%; background: currentColor; }
+  .brand .goose-glyph::after { content: ""; position: absolute; top: 6px; left: 2px; width: 12.5px; height: 8px; background: currentColor; border-radius: 50% 60% 40% 70% / 60% 50% 70% 40%; }
   .brand .name { font-family: var(--grot); font-weight: 700; font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase; line-height: 1.15; }
   .brand .name span { display: block; color: var(--ink-45); font-weight: 600; }
   .topbar .nav-mail {
@@ -283,6 +285,7 @@
 <script type="text/babel">
 
 
+
 const { useState, useEffect, useRef } = React;
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
@@ -361,7 +364,7 @@ function TopBar() {
   return (
     <header className={"topbar" + (scrolled ? " scrolled" : "")}>
       <a className="brand" href={MAIL}>
-        <span className="bug"></span>
+        <span className="goose-glyph"></span>
         <span className="name">Strange Goose<span>Productions</span></span>
       </a>
       <a className="nav-mail" href={MAIL}>Get in touch</a>
@@ -414,12 +417,12 @@ function Lead() {
             <span className="eyebrow">Who we are</span>
             <div className="meta" style={{ marginTop: 22 }}>
               <p style={{ margin: "0 0 18px" }}><span className="k">Based</span>Edinburgh, Scotland</p>
-              <p style={{ margin: "0 0 18px" }}><span className="k">Discipline</span>Direction, cinematography &amp; edit</p>
+              <p style={{ margin: "0 0 18px" }}><span className="k">Discipline</span>Direction, cinematography &amp; editing</p>
               <p style={{ margin: 0 }}><span className="k">For</span>Working &amp; emerging actors</p>
             </div>
           </div>
           <p data-reveal>
-            Strange Goose Productions offers professional showreel services for actors. We’re an award-winning Edinburgh film team — not a generic editing service. We understand performance, we understand what casting directors are looking for, and we know how to make footage sing.
+            Strange Goose Productions offers professional showreel services for actors. We’re an award-winning Edinburgh film team, not a generic editing service. We understand performance, we understand what casting directors are looking for.
           </p>
         </div>
       </div>
@@ -496,8 +499,7 @@ const LEDGER = [
   { name: "Best Actress", meta: "Glasgow 2024 · Aberdeen 2025", act: true },
   { name: "Best Actor", meta: "Inverness 2025", act: true },
   { name: "Best Acting Ensemble", meta: "Aberdeen 2025", act: true },
-  { name: "Best Editing", meta: "Aberdeen 2025 · Edinburgh 2024" },
-  { name: "Best Visual Effects", meta: "Edinburgh 2025" }]
+  { name: "Best Editing", meta: "Aberdeen 2025 · Edinburgh 2024" }]
 
 }];
 
@@ -519,7 +521,6 @@ function Honours() {
               We direct for performance — and juries notice. Across the 48 Hour Film Project our films have taken <strong>Best Film</strong>, <strong>Best Directing</strong> and <strong>Best Actor</strong>, with nominations for <strong>Best Actress</strong> and <strong>Best Acting Ensemble</strong> — alongside festival wins in the UK, USA and Italy. The same eye goes into your reel.
             </p>
             <p className="why-tag">8 wins · UK · USA · Italy</p>
-            <p className="led-legend"><i></i></p>
           </div>
           <div className="ledger" data-reveal>
             {LEDGER.map((col) =>
@@ -632,6 +633,7 @@ function App() {
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
 
 </script>
 
