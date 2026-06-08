@@ -1,12 +1,11 @@
 <!DOCTYPE html><html lang="en"><head>
 
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Production · Strange Goose</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site/styles.css">
 <style>
   body { display: flex; flex-direction: column; min-height: 100vh; transition: background 0.4s, color 0.4s; }
@@ -60,6 +59,48 @@
     line-height: 1.55;
   }
   .hero-ai .deck .accent { color: var(--accent); }
+
+  /* ── pillar divider ─────────────────── */
+  .pillar-divide {
+    padding: 56px 0 0;
+    border-top: 1px solid rgba(20,18,15,0.12);
+  }
+  .pillar-divide .inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .pillar-card {
+    background: var(--paper-2);
+    border: 1px solid rgba(20,18,15,0.10);
+    padding: 32px;
+    border-radius: 2px;
+  }
+  .pillar-card .pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    border: 1px solid rgba(20,18,15,0.18);
+    padding: 5px 10px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+  .pillar-card h3 {
+    font-size: clamp(22px, 2.4vw, 28px);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .pillar-card h3 .accent { color: var(--accent); }
+  .pillar-card p {
+    font-size: 15px;
+    color: var(--ink-2);
+    line-height: 1.6;
+    max-width: 40ch;
+  }
 
   /* ── compare pair (same scene, two tools) ─── */
   .compare-pair {
@@ -159,43 +200,9 @@
     object-fit: cover;
     display: block;
   }
-  .work-cell .tag {
-    position: absolute;
-    top: 14px; left: 14px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    background: var(--paper);
-    color: var(--ink);
-    padding: 6px 10px;
-    border-radius: 2px;
-  }
-  .work-cell .tag .dot {
-    width: 6px; height: 6px;
-    background: var(--accent);
-    border-radius: 50%;
-  }
-  .work-cell .cap {
-    position: absolute;
-    bottom: 14px; left: 14px; right: 14px;
-    font-size: 13px;
-    line-height: 1.45;
-    color: var(--paper);
-    background: rgba(10,9,8,0.78);
-    backdrop-filter: blur(4px);
-    padding: 10px 12px;
-    border-radius: 2px;
-    max-width: 38ch;
-  }
-  .work-cell .cap b { color: var(--paper); font-weight: 500; }
   .landscape-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .ugc-pair { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 
-  /* ── pipeline section (nodes + storyboards) ─── */
+  /* ── pipeline section ─── */
   .pipeline {
     padding: 8px 0 64px;
   }
@@ -253,7 +260,7 @@
     border-radius: 50%;
   }
 
-  /* ── reality (the pitch) ──────────────── */
+  /* ── reality ──────────────────────────── */
   .reality {
     padding: 64px 0;
     border-top: 1px solid rgba(20,18,15,0.12);
@@ -263,14 +270,14 @@
     grid-template-columns: 1fr 1.7fr;
     gap: 64px;
   }
-  .reality h2, .regulation h2 {
+  .reality h2, .regulation h2, .intern h2 {
     font-size: clamp(32px, 4vw, 48px);
     letter-spacing: -0.025em;
     line-height: 1;
   }
-  .reality h2 .accent, .regulation h2 .accent { color: var(--accent); }
+  .reality h2 .accent, .regulation h2 .accent, .intern h2 .accent { color: var(--accent); }
 
-  /* ── regulation (the regulatory picture) ─── */
+  /* ── regulation ─── */
   .regulation {
     padding: 64px 0;
     border-top: 1px solid rgba(20,18,15,0.12);
@@ -313,61 +320,50 @@
   }
   .myth .truth b { color: var(--ink); font-weight: 500; }
 
-  /* ── covered: list layout (default) ──── */
-  .covered {
+  /* ── the AI intern section ──────────── */
+  .intern {
     padding: 80px 0;
-    border-top: 1px solid rgba(20,18,15,0.12);
+    border-top: 3px solid var(--accent);
+    background: var(--paper-2);
   }
-  .covered .head {
-    margin-bottom: 56px;
+  .intern-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.7fr;
+    gap: 64px;
+    align-items: start;
+  }
+  .intern .section-label { margin-bottom: 16px; }
+  .intern-body {
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--ink-2);
+  }
+  .intern-body p + p { margin-top: 18px; }
+  .intern-body b { color: var(--ink); font-weight: 500; }
+  .intern-items {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 64px;
-    align-items: end;
+    gap: 12px;
+    margin-top: 0;
   }
-  .covered h2 {
-    font-size: clamp(36px, 5vw, 64px);
-    letter-spacing: -0.03em;
-    line-height: 0.96;
+  .intern-item {
+    background: var(--paper);
+    border: 1px solid rgba(20,18,15,0.08);
+    padding: 20px;
+    border-radius: 2px;
   }
-  .covered h2 .accent { color: var(--accent); }
-  .covered .head-meta {
-    font-size: 16px;
-    color: var(--ink-3);
-    line-height: 1.6;
-    max-width: 40ch;
-  }
-
-  /* layout: list (default) */
-  .covered-items {
-    border-top: 1px solid rgba(20,18,15,0.12);
-  }
-  .item {
-    display: grid;
-    grid-template-columns: 56px 1.2fr 2fr;
-    gap: 32px;
-    align-items: baseline;
-    padding: 28px 0;
-    border-bottom: 1px solid rgba(20,18,15,0.12);
-    transition: padding 0.2s, color 0.15s;
-  }
-  .item:hover { padding-left: 8px; }
-  .item .num {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.16em;
-    color: var(--ink-3);
-  }
-  .item .ttl {
-    font-size: clamp(22px, 2.6vw, 30px);
-    letter-spacing: -0.015em;
+  .intern-item .i-title {
+    font-size: 15px;
     font-weight: 600;
-    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.3;
   }
-  .item .body {
+  .intern-item .i-body {
+    font-size: 13.5px;
+    line-height: 1.55;
     color: var(--ink-2);
-    font-size: 15.5px;
-    line-height: 1.6;
   }
 
   /* ── credentials ────────────────────── */
@@ -395,35 +391,6 @@
     max-width: 52ch;
   }
   .creds p + p { margin-top: 16px; }
-  .creds .stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1px;
-    background: rgba(20,18,15,0.12);
-    border: 1px solid rgba(20,18,15,0.12);
-  }
-  .creds .stat {
-    background: var(--paper);
-    padding: 28px 24px;
-  }
-  .creds .stat .v {
-    font-size: clamp(36px, 4.5vw, 56px);
-    letter-spacing: -0.03em;
-    font-weight: 600;
-    line-height: 1;
-    color: var(--ink);
-    font-variant-numeric: tabular-nums;
-  }
-  .creds .stat .v .accent { color: var(--accent); }
-  .creds .stat .k {
-    margin-top: 12px;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    line-height: 1.5;
-  }
 
   /* ── what we don't ─────────────────── */
   .nots {
@@ -520,12 +487,6 @@
     font-size: 16.5px;
     line-height: 1.6;
   }
-  .cta-ai .row {
-    display: inline-flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
   .cta-ai .small {
     margin-top: 24px;
     font-family: var(--mono);
@@ -540,15 +501,13 @@
     .hero-ai { padding: 56px 0 40px; }
     .pair-grid { grid-template-columns: 1fr; }
     .landscape-pair { grid-template-columns: 1fr; }
-    .ugc-pair { grid-template-columns: 1fr 1fr 1fr; }
     .storyboard-pair { grid-template-columns: 1fr; }
     .reality-grid { grid-template-columns: 1fr; gap: 28px; }
     .regulation .reality-grid { grid-template-columns: 1fr; gap: 24px; }
     .myths { grid-template-columns: 1fr; }
-    .covered .head { grid-template-columns: 1fr; gap: 24px; }
-    .item { grid-template-columns: 40px 1fr; gap: 14px; padding: 22px 0; }
-    .item .body { grid-column: 2; }
-    .item:hover { padding-left: 0; }
+    .pillar-divide .inner { grid-template-columns: 1fr; }
+    .intern-grid { grid-template-columns: 1fr; gap: 32px; }
+    .intern-items { grid-template-columns: 1fr; }
     .creds-grid { grid-template-columns: 1fr; gap: 32px; }
     .nots .head { grid-template-columns: 1fr; gap: 16px; }
     .nots-list { grid-template-columns: 1fr 1fr; }
@@ -564,7 +523,7 @@
   }
 </style>
 </head>
-<body data-screen-label="04 AI Production" style="">
+<body data-screen-label="04 AI Production">
 
 <nav class="top">
   <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose</span></a>
@@ -583,52 +542,66 @@
 <section class="hero-ai">
   <div class="wrap">
     <span class="stamp">INDEPENDENT CONSULTANCY</span>
-    <h1>AI video is <span class="strike">free</span>, <span class="strike">instant</span> and <span class="strike">unregulated</span>.<br><span class="accent">None of that is true.</span></h1>
-    <p class="deck">The market is loud, the demos are misleading, and the tooling shifts every week. We help you cut through it. A straight conversation with working filmmakers. No software to sell you, no platform we're tied to. Just an honest read on what AI can do for your specific project, what it'll cost, and where it'll let you down.</p>
+    <h1>AI production advice from people who <span class="accent">actually use it.</span></h1>
+    <p class="deck">The market is loud, the demos are cherry-picked, and the tooling shifts every week. We're working filmmakers who use AI in production every day. No software to sell you, no platform we're tied to, no YouTube channel to feed. If you want a straight conversation about what this technology can actually do for your project, that's what we do.</p>
+  </div>
+</section>
+
+<section class="pillar-divide">
+  <div class="wrap">
+    <div class="inner">
+      <div class="pillar-card">
+        <span class="pill">Part one</span>
+        <h3>The part <span class="accent">creatives worry about</span></h3>
+        <p>AI video, images, voiceover, scripts. What it can do, what it costs, what the regulations say, and when to use a camera instead.</p>
+      </div>
+      <div class="pillar-card">
+        <span class="pill">Part two</span>
+        <h3>The part most people <span class="accent">don't know exists</span></h3>
+        <p>The AI intern. Coded tools, workflow automation, research. The day of reading websites and writing a report that nobody wants to spend — gone.</p>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="pipeline">
   <div class="wrap">
-    <div class="pair-head">
-      <div class="ttl">The landscape, <span class="accent">made navigable.</span></div>
-    </div>
     <div class="pipeline-stack">
       <div class="pipeline-nodes">
-        <img src="site/img/pipeline-nodes.jpg" alt="Reference: a typical AI production pipeline mapped as a node graph">
-        <span class="tag">
-</span>
+        <img src="site/img/pipeline-nodes.jpg" alt="AI production pipeline">
+        <span class="tag"><span class="dot"></span>The production pipeline</span>
       </div>
       <div class="storyboard-pair">
         <div class="storyboard-cell">
-          <img src="site/img/storyboard-handdrawn.jpg" alt="Reference: a traditional storyboard panel">
+          <img src="site/img/storyboard-cinematic.jpg" alt="Cinematic storyboard reference">
         </div>
         <div class="storyboard-cell">
-          <img src="site/img/storyboard-cinematic.jpg" alt="Reference: the same panel rendered through current AI tooling">
+          <img src="site/img/storyboard-handdrawn.jpg" alt="Hand-drawn storyboard reference">
         </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- PART ONE ─────────────────────────────────── -->
+
 <section class="reality">
   <div class="wrap">
     <div class="reality-grid">
       <div>
-        <p class="section-label">The reality</p>
-        <h2>If you're trying to figure out what AI <span class="accent">can actually do</span> for your project;</h2>
+        <p class="section-label">Part one — The fear zone</p>
+        <h2>What AI <span class="accent">actually does</span> to a production budget</h2>
       </div>
       <div class="reality-body">
-        <p>…and what it'll actually cost, we can help.</p>
-        <p>The honest answer is rarely the one being marketed. Some shots want a camera. Some want a generative pipeline. Some want both, stitched together. <span class="accent">Knowing which is which</span> is most of the job.</p>
+        <p>The honest answer is rarely the one being marketed. Some shots want a camera. Some want a generative pipeline. Some want both, stitched together. <b>Knowing which is which</b> is most of what you're paying for.</p>
         <div class="myths">
           <div class="myth">
             <div class="claim">"It's free."</div>
-            <div class="truth"><b>It isn't.</b> Tooling, compute, iteration, and the senior creative time to direct it all add up. There are real costs behind the demos.</div>
+            <div class="truth"><b>It isn't.</b> Tooling, compute, iteration cycles, and the senior creative time to direct it all add up. There are real costs behind the demos.</div>
           </div>
           <div class="myth">
             <div class="claim">"It's instant."</div>
-            <div class="truth"><b>Faster, not instant.</b> A finished spot still wants storyboarding, art direction, generation cycles, and proper grade and edit.</div>
+            <div class="truth"><b>Faster, not instant.</b> A finished spot still wants storyboarding, art direction, generation cycles, and a proper grade and edit.</div>
           </div>
           <div class="myth">
             <div class="claim">"It's indistinguishable from real film."</div>
@@ -658,78 +631,6 @@
   </div>
 </section>
 
-<section class="creds">
-  <div class="wrap">
-    <div class="creds-body">
-      <p class="section-label">Why an independent voice</p>
-      <h2>No platform.<br>No <span class="accent">incentive to sell.</span></h2>
-      <p>Most AI advice you'll find online is attached to a tool: a studio plugging a workflow, a vendor demoing their model, an influencer chasing affiliate revenue. The advice bends toward the product.</p>
-      <p>We're working filmmakers. We use these tools when they fit, and we say so when they don't. <span class="accent">The recommendation is the deliverable</span>, not a piece of software you have to buy afterwards.</p>
-    </div>
-    <div class="workflow">
-      <div class="landscape-pair">
-        <div class="work-cell landscape">
-          <img src="site/img/ai-landscape-1.jpg" alt="Example reference: generative landscape, modern interpretation">
-        </div>
-        <div class="work-cell landscape">
-          <img src="site/img/ai-landscape-2.jpg" alt="Example reference: same prompt, historical interpretation">
-        </div>
-      </div>
-      <div class="landscape-pair">
-        <div class="work-cell portrait">
-          <img src="site/img/ugc-1.jpg" alt="Example reference: short-form vertical content">
-        </div>
-        <div class="work-cell portrait">
-          <img src="site/img/ugc-2.jpg" alt="Example reference: short-form vertical content">
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="covered">
-  <div class="wrap">
-    <div class="head">
-      <div>
-        <p class="section-label">Where we come in</p>
-        <h2>What we can<br><span class="accent">help you with.</span></h2>
-      </div>
-    </div>
-    <div class="covered-items">
-      <div class="item">
-        <span class="num">01</span>
-        <span class="ttl">Working out what AI is actually for</span>
-        <span class="body">An honest read on which parts of your project the technology can carry, and which parts still want a camera.</span>
-      </div>
-      <div class="item">
-        <span class="num">02</span>
-        <span class="ttl">The right tools for the brief</span>
-        <span class="body">The technology is developing fast. We talk through what we'd reach for, today, for this kind of work, and what we'd refuse to touch.</span>
-      </div>
-      <div class="item">
-        <span class="num">03</span>
-        <span class="ttl">What's realistic for the project</span>
-        <span class="body">A frank conversation about what the work actually involves, and what corners you're being asked to cut without realising.</span>
-      </div>
-      <div class="item">
-        <span class="num">04</span>
-        <span class="ttl">Integrating AI into an existing workflow</span>
-        <span class="body">Where it slots into pre-pro, production, and post without breaking what already works. Where it costs you more time than it saves.</span>
-      </div>
-      <div class="item">
-        <span class="num">05</span>
-        <span class="ttl">What to ignore</span>
-        <span class="body">The launches, the hype cycles, the LinkedIn demos. What's a real tool. What's a highlight reel and a wall of failed renders.</span>
-      </div>
-      <div class="item">
-        <span class="num">06</span>
-        <span class="ttl">Disclosure obligations and workflow compliance</span>
-        <span class="body">Labelling, <b>C2PA</b> provenance, the paperwork that travels with the file. We map where AI enters your pipeline and what each market expects before delivery — not after a broadcaster flags it.</span>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="compare-pair">
   <div class="wrap">
     <div class="pair-head">
@@ -746,16 +647,72 @@
   </div>
 </section>
 
+<!-- PART TWO ─────────────────────────────────── -->
+
+<section class="intern">
+  <div class="wrap">
+    <div class="intern-grid">
+      <div>
+        <p class="section-label">Part two — The AI intern</p>
+        <h2>The work nobody <span class="accent">wants to spend a day on</span></h2>
+        <div class="intern-body">
+          <p>There's a version of AI that has nothing to do with video or images. It's the intern who reads everything, summarises it accurately, writes the first draft, builds the tool, runs the research, and has it done before lunch.</p>
+          <p>Most productions don't know this exists. The ones that do get a day back every week.</p>
+        </div>
+      </div>
+      <div class="intern-items">
+        <div class="intern-item">
+          <div class="i-title">Bespoke production tools</div>
+          <div class="i-body">Off-the-shelf software is built for the industry average. We build tools for how a specific company works. Our call sheet generator reflects our crew structure, our shoot rhythm, our way of communicating on set. Built in an afternoon. Used on every production.</div>
+        </div>
+        <div class="intern-item">
+          <div class="i-title">Research and briefing</div>
+          <div class="i-body">Location research, talent research, competitor analysis, regulatory summaries. The day of reading websites and producing a report that someone still has to read. AI does the reading. You make the decisions.</div>
+        </div>
+        <div class="intern-item">
+          <div class="i-title">Workflow automation</div>
+          <div class="i-body">Repetitive pipeline tasks — format conversions, file naming, delivery checklists, first-draft documents. The work that takes two hours and produces nothing interesting. Gone, or close to it.</div>
+        </div>
+        <div class="intern-item">
+          <div class="i-title">Can you build one for us?</div>
+          <div class="i-body">If you know exactly what's wrong with the tool you're currently using, there's a good chance something better is buildable. Whether you want to do it yourself, talk through how we approached ours, or hand it over entirely — any of those conversations is fine.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CREDENTIALS ──────────────────────────────── -->
+
+<section class="creds">
+  <div class="wrap">
+    <div class="creds-body">
+      <p class="section-label">Why an independent voice</p>
+      <h2>No platform.<br>No <span class="accent">incentive to sell.</span></h2>
+      <p>Most AI advice you'll find online is attached to a tool: a studio plugging a workflow, a vendor demoing their model, an influencer chasing affiliate revenue. The advice bends toward the product.</p>
+      <p>We're working filmmakers. We use these tools in production, we've built tools on top of them, and we say so when they're not the right answer. <span class="accent">The recommendation is the deliverable</span>, not a piece of software you have to buy afterwards.</p>
+      <p>It's not a free conversation. But if you've spent any time in YouTube comment sections trying to get a straight answer about this technology, it'll be worth your time.</p>
+    </div>
+    <div class="workflow">
+      <div class="landscape-pair">
+        <div class="work-cell landscape">
+          <img src="site/img/ai-landscape-1.jpg" alt="Example reference: generative landscape, modern interpretation">
+        </div>
+        <div class="work-cell landscape">
+          <img src="site/img/ai-landscape-2.jpg" alt="Example reference: same prompt, historical interpretation">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE DON'T DO ─────────────────────────── -->
+
 <section class="nots">
   <div class="wrap">
     <div class="head">
-      <div>
-        <p class="section-label">What this isn't</p>
-        <h2>The things we<br><span class="accent">don't do.</span></h2>
-      </div>
-      <div class="head-meta">
-        Worth saying out loud, so nobody wastes anyone's time.
-      </div>
+      <h2>The things we <span class="accent">don't do.</span></h2>
+      <p class="head-meta">Worth saying out loud, so nobody wastes anyone's time.</p>
     </div>
     <div class="nots-list">
       <div class="no">
@@ -787,28 +744,36 @@
   </div>
 </section>
 
+<!-- CTA ──────────────────────────────────────── -->
+
 <section class="cta-ai">
   <div class="wrap-tight">
-    <span class="label">Get in touch</span>
-    <h2>Tell us what<br>you're <span class="accent">trying to make.</span></h2>
-    <div class="row">
-      <a class="btn primary" href="mailto:info@strangegoose.co.uk?subject=AI%20Production%20Enquiry">Start a conversation →</a>
-    </div>
+    <div class="label">Get in touch</div>
+    <h2>Tell us what you're <span class="accent">trying to make.</span></h2>
+    <p>Or what you're trying to stop spending a day on. Either works.</p>
+    <a href="mailto:info@strangegoose.co.uk?subject=AI%20Production%20Enquiry" class="btn primary">Start a conversation →</a>
+    <p class="small">strangegoose.co.uk · info@strangegoose.co.uk</p>
   </div>
 </section>
 
 </main>
 
 <footer class="site">
-  <div><span class="goose-glyph"></span>&nbsp; Strange Goose · © 2026</div>
-  <div class="links">
-    <a href="work.html">Previous Work</a>
-    <a href="commercial.html">Hire Us</a>
-    <a href="ai.html">AI Production</a>
-    <a href="about.html">About</a>
-    <a href="glossary.html">Glossary</a>
-    <a href="mailto:info@strangegoose.co.uk">Email</a>
+  <div class="wrap">
+    <div class="footer-row">
+      <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose</span></a>
+      <nav class="footer-links">
+        <a href="work.html">Previous Work</a>
+        <a href="commercial.html">Hire Us</a>
+        <a href="ai.html">AI Production</a>
+        <a href="about.html">About</a>
+        <a href="glossary.html">Glossary</a>
+        <a href="mailto:info@strangegoose.co.uk">Email</a>
+      </nav>
+    </div>
+    <p class="footer-copy">Strange Goose · © 2026</p>
   </div>
 </footer>
 
-</body></html>
+</body>
+</html>
