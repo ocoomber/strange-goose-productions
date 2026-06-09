@@ -42,7 +42,7 @@
     </div>
     <p class="ws-intro">Spec work and commissioned pieces below.</p>
 
-    <div class="film-feature vertical" style="margin-top: 24px;">
+    <div class="film-feature vertical" style="margin-top: 24px;"><style>.film-feature.vertical a.player { padding-bottom: 177.78%; } .film-feature.vertical a.player iframe { position:absolute;inset:0;width:100%;height:100%;border:0; }</style>
       <a class="player" href="https://www.youtube.com/shorts/NBOzqZBKn-w" target="_blank" rel="noopener" data-yt="NBOzqZBKn-w">
         <img src="https://i.ytimg.com/vi/NBOzqZBKn-w/maxresdefault.jpg" alt="Still from the Deep Cuts Coffee spec advert" loading="lazy">
         <span class="play" aria-hidden="true"></span>
@@ -279,7 +279,7 @@
     var MOBILE = window.matchMedia('(max-width: 760px)');
     document.querySelectorAll('a.player[data-yt]').forEach(function (el) {
       el.addEventListener('click', function (e) {
-        if (MOBILE.matches && el.getAttribute("href").indexOf("shorts") !== -1) return; // Shorts open in app on mobile
+        
         if (el.dataset.playing) { e.preventDefault(); return; }
         e.preventDefault();
         var id = el.getAttribute('data-yt');
