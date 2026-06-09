@@ -59,6 +59,24 @@
   @media (max-width: 600px) {
     .ai-aside { flex-direction: column; align-items: flex-start; gap: 18px; }
   }
+
+  /* reel embed */
+  .reel-frame { margin-top: 48px; }
+  .reel-box {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 */
+    border-radius: 4px;
+    overflow: hidden;
+    background: #111;
+  }
+  .reel-box iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
 </style>
 </head>
 <body data-screen-label="01 Home">
@@ -86,11 +104,9 @@
       <a href="work.html" class="arrow-link">See our work →</a>
     </div>
 
-    <!-- reel: swap this dark box for a YouTube <iframe> when the reel is ready -->
     <div class="reel-frame">
       <div class="reel-box" id="reel">
-        <div class="play-btn" aria-hidden="true"></div>
-        <span class="reel-label">Commercial reel · coming soon</span>
+        <iframe src="https://www.youtube.com/embed/SihEIj_EKik" title="Strange Goose Productions — Commercial Reel" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
       </div>
     </div>
   </div>
