@@ -1,246 +1,157 @@
-<!DOCTYPE html><html lang="en"><head>
-
-
-
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About · Strange Goose</title>
+<title>About · Strange Goose Productions</title>
+<meta name="description" content="Strange Goose Productions is a three-person professional film team founded in Edinburgh in 2024. Eleven productions, awards in the UK, USA, and Italy.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site/styles.css">
-<style>
-  .about-hero { padding: 64px 0 40px; }
-  .about-hero h1 {
-    font-size: clamp(48px, 7vw, 88px);
-    letter-spacing: -0.03em;
-    line-height: 0.98;
-    margin-bottom: 20px;
-    max-width: 16ch;
-  }
-  .about-hero h1 .accent { color: var(--accent); }
-  .about-hero p {
-    color: var(--ink-2);
-    font-size: 18px;
-    max-width: 56ch;
-    line-height: 1.6;
-  }
-
-  .team {
-    padding: 40px 0 80px;
-  }
-  .team-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-  .member {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .member .ph { aspect-ratio: 3/4; overflow: hidden; padding: 0; background: #14120f; display: flex; align-items: center; justify-content: center; }
-  .member .ph::before { display: none; }
-  .member .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .member .ph .monogram {
-    font-family: var(--display, 'Inter Tight', sans-serif);
-    font-size: clamp(56px, 8vw, 96px);
-    font-weight: 600;
-    letter-spacing: -0.04em;
-    color: #f6f1e6;
-    opacity: 0.32;
-  }
-  .member h3 {
-    font-size: 24px;
-    letter-spacing: -0.015em;
-    font-weight: 600;
-  }
-  .member .role {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent);
-  }
-  .member .bio {
-    color: var(--ink-2);
-    line-height: 1.6;
-    font-size: 14.5px;
-  }
-  .member .credits {
-    margin-top: auto;
-    padding-top: 14px;
-    border-top: 1px solid rgba(20,18,15,0.1);
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    line-height: 1.7;
-  }
-  .member .credits b { color: var(--ink); font-weight: 500; }
-
-  .manifesto {
-    padding: 80px 0;
-    background: var(--paper-2);
-  }
-  .manifesto-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.3fr;
-    gap: 80px;
-    align-items: start;
-  }
-  .manifesto h2 {
-    font-size: 44px;
-    letter-spacing: -0.025em;
-    line-height: 1;
-    font-weight: 600;
-  }
-  .manifesto h2 .accent { color: var(--accent); }
-  .manifesto-body {
-    font-size: 17px;
-    line-height: 1.75;
-    color: var(--ink-2);
-  }
-  .manifesto-body p { margin-bottom: 18px; }
-  .manifesto-body p:last-child { margin-bottom: 0; }
-  .manifesto-body b { color: var(--ink); font-weight: 500; }
-
-  .facts {
-    padding: 64px 0;
-  }
-  .facts-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    border: 1px solid rgba(20,18,15,0.12);
-    border-radius: 2px;
-  }
-  .fact {
-    padding: 24px 20px;
-    border-right: 1px solid rgba(20,18,15,0.08);
-  }
-  .fact:last-child { border-right: none; }
-  .fact-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    margin-bottom: 10px;
-  }
-  .fact-value {
-    font-size: 20px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-  }
-
-  .cta-end {
-    padding: 80px 0;
-    text-align: center;
-  }
-  .cta-end h2 {
-    font-size: 48px;
-    letter-spacing: -0.025em;
-    margin-bottom: 16px;
-  }
-  .cta-end .accent { color: var(--accent); }
-  .cta-end p { color: var(--ink-2); max-width: 44ch; margin: 0 auto 28px; }
-
-  @media (max-width: 900px) {
-    .team-grid { grid-template-columns: 1fr; }
-    .manifesto-grid { grid-template-columns: 1fr; gap: 32px; }
-    .facts-grid { grid-template-columns: 1fr 1fr; }
-    .fact { border-right: none; border-bottom: 1px solid rgba(20,18,15,0.08); }
-    .fact:nth-child(odd) { border-right: 1px solid rgba(20,18,15,0.08); }
-  }
-</style>
 </head>
-<body data-screen-label="05 About">
+<body data-screen-label="04 About">
 
 <nav class="top">
-  <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose</span></a>
+  <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose Productions</span></a>
   <div class="links">
-    <a href="work.html">Previous Work</a>
-    <a href="commercial.html">Hire Us</a>
-    <a href="ai.html">AI Production</a>
+    <a href="work.html">Work</a>
+    <a href="services.html">Services</a>
     <a href="about.html" class="active">About</a>
-    <a href="glossary.html">Glossary</a>
   </div>
-  <a href="mailto:info@strangegoose.co.uk" class="cta"><span class="cta-text">Get in touch →</span></a>
+  <a href="contact.html" class="cta"><span class="cta-text">Contact</span></a>
 </nav>
 
-<section class="about-hero">
-  <div class="wrap">
-    <p class="eyebrow" style="margin-bottom: 28px;"><span class="goose-glyph"></span>About</p>
-    <h1>Not an agency.<br>Not a bedroom prompter.<br><span class="accent">A film team.</span></h1>
-    <p>A team in Edinburgh, making short films, music videos, and commercial content.</p>
-  </div>
-</section>
+<main>
 
-<section class="team">
+<header class="page-hd">
   <div class="wrap">
+    <p class="eyebrow">About</p>
+    <h1>We're Strange Goose.</h1>
+  </div>
+</header>
+
+<!-- ── STORY ── -->
+<div class="wrap">
+  <section class="story">
+    <div>
+      <p>Strange Goose Productions was founded in Edinburgh in 2024 by Owen Coomber and Torya Winters. In two years we've made eleven productions across short films, music videos, and 48-hour competition entries, and won festival awards in the UK and abroad.</p>
+      <p>We started because we wanted to make proper films without the overhead of a traditional production company. We built a pipeline that lets a tight, experienced team move fast and deliver well.</p>
+    </div>
+    <div class="story-aside">
+      <p>Eight times we've entered the 48 Hour Film Project, arriving on a Friday night with no script and leaving Sunday afternoon with a finished film. We've won Best Film, Best Directing, Best Actor, and dozens of other awards across Edinburgh, Glasgow, Inverness, and Aberdeen. We mention this not because competition films are commercial work, but because if you're a brand with a deadline, it's useful to know what we're capable of under pressure.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ── TEAM ── -->
+<section>
+  <div class="wrap">
+    <p class="section-label">The team</p>
     <div class="team-grid">
-
       <div class="member">
-        <div class="ph"><img src="uploads/owen_headshot.jpg" alt="Owen Coomber" loading="lazy"></div>
+        <div class="member-photo"><img src="img/owen.jpg" alt="Owen Coomber" loading="lazy"></div>
         <h3>Owen Coomber</h3>
-        <div class="role">Director</div>
-        <p class="bio">Writes and directs the pieces. Spends a lot of time thinking about what a shot is actually saying before filming it.</p>
+        <div class="member-role">Director / Editor</div>
+        <p>Owen directs and edits everything Strange Goose makes. He's made eleven productions in two years, won awards across three continents, and has never missed a deadline.</p>
       </div>
-
       <div class="member">
-        <div class="ph"><img src="uploads/torya_headshot.avif" alt="Torya Winters" loading="lazy"></div>
+        <div class="member-photo"><img src="img/torya.avif" alt="Torya Winters" loading="lazy"></div>
         <h3>Torya Winters</h3>
-        <div class="role">Producer</div>
-        <p class="bio">Runs the shoot. Keeps the day on rails. The reason we hit deadlines and budgets on projects.</p>
+        <div class="member-role">Producer</div>
+        <p>Torya produces. That means she keeps everything moving, on budget, and on time, and she's the person you'll deal with if you're commissioning us. She's also co-founder of Strange Goose.</p>
       </div>
-
       <div class="member">
-        <div class="ph"><span class="monogram">AM</span></div>
+        <div class="member-photo ph"><span class="ph-label">Portrait · Alex McNeill</span></div>
         <h3>Alex McNeill</h3>
-        <div class="role">Cinematographer</div>
-        <p class="bio">Behind the camera. Lights everything. Insists on one more take.</p>
+        <div class="member-role">Cinematographer</div>
+        <p>Alex is Strange Goose's Director of Photography. He's shot the majority of SGP's productions including Family Time (8 wins, Aberdeen 2025) and the commissioned Wild Song music video.</p>
       </div>
-
     </div>
   </div>
 </section>
 
-<section class="manifesto">
+<!-- ── AWARDS ── -->
+<section class="dark-section">
   <div class="wrap">
-    <div class="manifesto-grid">
-      <h2>How we got<br><span class="accent">good at this.</span></h2>
-      <div class="manifesto-body">
-        <p>We started by making horror shorts nobody paid us for. On fifty quid. For the fun of it.</p>
-        <p>One of those shorts went on to win international festival awards. On top of that we've made short films as part of a 48hr film making challenge and won multiple awards as well as the entire competition for the city of Aberdeen. The lessons we learned - what you actually need vs. what productions pretend you need, how to make one shoot day produce multiple deliverables, how to hit a deadline - have turned into a way of working.</p>
-        <p>Now, when a brand comes to us with a real-world budget and a tight timeline, <b>we already know how to make it work</b>. Because we've been making it work for ourselves for years.</p>
+    <p class="section-label">Awards</p>
+    <div class="awards" style="--c: rgba(246,241,230,0.16); margin-top: 8px;">
+      <div class="award-group" style="border-color: rgba(246,241,230,0.2);">
+        <h3 style="color: var(--paper);">Fairytale Farm</h3>
+        <div class="ag-sub" style="color: rgba(246,241,230,0.55);">Short Film · 2025</div>
+        <ul>
+          <li style="color: rgba(246,241,230,0.82);">Best Micro Short, Birmingham Horror Film Festival</li>
+          <li style="color: rgba(246,241,230,0.82);">Best Short, Holiday Horror Fest VIII (USA)</li>
+          <li style="color: rgba(246,241,230,0.82);">Best Horror, Monza Film Fest (Italy)</li>
+          <li style="color: rgba(246,241,230,0.82);">Best Horror, Night of Shorts (Italy)</li>
+          <li style="color: rgba(246,241,230,0.82);">Best Horror, Reale Film Festival (Italy)</li>
+        </ul>
+      </div>
+      <div class="award-group" style="border-color: rgba(246,241,230,0.2);">
+        <h3 style="color: var(--paper);">Family Time</h3>
+        <div class="ag-sub" style="color: rgba(246,241,230,0.55);">Aberdeen 48hr · 2025</div>
+        <ul>
+          <li style="color: rgba(246,241,230,0.82);">Best Film</li>
+          <li style="color: rgba(246,241,230,0.82);">Best Directing</li>
+          <li style="color: rgba(246,241,230,0.82);">Best Actor</li>
+          <li style="color: rgba(246,241,230,0.82);">Best Production Design</li>
+          <li style="color: rgba(246,241,230,0.82);">Best Song</li>
+          <li style="color: rgba(246,241,230,0.82);">Best Use of Genre</li>
+          <li style="color: rgba(246,241,230,0.82);">Best Use of Character</li>
+          <li style="color: rgba(246,241,230,0.82);">Braveheart Award</li>
+        </ul>
+      </div>
+      <div class="award-group" style="border-color: rgba(246,241,230,0.2);">
+        <h3 style="color: var(--paper);">Subject 1410</h3>
+        <div class="ag-sub" style="color: rgba(246,241,230,0.55);">Glasgow 48hr · 2024</div>
+        <ul>
+          <li style="color: rgba(246,241,230,0.82);">Best Make Up</li>
+          <li style="color: rgba(246,241,230,0.82);">Best Use of Location</li>
+        </ul>
+      </div>
+      <div class="award-group" style="border-color: rgba(246,241,230,0.2);">
+        <h3 style="color: var(--paper);">Roadtrippin'</h3>
+        <div class="ag-sub" style="color: rgba(246,241,230,0.55);">Inverness 48hr · 2025</div>
+        <ul>
+          <li style="color: rgba(246,241,230,0.82);">Best Sound Design</li>
+        </ul>
       </div>
     </div>
   </div>
 </section>
 
+</main>
 
-<section class="cta-end">
-  <div class="wrap-tight">
-    <h2>Think we might be<br><span class="accent">a good fit?</span></h2>
-    <p>Have a look at the work or drop us a line. We reply within a working day.</p>
-    <a class="btn primary" href="mailto:info@strangegoose.co.uk">Start a conversation →</a>
+<footer class="fork">
+  <div class="footer-main">
+    <div class="footer-col footer-brand">
+      <div class="fb-name"><span class="goose-glyph"></span>Strange Goose Productions</div>
+      <div class="fb-tag">Proper film. Built differently.</div>
+      <div class="fb-loc">Edinburgh, Scotland</div>
+    </div>
+    <div class="footer-col">
+      <h4>Navigation</h4>
+      <div class="fcol-links">
+        <a href="work.html">Work</a>
+        <a href="services.html">Services</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <div class="fcol-links">
+        <a href="/cdn-cgi/l/email-protection#c5acaba3aa85b6b1b7a4aba2a0a2aaaab6a0eba6aaebb0ae"><span class="__cf_email__" data-cfemail="aec7c0c8c1eedddadccfc0c9cbc9c1c1ddcb80cdc180dbc5">[email&#160;protected]</span></a>
+        <a href="https://instagram.com/strange_goose_productions" target="_blank" rel="noopener">instagram.com/strange_goose_productions</a>
+        <a href="https://youtube.com/@strange_goose_productions" target="_blank" rel="noopener">youtube.com/@strange_goose_productions</a>
+      </div>
+    </div>
   </div>
-</section>
-
-<footer class="site">
-  <div><span class="goose-glyph"></span>&nbsp; Strange Goose · © 2026</div>
-  <div class="links">
-    <a href="work.html">Previous Work</a>
-    <a href="commercial.html">Hire Us</a>
-    <a href="ai.html">AI Production</a>
-    <a href="about.html">About</a>
-    <a href="glossary.html">Glossary</a>
-    <a href="mailto:info@strangegoose.co.uk">Email</a>
+  <div class="footer-bottom">
+    <span>© 2026 Strange Goose Productions</span>
+    <span>www.strangegoose.co.uk</span>
   </div>
 </footer>
 
-
-
-</body></html>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>
