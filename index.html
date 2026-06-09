@@ -65,10 +65,38 @@
   .reel-box {
     position: relative;
     width: 100%;
-    padding-bottom: 56.25%; /* 16:9 */
+    padding-bottom: 56.25%;
     border-radius: 4px;
     overflow: hidden;
     background: #111;
+    cursor: pointer;
+  }
+  .reel-box img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .reel-box .play {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px; height: 64px;
+    background: rgba(20,18,15,0.72);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .reel-box .play::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 54%;
+    transform: translate(-50%, -50%);
+    border: 0 solid transparent;
+    border-left: 22px solid var(--paper);
+    border-top: 13px solid transparent;
+    border-bottom: 13px solid transparent;
   }
   .reel-box iframe {
     position: absolute;
@@ -105,8 +133,9 @@
     </div>
 
     <div class="reel-frame">
-      <div class="reel-box" id="reel">
-        <iframe src="https://www.youtube.com/embed/SihEIj_EKik" title="Strange Goose Productions — Commercial Reel" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
+      <div class="reel-box" id="reel" data-yt="SihEIj_EKik">
+        <img src="https://i.ytimg.com/vi/SihEIj_EKik/maxresdefault.jpg" alt="Strange Goose Productions — Commercial Reel" loading="lazy">
+        <span class="play" aria-hidden="true"></span>
       </div>
     </div>
   </div>
@@ -289,5 +318,23 @@
   </div>
 </footer>
 
+<script>
+  (function () {
+    var box = document.getElementById('reel');
+    if (!box) return;
+    box.addEventListener('click', function () {
+      if (box.dataset.playing) return;
+      var id = box.getAttribute('data-yt');
+      var frame = document.createElement('iframe');
+      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&modestbranding=1';
+      frame.title = 'Strange Goose Productions — Commercial Reel';
+      frame.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; web-share');
+      frame.setAttribute('allowfullscreen', '');
+      box.innerHTML = '';
+      box.appendChild(frame);
+      box.dataset.playing = '1';
+    });
+  })();
+</script>
 </body>
 </html>
