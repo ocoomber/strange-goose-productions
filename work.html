@@ -279,7 +279,7 @@
     var MOBILE = window.matchMedia('(max-width: 760px)');
     document.querySelectorAll('a.player[data-yt]').forEach(function (el) {
       el.addEventListener('click', function (e) {
-        if (MOBILE.matches) return;            // let the link open YouTube in a new tab
+        if (MOBILE.matches && el.getAttribute("href").indexOf("shorts") !== -1) return; // Shorts open in app on mobile
         if (el.dataset.playing) { e.preventDefault(); return; }
         e.preventDefault();
         var id = el.getAttribute('data-yt');
