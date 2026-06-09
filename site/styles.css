@@ -208,6 +208,79 @@ footer.site {
 footer.site .links { display: flex; gap: 24px; }
 footer.site a:hover { color: var(--ink); }
 
+footer.fork {
+  margin-top: 80px;
+  border-top: 1px solid rgba(20,18,15,0.1);
+  padding: 56px 40px 32px;
+  font-family: var(--sans);
+}
+footer.fork .footer-main {
+  display: flex;
+  gap: 48px;
+  margin-bottom: 40px;
+}
+footer.fork .footer-col {
+  flex: 1;
+  min-width: 0;
+}
+footer.fork .footer-brand {
+  flex: 2;
+}
+footer.fork .fb-name {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+footer.fork .fb-tag {
+  font-size: 14px;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+footer.fork .fb-loc {
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+}
+footer.fork h4 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 16px;
+  font-weight: 400;
+}
+footer.fork .fcol-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+footer.fork .fcol-links a {
+  font-size: 13px;
+  color: var(--ink-3);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+footer.fork .fcol-links a:hover { color: var(--ink); }
+footer.fork .footer-bottom {
+  border-top: 1px solid rgba(20,18,15,0.08);
+  padding-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
 /* ── section shared ── */
 section { padding: 80px 0; }
 section.tight { padding: 48px 0; }
@@ -254,6 +327,9 @@ section.tight { padding: 48px 0; }
   .wrap, .wrap-tight { padding: 0 20px; }
   footer.site { flex-direction: column; padding: 24px 20px; text-align: center; gap: 16px; }
   footer.site .links { flex-wrap: wrap; justify-content: center; gap: 14px; }
+  footer.fork { padding: 40px 20px 24px; }
+  footer.fork .footer-main { flex-direction: column; gap: 32px; }
+  footer.fork .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
   section { padding: 56px 0; }
 }
 @media (max-width: 480px) {
