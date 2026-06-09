@@ -11,25 +11,23 @@ Website for Strange Goose Productions. Static HTML/CSS, no build step, no depend
 | `index.html` | Homepage |
 | `about.html` | About SGP and the team |
 | `work.html` | Portfolio / project showcase |
-| `commercial.html` | Commercial production work |
-| `ai.html` | AI production work |
-| `glossary.html` | Glossary page |
-| `showreels.html` | Actor showreel services — **standalone, see below** |
+| `services.html` | Services offered |
+| `contact.html` | Contact page |
+| `ai.html` | AI production work — not in main nav, linked from homepage hero |
 
 ---
 
 ## Structure
 
-- **`site/styles.css`** — shared stylesheet used by all pages except `showreels.html`
-- **`site/img/`** — shared images used by the main site
-- **`uploads/`** — portfolio and production images (film stills, headshots etc)
+- **`site/styles.css`** — shared stylesheet used by all pages
+- **`img/`** — all images (portfolio stills, headshots, AI page images). All in one folder, no subfolders.
 - **`CNAME`** — GitHub Pages custom domain config, do not edit
 
 No shared header or footer components. Each page is fully self-contained HTML.
 
 ---
 
-## Design System (main site)
+## Design System
 
 Warm, earthy palette. Fonts loaded from Google Fonts.
 
@@ -52,21 +50,33 @@ Max content width: `1280px` (`.wrap`), `960px` (`.wrap-tight`).
 
 ---
 
-## showreels.html — Standalone Page
+## Video Embeds
 
-This page is completely separate from the rest of the site:
+All videos use a poster/click-to-play pattern — thumbnail shown first, iframe loads on click with autoplay. This keeps YouTube UI hidden until the user chooses to play.
 
-- **Does not use `site/styles.css`** — all styles are embedded in a `<style>` block in the `<head>`
-- Different fonts: Newsreader (serif), Archivo, Hanken Grotesk
-- The `<style>` block defines dark CSS variables as defaults — **these are overridden** by an inline `style` attribute on the `.page` div (line ~259) which applies the actual light theme (`--bg:#f4f1e8` etc)
-- Do not remove or alter that inline style override — it is what makes the page light
-- Accent colour on showreels is blue (`#5d80b0`), not amber
+- Thumbnails pulled from `https://i.ytimg.com/vi/VIDEO_ID/maxresdefault.jpg` — update the thumbnail on YouTube and it updates on the site automatically.
+- The click handler in `work.html` handles all `.player[data-yt]` elements.
+- The homepage reel (`index.html`) has its own equivalent inline script.
+
+---
+
+## Email Links
+
+All email links must be plain `mailto:info@strangegoose.co.uk`. Do not use Cloudflare email obfuscation (`/cdn-cgi/l/email-protection`) — it only works behind Cloudflare and breaks on GitHub Pages. If you see `[email protected]` on the live site, a page with CF-encoded links has been pushed from an old local copy.
 
 ---
 
 ## Deployment
 
-Owen syncs to GitHub via the GitHub desktop app. Pushing to `main` deploys to strangegoose.co.uk via GitHub Pages. No CI, no build process.
+Owen syncs to GitHub via GitHub Desktop. Pushing to `main` deploys to strangegoose.co.uk via GitHub Pages. No CI, no build process.
+
+**Important:** Owen sometimes pushes pages directly from his local machine. If a push is rejected because the remote is ahead, always `git pull --rebase origin main` before pushing. Never force push.
+
+---
+
+## Testing Workflow
+
+For UI changes that need real device testing (mobile layout, video embeds etc): create a named test file in `main` (e.g. `work-test.html`), let Owen test it at strangegoose.co.uk/work-test.html on his phone or desktop, then apply the change to the real file and delete the test file in a single commit. This avoids spinning up a branch for small UI tests.
 
 ---
 
@@ -74,5 +84,5 @@ Owen syncs to GitHub via the GitHub desktop app. Pushing to `main` deploys to st
 
 - Plain HTML5, no frameworks, no templating
 - CSS variables for all colours and fonts — never hardcode hex values into page-level styles when a variable exists
-- Images referenced from `uploads/` use relative paths
-- All pages link to `site/styles.css` with a relative path (`site/styles.css`) except `showreels.html`
+- All images in `img/` with hyphenated filenames (no spaces)
+- All pages link to `site/styles.css` with a relative path
