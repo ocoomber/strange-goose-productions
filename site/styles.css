@@ -613,10 +613,17 @@ a.player:hover .play { background: var(--accent); border-color: var(--accent); t
 .film-feature .film-info .fi-award { font-size: 16px; margin-top: 14px; }
 .film-info .fi-award .win { color: var(--ink); }
 
+/* ── vertical reel feature (9:16 — Instagram/YouTube Shorts) ── */
+.film-feature.vertical { grid-template-columns: 340px 1fr; gap: 52px; align-items: center; }
+.film-feature.vertical .player { aspect-ratio: 9 / 16; }
+
 @media (max-width: 900px) {
   .film-grid-lg { grid-template-columns: 1fr; gap: 44px; }
   .film-feature { grid-template-columns: 1fr; gap: 20px; }
   .film-feature .film-info { padding-top: 0; }
+  .film-feature.vertical { grid-template-columns: 1fr; gap: 24px; justify-items: center; }
+  .film-feature.vertical .player { width: 100%; max-width: 300px; }
+  .film-feature.vertical .film-info { text-align: center; }
 }
 
 /* ── SERVICES PAGE ── */
