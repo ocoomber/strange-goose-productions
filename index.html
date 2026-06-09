@@ -3,573 +3,275 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strange Goose Productions</title>
+<title>Strange Goose Productions · Proper film. Built differently.</title>
+<meta name="description" content="A three-person professional film team in Edinburgh. Award-winning short films, music videos, and commercial content. Proper craft, built differently.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site/styles.css">
 <style>
-  body { display: flex; flex-direction: column; min-height: 100vh; }
-  main { flex: 1; }
-
-  /* ── HERO ── */
-  .hero { padding: 64px 0 32px; }
-  .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    gap: 72px;
-    align-items: end;
-  }
-  .hero-text .eyebrow { margin-bottom: 28px; }
-  .hero-text h1 {
-    font-size: clamp(56px, 8.6vw, 132px);
-    line-height: 0.92;
-    letter-spacing: -0.035em;
-    font-weight: 600;
-    max-width: 11ch;
-    margin-bottom: 36px;
-  }
-  .hero-text h1 .accent { color: var(--accent); }
-  .hero-text .lede {
-    font-size: 19px;
-    line-height: 1.5;
-    color: var(--ink-2);
-    max-width: 38ch;
-    margin-bottom: 36px;
-  }
-  .hero-meta {
+  /* AI consultancy aside — quiet callout inside the dark differentiator */
+  .ai-aside {
+    margin-top: 40px;
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px 36px;
     flex-wrap: wrap;
-    gap: 8px 0;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-3);
+    padding: 22px 26px;
+    border: 1px solid rgba(246,241,230,0.16);
+    border-radius: 4px;
+    background: rgba(246,241,230,0.035);
   }
-  .hero-meta span {
-    padding-right: 18px;
-    border-right: 1px solid rgba(20,18,15,0.18);
-    margin-right: 18px;
-  }
-  .hero-meta span:last-child { border-right: none; margin-right: 0; padding-right: 0; }
-
-  /* stacked stills composition */
-  .hero-art {
-    position: relative;
-    aspect-ratio: 4 / 5;
-    width: 100%;
-  }
-  .hero-still {
-    position: absolute;
-    overflow: hidden;
-    background: #0c0b0a;
-    box-shadow: 0 24px 48px -28px rgba(20,18,15,0.4);
-  }
-  .hero-still img {
-    position: absolute;
-    inset: 0;
-    width: 100%; height: 100%;
-    object-fit: cover;
-    display: block;
-    opacity: 0;
-    transition: opacity 0.6s ease;
-  }
-  .hero-still img.is-on { opacity: 1; }
-  .hero-still .still-cap {
-    position: absolute;
-    left: 12px; bottom: 12px;
+  .ai-aside-label {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 9px;
     font-family: var(--mono);
-    font-size: 9.5px;
-    letter-spacing: 0.16em;
+    font-size: 10px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #f6f1e6;
-    background: rgba(10,9,8,0.55);
-    padding: 5px 9px;
-    border-radius: 2px;
-    backdrop-filter: blur(4px);
+    color: var(--accent);
+    margin-bottom: 11px;
   }
-  .hero-still .still-cap .dot {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
-  }
-  .hero-still-a {
-    top: 0; left: 0; width: 78%; aspect-ratio: 4/5;
-    z-index: 2;
-  }
-  .hero-still-b {
-    bottom: 6%; right: 0; width: 52%; aspect-ratio: 16/10;
-    z-index: 3;
-  }
-  /* sprocket marks evoking film */
-  .hero-art::before, .hero-art::after {
-    content: '';
-    position: absolute;
-    width: 6px;
-    background-image: linear-gradient(to bottom, var(--ink) 0 6px, transparent 6px 18px);
-    background-size: 6px 18px;
-    opacity: 0.55;
-    pointer-events: none;
-  }
-  .hero-art::before { left: -18px; top: 4%; bottom: 30%; }
-  .hero-art::after  { right: -18px; top: 30%; bottom: 4%; }
-
-  /* ── WHAT ── */
-  .what {
-    margin-top: 80px;
-    display: grid;
-    grid-template-columns: 1fr 1.6fr;
-    gap: 64px;
-    padding-top: 56px;
-    border-top: 1px solid rgba(20,18,15,0.12);
-  }
-  .what p {
-    font-size: 19px;
+  .ai-aside-label .ai-aside-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .ai-aside-main p {
+    margin: 0;
+    font-size: 15px;
     line-height: 1.55;
-    color: var(--ink-2);
+    color: rgba(246,241,230,0.8);
     max-width: 52ch;
   }
-  .what p + p { margin-top: 18px; }
-  .what p .accent { color: var(--accent); }
-
-  /* ── REEL STRIP ── */
-  .reel-section { padding: 88px 0 16px; }
-  .reel-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 16px;
-    padding: 0 40px;
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-  }
-  .reel-head h2 {
-    font-size: clamp(28px, 3.6vw, 44px);
-    letter-spacing: -0.02em;
-    font-weight: 600;
-  }
-  .reel-head .reel-meta {
+  .ai-aside-link {
+    flex-shrink: 0;
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--ink-3);
-    display: flex; align-items: center; gap: 14px;
-  }
-  .reel-head .reel-meta a {
-    color: var(--ink);
-    border-bottom: 1px solid var(--accent);
-    padding-bottom: 2px;
-    transition: color 0.15s;
-  }
-  .reel-head .reel-meta a:hover { color: var(--accent); }
-
-  .reel-viewport {
-    position: relative;
-    overflow: hidden;
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 60px, #000 calc(100% - 60px), transparent);
-            mask-image: linear-gradient(to right, transparent, #000 60px, #000 calc(100% - 60px), transparent);
-  }
-  .reel-track {
-    display: flex;
-    gap: 18px;
-    width: max-content;
-    animation: reel 70s linear infinite;
-    padding: 8px 0 24px;
-  }
-  .reel-viewport:hover .reel-track { animation-play-state: paused; }
-
-  @keyframes reel {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-  }
-
-  .reel-cell {
-    flex: 0 0 auto;
-    width: 360px;
-    aspect-ratio: 16/9;
-    position: relative;
-    overflow: hidden;
-    background: #0c0b0a;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 11px 17px;
     border-radius: 2px;
-    display: block;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
   }
-  .reel-cell img {
-    width: 100%; height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-  }
-  .reel-cell:hover img { transform: scale(1.04); }
-  .reel-cell .cell-cap {
-    position: absolute;
-    inset: auto 0 0 0;
-    padding: 14px 14px 12px;
-    color: #f6f1e6;
-    background: linear-gradient(to top, rgba(10,9,8,0.85), rgba(10,9,8,0));
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 10px;
-  }
-  .reel-cell .cell-ttl {
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-  .reel-cell .cell-tag {
-    font-family: var(--mono);
-    font-size: 9.5px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: #f6f1e6;
-    opacity: 0.75;
-  }
-  .reel-cell.portrait { width: 220px; aspect-ratio: 9/14; }
-
-  /* ── NAV LIST ── */
-  .nav-list {
-    margin-top: 56px;
-    border-top: 1px solid rgba(20,18,15,0.12);
-  }
-  .nav-list a {
-    display: grid;
-    grid-template-columns: 56px 1fr auto;
-    gap: 24px;
-    align-items: center;
-    padding: 22px 0;
-    border-bottom: 1px solid rgba(20,18,15,0.12);
-    transition: color 0.15s, padding 0.2s;
-  }
-  .nav-list a:hover { color: var(--accent); padding-left: 8px; }
-  .nav-list .num {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.16em;
-    color: var(--ink-3);
-  }
-  .nav-list .label {
-    font-size: clamp(26px, 4vw, 44px);
-    letter-spacing: -0.02em;
-    font-weight: 600;
-    line-height: 1;
-  }
-  .nav-list .desc {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-    text-align: right;
-  }
-  .nav-list a:hover .desc { color: var(--accent); }
-
-  /* ── CONTACT ── */
-  .contact-line {
-    margin-top: 72px;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 16px;
-    padding-bottom: 24px;
-  }
-  .contact-line .label {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--ink-3);
-  }
-  .contact-line a.email {
-    font-size: clamp(22px, 3vw, 32px);
-    letter-spacing: -0.01em;
-    border-bottom: 1px solid rgba(20,18,15,0.25);
-    padding-bottom: 4px;
-    transition: color 0.15s, border-color 0.15s;
-  }
-  .contact-line a.email:hover { color: var(--accent); border-color: var(--accent); }
-
-  /* ── responsive ── */
-  @media (max-width: 1020px) {
-    .hero-grid { gap: 40px; }
-    .hero-still-a { width: 82%; }
-    .hero-still-b { width: 56%; }
-  }
-  @media (max-width: 800px) {
-    .hero { padding: 40px 0 24px; }
-    .hero-grid { grid-template-columns: 1fr; gap: 32px; }
-    .hero-text h1 { margin-bottom: 24px; }
-    .hero-art { max-width: 480px; }
-    .hero-art::before, .hero-art::after { display: none; }
-    .what { margin-top: 56px; grid-template-columns: 1fr; gap: 24px; padding-top: 32px; }
-    .what p { font-size: 17px; }
-    .reel-section { padding: 56px 0 8px; }
-    .reel-head { padding: 0 24px; }
-    .reel-cell { width: 280px; }
-    .reel-cell.portrait { width: 180px; }
-    .nav-list { margin-top: 40px; }
-    .nav-list a { grid-template-columns: 40px 1fr; gap: 14px; padding: 20px 0; }
-    .nav-list a:hover { padding-left: 0; }
-    .nav-list .desc { display: none; }
-    .contact-line { margin-top: 48px; flex-direction: column; align-items: flex-start; gap: 8px; }
-  }
-  @media (max-width: 560px) {
-    .hero-meta { font-size: 10px; }
-    .hero-meta span { padding-right: 10px; margin-right: 10px; }
+  .ai-aside-link:hover { background: var(--accent); color: #1A1714; }
+  @media (max-width: 600px) {
+    .ai-aside { flex-direction: column; align-items: flex-start; gap: 18px; }
   }
 </style>
 </head>
 <body data-screen-label="01 Home">
 
 <nav class="top">
-  <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose</span></a>
+  <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose Productions</span></a>
   <div class="links">
-    <a href="work.html">Previous Work</a>
-    <a href="commercial.html">Hire Us</a>
-    <a href="ai.html">AI Production</a>
+    <a href="work.html">Work</a>
+    <a href="services.html">Services</a>
     <a href="about.html">About</a>
-    <a href="glossary.html">Glossary</a>
   </div>
-  <a href="mailto:info@strangegoose.co.uk" class="cta"><span class="cta-text">Get in touch →</span></a>
+  <a href="contact.html" class="cta"><span class="cta-text">Contact</span></a>
 </nav>
 
 <main>
 
-<section class="hero">
-  <div class="wrap hero-grid">
-
-    <div class="hero-text">
-      <p class="eyebrow"><span class="goose-glyph"></span>Strange Goose Productions · Edinburgh</p>
-      <h1>Proper film.<br><span class="accent">Built differently.</span></h1>
-      <p class="lede">A three-person film team (director, producer, cinematographer) making short films, music videos, and brand commercials out of Edinburgh.</p>
-      <div class="hero-meta">
-        <span>
-</span>
-        <span>
-</span>
-        <span>
-</span>
-      </div>
+<!-- ── HERO ── -->
+<section class="home-hero">
+  <div class="wrap">
+    <h1 class="display">Proper film.<br><em>Built differently.</em></h1>
+    <p class="lede">Short film, music video, and commercial content. Award-winning craft. Edinburgh-based.</p>
+    <p class="body">We're a professional film team. Not an agency, not a one-person operation. We have real festival credits and a production pipeline that moves faster than a traditional company without cutting the corners that matter.</p>
+    <div class="hero-actions">
+      <a href="contact.html" class="btn primary lg">Talk to us about your project</a>
+      <a href="work.html" class="arrow-link">See our work →</a>
     </div>
 
-    <div class="hero-art" aria-hidden="true">
-      <div class="hero-still hero-still-a" id="still-a">
-        <img src="uploads/fairytale%20farm.jpg" alt="" class="is-on">
-        <img src="uploads/subject%201410.jpg" alt="">
-        <img src="uploads/crossfire.jpg" alt="">
-        <img src="uploads/the%20journeyman.jpg" alt="">
-        <div class="still-cap">
-          <span class="dot"></span>
-          <span class="cap-title">Fairytale Farm · 2025</span>
-        </div>
-      </div>
-      <div class="hero-still hero-still-b" id="still-b">
-        <img src="uploads/getting%20over.jpg" alt="" class="is-on">
-        <img src="uploads/family%20time.jpg" alt="">
-        <img src="uploads/roadtripppin.jpg" alt="">
-        <img src="uploads/where%20ball.jpg" alt="">
-        <img src="uploads/unravelling.jpg" alt="">
-        <div class="still-cap">
-          <span class="dot"></span>
-          <span class="cap-title">Getting Over Going Under</span>
-        </div>
+    <!-- reel: swap this dark box for a YouTube <iframe> when the reel is ready -->
+    <div class="reel-frame">
+      <div class="reel-box" id="reel">
+        <div class="play-btn" aria-hidden="true"></div>
+        <span class="reel-label">Commercial reel · coming soon</span>
       </div>
     </div>
-
   </div>
 </section>
 
-<div class="wrap">
-  <div class="what">
-    <p class="section-label" style="margin-bottom: 0;">What we do</p>
-    <div>
-      <p>Real cinematic craft, made by a small team that moves quickly. Awarded shorts at festivals across the UK and abroad, music videos and commercials for brands who want something with a pulse.</p>
-      <p>No middlemen. No agency markup. One conversation away from a director who'll be on set.</p>
-    </div>
+<!-- ── CREDENTIALS BAR ── -->
+<div class="creds" aria-label="Selected credentials">
+  <div class="creds-track">
+    <span class="creds-item"><span class="dot"></span>Winner · Aberdeen 48hr Film Project 2025</span>
+    <span class="creds-item"><span class="dot"></span>Best Micro Short · Birmingham Horror Film Festival</span>
+    <span class="creds-item"><span class="dot"></span>Best Short · Holiday Horror Fest VIII (USA)</span>
+    <span class="creds-item"><span class="dot"></span>Lift-Off Global Sessions · Official Selection</span>
+    <span class="creds-item"><span class="dot"></span>Commissioned to film the Wild Song Songwriting Challenge winner · Screened at Wild Song Film Festival</span>
+    <span class="creds-item"><span class="dot"></span>Best Horror · Reale Film Festival (Italy)</span>
+    <span class="creds-item"><span class="dot"></span>Best Horror · Monza Film Festival (Italy)</span>
+    <!-- duplicate for seamless marquee -->
+    <span class="creds-item" aria-hidden="true"><span class="dot"></span>Winner · Aberdeen 48hr Film Project 2025</span>
+    <span class="creds-item" aria-hidden="true"><span class="dot"></span>Best Micro Short · Birmingham Horror Film Festival</span>
+    <span class="creds-item" aria-hidden="true"><span class="dot"></span>Best Short · Holiday Horror Fest VIII (USA)</span>
+    <span class="creds-item" aria-hidden="true"><span class="dot"></span>Lift-Off Global Sessions · Official Selection</span>
+    <span class="creds-item" aria-hidden="true"><span class="dot"></span>Commissioned to film the Wild Song Songwriting Challenge winner · Screened at Wild Song Film Festival</span>
+    <span class="creds-item" aria-hidden="true"><span class="dot"></span>Best Horror · Reale Film Festival (Italy)</span>
+    <span class="creds-item" aria-hidden="true"><span class="dot"></span>Best Horror · Monza Film Festival (Italy)</span>
   </div>
 </div>
 
-<section class="reel-section">
-  <div class="reel-head">
-    <h2>Selected reel <span style="color: var(--ink-3); font-weight: 400;">· 2024–2026</span></h2>
-    <div class="reel-meta">
-      <span>12 projects · 5 festival wins</span>
-      <a href="work.html">View all work →</a>
+<!-- ── CAPABILITIES ── -->
+<section>
+  <div class="wrap">
+    <p class="section-label">What we do</p>
+    <div class="cap-intro">
+      <h2>Film for brands, artists, and the screen.</h2>
+      <p>We're a director, a producer, and a cinematographer. Three people who have spent two years winning awards under the most compressed production conditions imaginable, and building a pipeline that brings that same discipline to commercial and branded work.</p>
     </div>
-  </div>
 
-  <div class="reel-viewport">
-    <div class="reel-track" id="reel-track">
-      <!-- group A -->
-      <a class="reel-cell" href="work.html">
-        <img src="uploads/unravelling.jpg" alt="Unravelling" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Unravelling</span><span class="cell-tag">Latest</span></div>
+    <div class="cap-grid">
+      <a class="cap-card" href="services.html">
+        <span class="cap-num">01</span>
+        <h3>Commercial &amp; Branded</h3>
+        <p>Cinematic content for brands that want to look like they spent ten times more than they did. Genuine craft, honest pricing, real timelines.</p>
+        <span class="arrow-link">View commercial work →</span>
       </a>
-      <a class="reel-cell" href="work.html">
-        <img src="uploads/fairytale%20farm.jpg" alt="Fairytale Farm" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Fairytale Farm</span><span class="cell-tag">Short · 5 wins</span></div>
+      <a class="cap-card" href="work.html">
+        <span class="cap-num">02</span>
+        <h3>Short Film</h3>
+        <p>Festival-ready narrative shorts. Award-winning. We've had films screened live on three continents. We treat every short like it's going somewhere. It usually does.</p>
+        <span class="arrow-link">View short films →</span>
       </a>
-      <a class="reel-cell" href="work.html">
-        <img src="uploads/getting%20over.jpg" alt="Getting Over Going Under" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Getting Over Going Under</span><span class="cell-tag">Music</span></div>
-      </a>
-      <a class="reel-cell" href="work.html">
-        <img src="uploads/subject%201410.jpg" alt="Subject 1410" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Subject 1410</span><span class="cell-tag">Short</span></div>
-      </a>
-      <a class="reel-cell portrait" href="work.html">
-        <img src="uploads/deep%20cuts%20coffee.jpg" alt="Deep Cuts Coffee" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Deep Cuts Coffee</span><span class="cell-tag">Reel</span></div>
-      </a>
-      <a class="reel-cell" href="work.html">
-        <img src="uploads/crossfire.jpg" alt="Crossfire" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Crossfire</span><span class="cell-tag">Short</span></div>
-      </a>
-      <a class="reel-cell" href="work.html">
-        <img src="uploads/family%20time.jpg" alt="Family Time" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Family Time</span><span class="cell-tag">48hr Winner</span></div>
-      </a>
-      <a class="reel-cell" href="work.html">
-        <img src="uploads/roadtripppin.jpg" alt="Roadtripppin'" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Roadtripppin'</span><span class="cell-tag">Short</span></div>
-      </a>
-      <a class="reel-cell" href="work.html">
-        <img src="uploads/the%20journeyman.jpg" alt="The Journeyman" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">The Journeyman</span><span class="cell-tag">Short</span></div>
-      </a>
-      <a class="reel-cell" href="work.html">
-        <img src="uploads/where%20ball.jpg" alt="Where Ball?" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Where Ball?</span><span class="cell-tag">Festival</span></div>
-      </a>
-
-      <!-- group B (duplicate for seamless marquee) -->
-      <a class="reel-cell" href="work.html" aria-hidden="true" tabindex="-1">
-        <img src="uploads/unravelling.jpg" alt="" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Unravelling</span><span class="cell-tag">Latest</span></div>
-      </a>
-      <a class="reel-cell" href="work.html" aria-hidden="true" tabindex="-1">
-        <img src="uploads/fairytale%20farm.jpg" alt="" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Fairytale Farm</span><span class="cell-tag">Short · 5 wins</span></div>
-      </a>
-      <a class="reel-cell" href="work.html" aria-hidden="true" tabindex="-1">
-        <img src="uploads/getting%20over.jpg" alt="" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Getting Over Going Under</span><span class="cell-tag">Music</span></div>
-      </a>
-      <a class="reel-cell" href="work.html" aria-hidden="true" tabindex="-1">
-        <img src="uploads/subject%201410.jpg" alt="" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Subject 1410</span><span class="cell-tag">Short</span></div>
-      </a>
-      <a class="reel-cell portrait" href="work.html" aria-hidden="true" tabindex="-1">
-        <img src="uploads/deep%20cuts%20coffee.jpg" alt="" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Deep Cuts Coffee</span><span class="cell-tag">Reel</span></div>
-      </a>
-      <a class="reel-cell" href="work.html" aria-hidden="true" tabindex="-1">
-        <img src="uploads/crossfire.jpg" alt="" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Crossfire</span><span class="cell-tag">Short</span></div>
-      </a>
-      <a class="reel-cell" href="work.html" aria-hidden="true" tabindex="-1">
-        <img src="uploads/family%20time.jpg" alt="" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Family Time</span><span class="cell-tag">48hr Winner</span></div>
-      </a>
-      <a class="reel-cell" href="work.html" aria-hidden="true" tabindex="-1">
-        <img src="uploads/roadtripppin.jpg" alt="" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Roadtripppin'</span><span class="cell-tag">Short</span></div>
-      </a>
-      <a class="reel-cell" href="work.html" aria-hidden="true" tabindex="-1">
-        <img src="uploads/the%20journeyman.jpg" alt="" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">The Journeyman</span><span class="cell-tag">Short</span></div>
-      </a>
-      <a class="reel-cell" href="work.html" aria-hidden="true" tabindex="-1">
-        <img src="uploads/where%20ball.jpg" alt="" loading="lazy">
-        <div class="cell-cap"><span class="cell-ttl">Where Ball?</span><span class="cell-tag">Festival</span></div>
+      <a class="cap-card" href="work.html">
+        <span class="cap-num">03</span>
+        <h3>Music Video</h3>
+        <p>From commissioned competition winners to independent artists. We treat every music video like a short film. The song deserves a proper visual story.</p>
+        <span class="arrow-link">View music videos →</span>
       </a>
     </div>
   </div>
 </section>
 
-<section style="padding: 32px 0 0;">
-<div class="wrap">
+<!-- ── DIFFERENTIATOR (dark) ── -->
+<section class="dark-section">
+  <div class="wrap">
+    <p class="section-label">Why us</p>
+    <div class="dark-block">
+      <h2 class="display">We make <em>real films</em>. We just build them differently.</h2>
+      <div>
+        <p>Traditional production companies charge six figures and take three months. Solo operators cut corners you'll notice later. We sit in neither place.</p>
+        <p>Strange Goose is a professional film team with a modern production pipeline. That means faster turnarounds, leaner budgets, and no sacrifice on the craft. The craft is why we exist.</p>
+        <a href="about.html" class="arrow-link">About the team →</a>
+        <aside class="ai-aside">
+          <div class="ai-aside-main">
+            <span class="ai-aside-label"><span class="ai-aside-dot"></span>Independent AI consultancy</span>
+            <p>Working in production and trying to work out what AI can realistically do, and what it can't? We consult.</p>
+          </div>
+          <a href="ai.html" class="ai-aside-link">Find out more →</a>
+        </aside>
+      </div>
+    </div>
 
-  <nav class="nav-list" aria-label="Site sections">
-    <a href="work.html">
-      <span class="num">01</span>
-      <span class="label">Previous Work</span>
-      <span class="desc">Shorts · Music · Commercial</span>
-    </a>
-    <a href="commercial.html">
-      <span class="num">02</span>
-      <span class="label">Hire Us</span>
-      <span class="desc">For brands</span>
-    </a>
-    <a href="ai.html">
-      <span class="num">03</span>
-      <span class="label">AI Production</span>
-      <span class="desc">Consultancy · 90 min</span>
-    </a>
-    <a href="about.html">
-      <span class="num">04</span>
-      <span class="label">About</span>
-      <span class="desc">Who we are</span>
-    </a>
-    <a href="glossary.html">
-      <span class="num">05</span>
-      <span class="label">Glossary</span>
-      <span class="desc">Plain-English video terms</span>
-    </a>
-  </nav>
-
-  <div class="contact-line">
-    <span class="label">Say hello</span>
-    <a class="email" href="mailto:info@strangegoose.co.uk">info@strangegoose.co.uk &nbsp;↗</a>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num tabular">11<span class="accent">+</span></div>
+        <div class="stat-lbl">Productions completed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num tabular">8</div>
+        <div class="stat-lbl">48HR COMPETITIONS COMPLETED</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num tabular">3</div>
+        <div class="stat-lbl">Continents screened on</div>
+      </div>
+    </div>
   </div>
+</section>
 
-</div>
+<!-- ── SELECTED WORK ── -->
+<section>
+  <div class="wrap">
+    <div class="work-head">
+      <h2 class="display" style="font-size: clamp(30px, 4.2vw, 56px);">From Edinburgh. Seen everywhere.</h2>
+      <a href="work.html" class="arrow-link">All work →</a>
+    </div>
+
+    <div class="sw-grid">
+      <a class="sw-card featured" href="work.html">
+        <img src="img/fairytale-farm.jpg" alt="Fairytale Farm" loading="lazy">
+        <div class="sw-overlay">
+          <span class="sw-tag"><span class="dot"></span>Short Film · 2025</span>
+          <span class="sw-ttl">Fairytale Farm</span>
+          <span class="sw-award">Best Micro Short, Birmingham Horror Film Festival · Best Short, Holiday Horror Fest VIII</span>
+        </div>
+      </a>
+      <a class="sw-card" href="work.html">
+        <img src="img/family-time.jpg" alt="Family Time" loading="lazy">
+        <div class="sw-overlay">
+          <span class="sw-tag"><span class="dot"></span>48hr Film · 2025</span>
+          <span class="sw-ttl">Family Time</span>
+          <span class="sw-award">Overall Winner · Aberdeen</span>
+        </div>
+      </a>
+      <a class="sw-card" href="work.html">
+        <img src="img/getting-over.jpg" alt="Getting Over Going Under" loading="lazy">
+        <div class="sw-overlay">
+          <span class="sw-tag"><span class="dot"></span>Music Video · 2026</span>
+          <span class="sw-ttl">Getting Over Going Under</span>
+          <span class="sw-award">Wild Song Film Festival · Official Selection</span>
+        </div>
+      </a>
+      <a class="sw-card" href="work.html">
+        <img src="img/subject-1410.jpg" alt="Subject 1410" loading="lazy">
+        <div class="sw-overlay">
+          <span class="sw-tag"><span class="dot"></span>48hr Film · 2024</span>
+          <span class="sw-ttl">Subject 1410</span>
+          <span class="sw-award">Two Wins · Six nominations</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA CLOSER ── -->
+<section class="cta-closer">
+  <div class="wrap-tight">
+    <h2 class="display" style="font-size: clamp(40px, 6vw, 84px);">Got a project? <em>Let's talk.</em></h2>
+    <p>Whether you need a brand film, a music video, or you're not quite sure what you need yet, start with a conversation. No pitch, no hard sell.</p>
+    <a href="/cdn-cgi/l/email-protection#cba2a5ada48bb8bfb9aaa5acaeaca4a4b8aee5a8a4e5bea0" class="btn primary lg">Talk to us about your project</a>
+  </div>
 </section>
 
 </main>
 
-<footer class="site">
-  <div><span class="goose-glyph"></span>&nbsp; Strange Goose · © 2026</div>
-  <div class="links">
-    <a href="work.html">Previous Work</a>
-    <a href="commercial.html">Hire Us</a>
-    <a href="ai.html">AI Production</a>
-    <a href="about.html">About</a>
-    <a href="glossary.html">Glossary</a>
-    <a href="mailto:info@strangegoose.co.uk">Email</a>
+<footer class="fork">
+  <div class="footer-main">
+    <div class="footer-col footer-brand">
+      <div class="fb-name"><span class="goose-glyph"></span>Strange Goose Productions</div>
+      <div class="fb-tag">Proper film. Built differently.</div>
+      <div class="fb-loc">Edinburgh, Scotland</div>
+    </div>
+    <div class="footer-col">
+      <h4>Navigation</h4>
+      <div class="fcol-links">
+        <a href="work.html">Work</a>
+        <a href="services.html">Services</a>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <div class="fcol-links">
+        <a href="/cdn-cgi/l/email-protection#452c2b232a05363137242b2220222a2a36206b262a6b302e"><span class="__cf_email__" data-cfemail="254c4b434a65565157444b4240424a4a56400b464a0b504e">[email&#160;protected]</span></a>
+        <a href="https://instagram.com/strange_goose_productions" target="_blank" rel="noopener">instagram.com/strange_goose_productions</a>
+        <a href="https://youtube.com/@strange_goose_productions" target="_blank" rel="noopener">youtube.com/@strange_goose_productions</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Strange Goose Productions</span>
+    <span>www.strangegoose.co.uk</span>
   </div>
 </footer>
 
-<script>
-  // Hero stills: cross-fade between images at staggered cadence,
-  // and keep the caption text in sync with the visible image.
-  (function () {
-    function cycle(rootId, captions, period, offset) {
-      const root = document.getElementById(rootId);
-      if (!root) return;
-      const imgs = Array.from(root.querySelectorAll('img'));
-      const cap = root.querySelector('.cap-title');
-      if (imgs.length < 2) return;
-      let idx = 0;
-      setTimeout(function tick() {
-        imgs[idx].classList.remove('is-on');
-        idx = (idx + 1) % imgs.length;
-        imgs[idx].classList.add('is-on');
-        if (cap && captions[idx]) cap.textContent = captions[idx];
-        setTimeout(tick, period);
-      }, offset);
-    }
-
-    cycle('still-a',
-      ['Fairytale Farm · 2025', 'Subject 1410 · 2024', 'Crossfire · 2025', 'The Journeyman · 2025'],
-      5200, 4400);
-    cycle('still-b',
-      ['Getting Over Going Under', 'Family Time · 48hr', "Roadtripppin' · 2025", 'Where Ball? · 2025', 'Unravelling · 48hr'],
-      5200, 7000);
-  })();
-</script>
-
-</body>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
 </html>
