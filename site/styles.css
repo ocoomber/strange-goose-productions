@@ -741,3 +741,250 @@ footer.fork {
   .footer-bottom { padding: 16px 20px; }
   .play-btn { width: 60px; height: 60px; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   THEATRE · screening room treatment (work.html only)
+   Every selector is scoped under body.theatre. No other page
+   carries the class, so nothing here can leak elsewhere.
+   ════════════════════════════════════════════════════════════ */
+
+body.theatre {
+  --paper: #15120f;
+  --paper-2: #1A1714;
+  --paper-3: #211d18;
+  --ink: #f6f1e6;
+  --ink-2: rgba(246,241,230,0.84);
+  --ink-3: rgba(246,241,230,0.64);
+  --muted: rgba(246,241,230,0.46);
+  --faint: rgba(246,241,230,0.18);
+  --hairline: rgba(246,241,230,0.14);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* the grain overlay reads as film grain on dark — lift it a touch */
+body.theatre::after { opacity: 0.055; }
+
+/* keyboard focus must survive near-black */
+body.theatre a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ── nav dark variant ── */
+body.theatre nav.top {
+  background: rgba(21,18,15,0.82);
+  border-bottom: 1px solid var(--hairline);
+  box-shadow: 0 10px 30px -24px rgba(0,0,0,0.9);
+}
+body.theatre nav.top .links a:hover,
+body.theatre nav.top .links a.active { background: rgba(246,241,230,0.07); }
+
+/* ── page header ── */
+body.theatre .theatre-hd {
+  padding: clamp(90px, 13vh, 150px) 0 64px;
+  border-bottom: 1px solid var(--hairline);
+  background: radial-gradient(ellipse 70% 62% at 50% -12%, rgba(255,199,138,0.07), transparent 70%);
+}
+body.theatre .theatre-hd .eyebrow { color: var(--accent); }
+body.theatre .theatre-hd h1 {
+  font-size: clamp(56px, 9.5vw, 132px);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  margin-top: 26px;
+}
+body.theatre .theatre-hd .sub {
+  font-size: clamp(18px, 2vw, 22px);
+  line-height: 1.45;
+  color: var(--ink-3);
+  max-width: 48ch;
+  margin-top: 26px;
+}
+
+/* ── now showing feature ── */
+body.theatre .now-showing { padding: 72px 0 76px; border-bottom: 1px solid var(--hairline); }
+body.theatre .ns-marker {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+body.theatre .ns-marker .ns-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent);
+  animation: theatre-pulse 2.4s ease-in-out infinite;
+}
+@keyframes theatre-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.theatre .ns-marker .ns-dot { animation: none; }
+}
+body.theatre .ns-frame {
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  box-shadow: 0 30px 120px -40px rgba(0,0,0,0.9), 0 0 90px -30px oklch(58% 0.14 45 / 0.25);
+}
+body.theatre .ns-player { border: none; box-shadow: none; border-radius: 0; }
+body.theatre .ns-bar {
+  position: absolute;
+  left: 0; right: 0;
+  height: 50%;
+  background: #0a0908;
+  pointer-events: none;
+  z-index: 3;
+  transform: scaleY(0); /* invisible unless the GSAP curtain drives it */
+}
+body.theatre .ns-bar-top { top: 0; transform-origin: top center; }
+body.theatre .ns-bar-btm { bottom: 0; transform-origin: bottom center; }
+body.theatre .ns-overlay {
+  position: absolute; inset: 0;
+  z-index: 2;
+  background: linear-gradient(to top, rgba(10,9,8,0.86) 0%, rgba(10,9,8,0.18) 45%, rgba(10,9,8,0) 75%);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: clamp(20px, 3vw, 38px);
+  pointer-events: none;
+}
+body.theatre .ns-ttl {
+  font-size: clamp(30px, 4.4vw, 60px);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  color: #f6f1e6;
+}
+body.theatre .ns-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(246,241,230,0.78);
+  margin-top: 12px;
+}
+body.theatre .ns-awards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin-top: 24px;
+}
+body.theatre .award-note {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── award chips ── */
+body.theatre .award-chip {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid oklch(58% 0.14 45 / 0.45);
+  padding: 4px 9px;
+  border-radius: 2px;
+  margin: 2px 6px 2px 0;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* ── act sections ── */
+body.theatre .work-section { padding: 72px 0; border-bottom: 1px solid var(--hairline); }
+body.theatre .ws-head {
+  position: relative;
+  padding-top: 30px;
+  margin-bottom: 22px;
+  align-items: end;
+}
+body.theatre .ws-rule {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--hairline);
+}
+body.theatre .act-num {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+body.theatre .act-num::after {
+  content: '';
+  width: 28px; height: 1px;
+  background: var(--accent);
+  opacity: 0.55;
+}
+body.theatre .ws-grid-gap { margin-top: 36px; }
+
+/* ── players as lit screens ── */
+body.theatre .player {
+  border: 1px solid var(--hairline);
+  border-radius: 3px;
+  box-shadow: 0 24px 70px -30px rgba(0,0,0,0.9);
+  transition: box-shadow 0.4s ease;
+}
+body.theatre .player::after {
+  content: '';
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: inset 0 0 70px 12px rgba(0,0,0,0.4);
+}
+body.theatre .player[data-playing]::after { content: none; }
+body.theatre a.player:hover {
+  box-shadow: 0 24px 70px -30px rgba(0,0,0,0.9), 0 0 70px -18px oklch(58% 0.14 45 / 0.32);
+}
+body.theatre .ns-player::after { box-shadow: inset 0 0 120px 30px rgba(0,0,0,0.5); }
+body.theatre .player img { transition: transform 1.2s cubic-bezier(0.2, 0.6, 0.2, 1); }
+body.theatre a.player:hover img { transform: scale(1.05); }
+body.theatre .player .play {
+  background: rgba(0,0,0,0.5);
+  border-color: rgba(246,241,230,0.75);
+  z-index: 2;
+}
+body.theatre .player .yr-badge { z-index: 2; }
+
+/* non-playable stills sit quiet so playable cards invite the click */
+body.theatre div.player img { filter: brightness(0.9); }
+
+/* ── film info ── */
+body.theatre .film-info .fi-ttl { font-weight: 700; letter-spacing: -0.025em; }
+
+/* footer hairline (hardcoded paper rgba is invisible on dark) */
+body.theatre .footer-bottom { border-top-color: var(--hairline); }
+
+/* ── end card ── */
+body.theatre .end-card-wrap { padding: 96px 0 16px; text-align: center; }
+body.theatre .end-card .ec-fin {
+  display: block;
+  font-size: clamp(34px, 4vw, 56px);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  font-style: italic;
+  margin-bottom: 22px;
+}
+
+/* ── responsive ── */
+@media (max-width: 720px) {
+  body.theatre .theatre-hd { padding: 64px 0 44px; }
+  body.theatre .now-showing { padding: 52px 0 56px; }
+  body.theatre .work-section { padding: 56px 0; }
+  body.theatre .end-card-wrap { padding: 64px 0 8px; }
+}
+@media (max-width: 380px) {
+  body.theatre .theatre-hd h1 { font-size: 48px; }
+}
