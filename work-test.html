@@ -37,9 +37,8 @@
 <div class="reel-progress" aria-hidden="true"><span></span></div>
 
 <section class="reel-stage" aria-label="Selected work">
-  <div class="reel-perf-edge-top" aria-hidden="true"></div>
-  <div class="reel-perf-edge-btm" aria-hidden="true"></div>
   <div class="reel-viewport">
+    <div class="reel-band">
     <div class="reel-track">
 
       <!-- ── ACT I ── -->
@@ -233,6 +232,7 @@
       </div>
 
     </div>
+    </div>
   </div>
 </section>
 
@@ -399,15 +399,15 @@
       .from('.reel-cue',            { autoAlpha: 0, duration: 0.5          }, 0.68);
   });
 
-  /* desktop pin + scrub */
+  /* desktop pin + scrub — translate the band so perfs travel with frames */
   mm.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)', function () {
     var stage = document.querySelector('.reel-stage');
-    var track = document.querySelector('.reel-track');
-    if (!stage || !track || !vp) return;
+    var band  = document.querySelector('.reel-band');
+    if (!stage || !band || !vp) return;
     vp.classList.add('is-pinned');
-    var getLen = function () { return Math.max(0, track.scrollWidth - vp.clientWidth); };
+    var getLen = function () { return Math.max(0, band.scrollWidth - vp.clientWidth); };
 
-    var tween = gsap.to(track, {
+    var tween = gsap.to(band, {
       x: function () { return -getLen(); },
       ease: 'none',
       scrollTrigger: {
@@ -424,19 +424,19 @@
     /* frames ease in as they enter the gate */
     var items   = gsap.utils.toArray('.reel-frame, .reel-slate');
     var reveals = items.map(function (el) {
-      return gsap.from(el, { autoAlpha: 0, scale: 0.92, duration: 0.45, ease: 'power2.out', paused: true });
+      return gsap.from(el, { autoAlpha: 0, duration: 0.4, ease: 'power2.out', paused: true });
     });
     items.forEach(function (el, i) {
       ScrollTrigger.create({
         trigger: el,
         containerAnimation: tween,
-        start: 'left 96%',
+        start: 'left 98%',
         onEnter:     function () { reveals[i].play(); },
         onLeaveBack: function () { reveals[i].reverse(); }
       });
     });
 
-    return function () { vp.classList.remove('is-pinned'); gsap.set(track, { x: 0 }); };
+    return function () { vp.classList.remove('is-pinned'); gsap.set(band, { x: 0 }); };
   });
 })();
 </script>
