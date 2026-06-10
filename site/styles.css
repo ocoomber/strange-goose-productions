@@ -1047,7 +1047,8 @@ body.theatre .reel-viewport.is-pinned { overflow: hidden; scroll-snap-type: none
    immediately above the bottom holes. No gap. */
 body.theatre .reel-band {
   position: relative;
-  display: inline-block; /* sizes to max-content width of track */
+  display: block;
+  width: max-content;
   padding: 20px 0;
   background: #0c0a09;
   /* hairline rules separating perf strips from image area */
@@ -1080,8 +1081,9 @@ body.theatre .reel-band::after  { bottom: 0; }
 /* ── Track: flex row of frames and slates, no vertical padding ── */
 body.theatre .reel-track {
   display: flex;
-  align-items: stretch; /* all children same height — slates match frames */
-  gap: 4px;             /* tight gap for a real strip feel */
+  align-items: center;
+  height: clamp(160px, 22vh, 240px); /* explicit: matches frame/slate, keeps band tight */
+  gap: 4px;
   padding: 0 max(6vw, 40px);
 }
 
@@ -1175,11 +1177,11 @@ body.theatre .reel-frame:not(.is-playable) img { filter: brightness(0.8) saturat
 body.theatre .reel-frame:not(.is-playable):hover .player { filter: brightness(1.0); }
 body.theatre .reel-frame:not(.is-playable):hover img { transform: none; }
 
-/* ── Act leader slates: same height as frames via align-items:stretch ── */
+/* ── Act leader slates: same explicit height as frames ── */
 body.theatre .reel-slate {
   flex: 0 0 auto;
   width: clamp(140px, 15vw, 210px);
-  /* height comes from align-items: stretch on the track */
+  height: clamp(160px, 22vh, 240px); /* MUST match .reel-frame height */
   scroll-snap-align: center;
   border-left: 3px solid #0c0a09;
   border-right: 3px solid #0c0a09;
@@ -1303,28 +1305,42 @@ body.theatre .reel-lb-close::before { content: '×'; font-size: 18px; font-famil
   body.theatre .reel-track { padding: 0 max(7vw, 56px); }
 }
 
-/* ── Mobile: width-based frames ── */
+/* ── Mobile: height-based, same for frames and slates ── */
 @media (max-width: 899px) {
-  body.theatre .reel-track { gap: 3px; padding: 0 5vw; }
-
-  body.theatre .reel-frame {
-    height: auto;
-    width: min(72vw, 320px);
+  body.theatre .reel-band { padding: 16px 0; }
+  body.theatre .reel-band::before,
+  body.theatre .reel-band::after { height: 16px; }
+  body.theatre .reel-band::before,
+  body.theatre .reel-band::after {
+    -webkit-mask: linear-gradient(to bottom, transparent 0 3px, #000 3px 13px, transparent 13px 16px);
+            mask: linear-gradient(to bottom, transparent 0 3px, #000 3px 13px, transparent 13px 16px);
   }
+  body.theatre .reel-band {
+    box-shadow:
+      inset 0 16px 0 -15px rgba(246,241,230,0.12),
+      inset 0 -16px 0 -15px rgba(246,241,230,0.12);
+  }
+  body.theatre .reel-track { height: min(44vw, 190px); gap: 3px; padding: 0 4vw; }
+
+  /* both frames and slates same explicit height — band stays tight */
+  body.theatre .reel-frame,
+  body.theatre .reel-slate { height: min(44vw, 190px); }
+
+  /* frame: height set, width via aspect-ratio */
+  body.theatre .reel-frame { width: auto; }
   body.theatre .reel-frame .player {
-    height: auto;
-    width: 100%;
+    height: 100%;
+    width: auto;
     aspect-ratio: 16 / 9;
     border-right-width: 2px;
   }
   body.theatre .reel-frame--v .player { aspect-ratio: 9 / 16; }
 
+  /* slate: set width, height comes from the shared height rule above */
   body.theatre .reel-slate {
-    width: min(50vw, 200px);
+    width: clamp(110px, 28vw, 160px);
     border-left-width: 2px;
     border-right-width: 2px;
-    aspect-ratio: 16 / 9;
-    height: auto;
   }
 
   body.theatre .reel-lb-inner { width: 96vw; }
