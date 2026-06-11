@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Work · Strange Goose Productions</title>
 <meta name="description" content="Short films, music videos, and commercial content from Edinburgh. Award-winning work from Strange Goose Productions.">
+<meta name="theme-color" content="#0c0a09">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site/styles.css">
 </head>
-<body data-screen-label="02 Work">
+<body class="theatre" data-screen-label="02 Work">
 
 <nav class="top">
   <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose Productions</span></a>
@@ -24,210 +25,246 @@
 
 <main>
 
-<header class="page-hd">
+<header class="theatre-hd">
   <div class="wrap">
-    <p class="eyebrow">Portfolio</p>
+    <p class="eyebrow">Portfolio · The Reel</p>
     <h1>The work.</h1>
-    <p class="sub">Short films, music videos, and commercial content.</p>
+    <p class="sub">Short films, music videos, and commercial content. Click any frame to watch.</p>
+    <p class="reel-cue"><span class="cue-arrow" aria-hidden="true">↓</span> Wind the reel to browse</p>
   </div>
 </header>
 
-<!-- ── COMMERCIAL & BRANDED ── -->
-<section class="work-section">
-  <div class="wrap">
-    <div class="ws-head">
-      <h2>Commercial &amp; Branded</h2>
-    </div>
-    <p class="ws-intro">Spec work and commissioned pieces below.</p>
+<!-- Reel transport: film-reel spools wind the strip -->
+<div class="reel-controls">
+  <button class="reel-spool reel-spool--prev" type="button" aria-label="Rewind — previous films" disabled>
+    <svg class="spool-svg" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+      <circle class="spool-ring" cx="28" cy="28" r="24" stroke="currentColor" stroke-width="2"></circle>
+      <circle class="spool-ring spool-ring--inner" cx="28" cy="28" r="19" stroke="currentColor" stroke-width="1"></circle>
+      <circle class="spool-hub" cx="28" cy="28" r="5" fill="currentColor"></circle>
+      <circle class="spool-hole" cx="28" cy="11.5" r="4" fill="currentColor"></circle>
+      <circle class="spool-hole" cx="43.7" cy="22.9" r="4" fill="currentColor"></circle>
+      <circle class="spool-hole" cx="37.7" cy="41.35" r="4" fill="currentColor"></circle>
+      <circle class="spool-hole" cx="18.3" cy="41.35" r="4" fill="currentColor"></circle>
+      <circle class="spool-hole" cx="12.3" cy="22.9" r="4" fill="currentColor"></circle>
+    </svg>
+    <span class="spool-label">&lsaquo;&lsaquo; Rewind</span>
+  </button>
 
-    <div class="film-feature vertical" style="margin-top: 24px;"><style>.film-feature.vertical a.player { padding-bottom: 177.78%; } .film-feature.vertical a.player iframe { position:absolute;inset:0;width:100%;height:100%;border:0; }</style>
-      <a class="player" href="https://www.youtube.com/shorts/NBOzqZBKn-w" target="_blank" rel="noopener" data-yt="NBOzqZBKn-w">
-        <img src="https://i.ytimg.com/vi/NBOzqZBKn-w/maxresdefault.jpg" alt="Still from the Deep Cuts Coffee spec advert" loading="lazy">
-        <span class="play" aria-hidden="true"></span>
-        <span class="yr-badge">2026</span>
-      </a>
-      <div class="film-info">
-        <div class="fi-ttl">Deep Cuts Coffee</div>
-        <div class="fi-type">Spec Advert · Vertical · 2026</div>
-        <div class="fi-award">Spec advert for Deep Cuts Coffee, shot vertical for social.</div>
-      </div>
-    </div>
+  <div class="reel-meter" aria-hidden="true">
+    <span class="reel-meter-fill"></span>
+    <span class="reel-meter-head"></span>
   </div>
-</section>
 
-<!-- ── SHORT FILMS ── -->
-<section class="work-section">
-  <div class="wrap">
-    <div class="ws-head">
-      <h2>Short Films</h2>
-    </div>
-    <div class="film-grid-lg" style="margin-top: 24px;">
+  <button class="reel-spool reel-spool--next" type="button" aria-label="Advance — next films">
+    <span class="spool-label">Advance &rsaquo;&rsaquo;</span>
+    <svg class="spool-svg" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+      <circle class="spool-ring" cx="28" cy="28" r="24" stroke="currentColor" stroke-width="2"></circle>
+      <circle class="spool-ring spool-ring--inner" cx="28" cy="28" r="19" stroke="currentColor" stroke-width="1"></circle>
+      <circle class="spool-hub" cx="28" cy="28" r="5" fill="currentColor"></circle>
+      <circle class="spool-hole" cx="28" cy="11.5" r="4" fill="currentColor"></circle>
+      <circle class="spool-hole" cx="43.7" cy="22.9" r="4" fill="currentColor"></circle>
+      <circle class="spool-hole" cx="37.7" cy="41.35" r="4" fill="currentColor"></circle>
+      <circle class="spool-hole" cx="18.3" cy="41.35" r="4" fill="currentColor"></circle>
+      <circle class="spool-hole" cx="12.3" cy="22.9" r="4" fill="currentColor"></circle>
+    </svg>
+  </button>
+</div>
 
-      <div class="film-entry">
-        <a class="player" href="https://youtu.be/M8qZY5vbkZU" target="_blank" rel="noopener" data-yt="M8qZY5vbkZU">
-          <img src="img/fairytale-farm.jpg" alt="Still from Fairytale Farm" loading="lazy">
-          <span class="play" aria-hidden="true"></span>
-          <span class="yr-badge">2025</span>
-        </a>
-        <div class="film-info">
-          <div class="fi-ttl">Fairytale Farm<span class="fi-type">Short Film</span></div>
-          <div class="fi-award"><span class="win">Best Micro Short</span> (Birmingham Horror FF) · <span class="win">Best Short</span> (Holiday Horror Fest VIII, USA) · 12 festival selections</div>
+<section class="reel-stage" aria-label="Selected work">
+  <div class="reel-viewport">
+    <div class="reel-band">
+    <div class="reel-track">
+
+      <!-- ── ACT I ── -->
+      <div class="reel-slate">
+        <span class="slate-act">Act I</span>
+        <span class="slate-cat">Commercial &amp; Branded</span>
+      </div>
+
+      <div class="reel-frame reel-frame--v is-playable"
+           data-yt="NBOzqZBKn-w"
+           data-ttl="Deep Cuts Coffee"
+           data-meta="Spec Advert · Vertical · 2026">
+        <span class="reel-idx">Deep Cuts Coffee</span>
+        <div class="player">
+          <img src="https://i.ytimg.com/vi/NBOzqZBKn-w/maxresdefault.jpg" alt="Still from the Deep Cuts Coffee spec advert" loading="lazy">
+          <span class="reel-play-hint" aria-hidden="true"></span>
         </div>
       </div>
 
-      <div class="film-entry">
+      <!-- ── ACT II ── -->
+      <div class="reel-slate">
+        <span class="slate-act">Act II</span>
+        <span class="slate-cat">Short Films</span>
+      </div>
+
+      <div class="reel-frame is-playable"
+           data-yt="M8qZY5vbkZU"
+           data-ttl="Fairytale Farm"
+           data-meta="Short Film · 2025"
+           data-chips="Best Micro Short · Birmingham Horror FF|Best Short · Holiday Horror Fest VIII, USA">
+        <span class="reel-idx">Fairytale Farm</span>
+        <div class="player">
+          <img src="img/fairytale-farm.jpg" alt="Still from Fairytale Farm" loading="eager">
+          <span class="reel-play-hint" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="reel-frame"
+           data-ttl="Where Ball?"
+           data-meta="Short Film · Official Selection, Expresso 90 Film Festival · 2026">
+        <span class="reel-idx">Where Ball?</span>
         <div class="player">
           <img src="img/where-ball.jpg" alt="Still from Where Ball?" loading="lazy">
-          <span class="yr-badge">2026</span>
-        </div>
-        <div class="film-info">
-          <div class="fi-ttl">Where Ball?<span class="fi-type">Short Film</span></div>
-          <div class="fi-award">Official Selection · Expresso 90 Film Festival</div>
         </div>
       </div>
 
-      <div class="film-entry">
+      <div class="reel-frame"
+           data-ttl="The Science of Grief"
+           data-meta="Short Film · 2025">
+        <span class="reel-idx">The Science of Grief</span>
         <div class="player">
           <img src="img/science-of-grief.jpg" alt="Still from The Science of Grief" loading="lazy">
-          <span class="yr-badge">2025</span>
-        </div>
-        <div class="film-info">
-          <div class="fi-ttl">The Science of Grief<span class="fi-type">Short Film</span></div>
         </div>
       </div>
 
-    </div>
-  </div>
-</section>
-
-<!-- ── MUSIC VIDEOS ── -->
-<section class="work-section">
-  <div class="wrap">
-    <div class="ws-head">
-      <h2>Music Videos</h2>
-    </div>
-    <div class="film-feature" style="margin-top: 24px;">
-      <a class="player" href="https://youtu.be/Jft-DIJjCy4" target="_blank" rel="noopener" data-yt="Jft-DIJjCy4">
-        <img src="img/getting-over.jpg" alt="Still from Getting Over Going Under" loading="lazy">
-        <span class="play" aria-hidden="true"></span>
-        <span class="yr-badge">2026</span>
-      </a>
-      <div class="film-info">
-        <div class="fi-ttl">Getting Over Going Under</div>
-        <div class="fi-type">Gareth Overton · Music Video · 2026</div>
-        <div class="fi-award">Commissioned · <span class="win">Wild Song Songwriting Challenge winner</span> · Official Selection, Wild Song Film Festival</div>
+      <!-- ── ACT III ── -->
+      <div class="reel-slate">
+        <span class="slate-act">Act III</span>
+        <span class="slate-cat">Music Videos</span>
       </div>
-    </div>
-  </div>
-</section>
 
-<!-- ── 48HR FILMS ── -->
-<section class="work-section">
-  <div class="wrap">
-    <div class="ws-head">
-      <h2>48hr Films</h2>
-    </div>
-    <p class="ws-intro">Eight competitions across Scotland. These films were written, shot, and delivered in 48 hours. They've won awards.</p>
-    <div class="film-grid-lg">
+      <div class="reel-frame is-playable"
+           data-yt="Jft-DIJjCy4"
+           data-ttl="Getting Over Going Under"
+           data-meta="Gareth Overton · Music Video · 2026"
+           data-chips="Wild Song Songwriting Challenge Winner">
+        <span class="reel-idx">Getting Over Going Under</span>
+        <div class="player">
+          <img src="img/getting-over.jpg" alt="Still from Getting Over Going Under" loading="lazy">
+          <span class="reel-play-hint" aria-hidden="true"></span>
+        </div>
+      </div>
 
-      <div class="film-entry">
-        <a class="player" href="https://youtu.be/FTKCQEnO-TU" target="_blank" rel="noopener" data-yt="FTKCQEnO-TU">
+      <!-- ── ACT IV ── -->
+      <div class="reel-slate">
+        <span class="slate-act">Act IV</span>
+        <span class="slate-cat">48hr Films</span>
+      </div>
+
+      <div class="reel-frame is-playable"
+           data-yt="FTKCQEnO-TU"
+           data-ttl="Unravelling"
+           data-meta="48hr Film · Edinburgh 2026 · Latest"
+           data-chips="1 Win|10 Nominations">
+        <span class="reel-idx">Unravelling</span>
+        <div class="player">
           <img src="img/unravelling.png" alt="Title card from Unravelling" loading="lazy">
-          <span class="play" aria-hidden="true"></span>
-          <span class="yr-badge">Edinburgh · 2026</span>
-        </a>
-        <div class="film-info">
-          <div class="fi-ttl">Unravelling<span class="fi-type">48hr Film · Latest</span></div>
-          <div class="fi-award"><span class="win">1 win</span> · 10 nominations</div>
+          <span class="reel-play-hint" aria-hidden="true"></span>
         </div>
       </div>
 
-      <div class="film-entry">
+      <div class="reel-frame"
+           data-ttl="Family Time"
+           data-meta="48hr Film · Aberdeen 2025"
+           data-chips="Overall Winner|8 Wins incl. Best Directing, Best Actor">
+        <span class="reel-idx">Family Time</span>
         <div class="player">
           <img src="img/family-time.jpg" alt="Still from Family Time" loading="lazy">
-          <span class="yr-badge">Aberdeen · 2025</span>
-        </div>
-        <div class="film-info">
-          <div class="fi-ttl">Family Time<span class="fi-type">48hr Film</span></div>
-          <div class="fi-award">8 wins incl. Overall Winner, Best Directing, Best Actor</div>
         </div>
       </div>
 
-      <div class="film-entry">
-        <a class="player" href="https://youtu.be/AN9-Np6hoGc" target="_blank" rel="noopener" data-yt="AN9-Np6hoGc">
+      <div class="reel-frame is-playable"
+           data-yt="AN9-Np6hoGc"
+           data-ttl="Roadtrippin'"
+           data-meta="48hr Film · Inverness 2025"
+           data-chips="Best Sound Design">
+        <span class="reel-idx">Roadtrippin'</span>
+        <div class="player">
           <img src="img/roadtrippin.jpg" alt="Still from Roadtrippin'" loading="lazy">
-          <span class="play" aria-hidden="true"></span>
-          <span class="yr-badge">Inverness · 2025</span>
-        </a>
-        <div class="film-info">
-          <div class="fi-ttl">Roadtrippin'<span class="fi-type">48hr Film</span></div>
-          <div class="fi-award"><span class="win">Best Sound Design</span> · 7 other nominations</div>
+          <span class="reel-play-hint" aria-hidden="true"></span>
         </div>
       </div>
 
-      <div class="film-entry">
-        <a class="player" href="https://youtu.be/LfrdeH2ybHQ" target="_blank" rel="noopener" data-yt="LfrdeH2ybHQ">
+      <div class="reel-frame is-playable"
+           data-yt="LfrdeH2ybHQ"
+           data-ttl="The Journeyman"
+           data-meta="48hr Film · Edinburgh 2025 · 9 Nominations">
+        <span class="reel-idx">The Journeyman</span>
+        <div class="player">
           <img src="img/the-journeyman.jpg" alt="Still from The Journeyman" loading="lazy">
-          <span class="play" aria-hidden="true"></span>
-          <span class="yr-badge">Edinburgh · 2025</span>
-        </a>
-        <div class="film-info">
-          <div class="fi-ttl">The Journeyman<span class="fi-type">48hr Film</span></div>
-          <div class="fi-award">9 nominations</div>
+          <span class="reel-play-hint" aria-hidden="true"></span>
         </div>
       </div>
 
-      <div class="film-entry">
-        <a class="player" href="https://youtu.be/MiGWIg5WinU" target="_blank" rel="noopener" data-yt="MiGWIg5WinU">
+      <div class="reel-frame is-playable"
+           data-yt="MiGWIg5WinU"
+           data-ttl="Crossfire"
+           data-meta="48hr Film · Glasgow 2025 · 3 Nominations">
+        <span class="reel-idx">Crossfire</span>
+        <div class="player">
           <img src="img/crossfire.jpg" alt="Still from Crossfire" loading="lazy">
-          <span class="play" aria-hidden="true"></span>
-          <span class="yr-badge">Glasgow · 2025</span>
-        </a>
-        <div class="film-info">
-          <div class="fi-ttl">Crossfire<span class="fi-type">48hr Film</span></div>
-          <div class="fi-award">3 nominations</div>
+          <span class="reel-play-hint" aria-hidden="true"></span>
         </div>
       </div>
 
-      <div class="film-entry">
-        <a class="player" href="https://youtu.be/Bt1LFJmsHWM" target="_blank" rel="noopener" data-yt="Bt1LFJmsHWM">
+      <div class="reel-frame is-playable"
+           data-yt="Bt1LFJmsHWM"
+           data-ttl="Subject 1410"
+           data-meta="48hr Film · Glasgow 2024"
+           data-chips="Best Make Up|Best Use of Location">
+        <span class="reel-idx">Subject 1410</span>
+        <div class="player">
           <img src="img/subject-1410.jpg" alt="Still from Subject 1410" loading="lazy">
-          <span class="play" aria-hidden="true"></span>
-          <span class="yr-badge">Glasgow · 2024</span>
-        </a>
-        <div class="film-info">
-          <div class="fi-ttl">Subject 1410<span class="fi-type">48hr Film</span></div>
-          <div class="fi-award"><span class="win">Best Make Up</span> · <span class="win">Best Use of Location</span> · 6 other nominations</div>
+          <span class="reel-play-hint" aria-hidden="true"></span>
         </div>
       </div>
 
-      <div class="film-entry">
-        <a class="player" href="https://youtu.be/fzJwUf2AF10" target="_blank" rel="noopener" data-yt="fzJwUf2AF10">
+      <div class="reel-frame is-playable"
+           data-yt="fzJwUf2AF10"
+           data-ttl="Creag"
+           data-meta="48hr Film · Inverness 2024 · 2 Nominations">
+        <span class="reel-idx">Creag</span>
+        <div class="player">
           <img src="img/creag.jpg" alt="Still from Creag" loading="lazy">
-          <span class="play" aria-hidden="true"></span>
-          <span class="yr-badge">Inverness · 2024</span>
-        </a>
-        <div class="film-info">
-          <div class="fi-ttl">Creag<span class="fi-type">Inverness · 2024</span></div>
-          <div class="fi-award">2 nominations</div>
+          <span class="reel-play-hint" aria-hidden="true"></span>
         </div>
       </div>
 
-      <div class="film-entry">
-        <a class="player" href="https://youtu.be/nz5U87R7G6A" target="_blank" rel="noopener" data-yt="nz5U87R7G6A">
+      <div class="reel-frame is-playable"
+           data-yt="nz5U87R7G6A"
+           data-ttl="Dream House"
+           data-meta="48hr Film · Edinburgh 2024 · Best Editing Nomination">
+        <span class="reel-idx">Dream House</span>
+        <div class="player">
           <img src="img/dream-house.jpg" alt="Still from Dream House" loading="lazy">
-          <span class="play" aria-hidden="true"></span>
-          <span class="yr-badge">Edinburgh · 2024</span>
-        </a>
-        <div class="film-info">
-          <div class="fi-ttl">Dream House<span class="fi-type">Edinburgh · 2024</span></div>
-          <div class="fi-award">Best Editing nomination</div>
+          <span class="reel-play-hint" aria-hidden="true"></span>
         </div>
+      </div>
+
+      <!-- ── END ── -->
+      <div class="reel-slate reel-slate--end">
+        <span class="slate-fin">Fin.</span>
+        <a class="arrow-link" href="contact.html">Start a conversation</a>
       </div>
 
     </div>
+    </div>
   </div>
 </section>
+
+<!-- Lightbox -->
+<div class="reel-lb" role="dialog" aria-modal="true" aria-label="Film player" aria-hidden="true">
+  <div class="reel-lb-inner">
+    <button class="reel-lb-close" aria-label="Close">Close</button>
+    <div class="reel-lb-player"></div>
+    <div class="reel-lb-info">
+      <span class="reel-lb-ttl"></span>
+      <span class="reel-lb-meta"></span>
+      <div class="reel-lb-chips"></div>
+    </div>
+  </div>
+</div>
 
 </main>
 
@@ -250,7 +287,7 @@
     <div class="footer-col">
       <h4>Contact</h4>
       <div class="fcol-links">
-        <a href="mailto:info@strangegoose.co.uk">info@strangegoose.co.uk</a>
+        <a href="/cdn-cgi/l/email-protection#88e1e6eee7c8fbfcfae9e6efedefe7e7fbeda6ebe7a6fde3"><span class="__cf_email__" data-cfemail="dab3b4bcb59aa9aea8bbb4bdbfbdb5b5a9bff4b9b5f4afb1">[email&#160;protected]</span></a>
         <a href="https://instagram.com/strange_goose_productions" target="_blank" rel="noopener">instagram.com/strange_goose_productions</a>
         <a href="https://youtube.com/@strange_goose_productions" target="_blank" rel="noopener">youtube.com/@strange_goose_productions</a>
       </div>
@@ -262,25 +299,225 @@
   </div>
 </footer>
 
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 <script>
-  (function () {
-    document.querySelectorAll('a.player[data-yt]').forEach(function (el) {
-      el.addEventListener('click', function (e) {
-        
-        if (el.dataset.playing) { e.preventDefault(); return; }
-        e.preventDefault();
-        var id = el.getAttribute('data-yt');
-        var frame = document.createElement('iframe');
-        frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&modestbranding=1';
-        frame.title = 'Video player';
-        frame.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; web-share');
-        frame.setAttribute('allowfullscreen', '');
-        el.innerHTML = '';
-        el.appendChild(frame);
-        el.dataset.playing = '1';
-      });
+(function () {
+  /* ── Reel transport: spool buttons, drag-to-pan, position meter ── */
+  var bar       = document.querySelector('.reel-progress span');
+  var vp        = document.querySelector('.reel-viewport');
+  var prevBtn   = document.querySelector('.reel-spool--prev');
+  var nextBtn   = document.querySelector('.reel-spool--next');
+  var meterFill = document.querySelector('.reel-meter-fill');
+  var meterHead = document.querySelector('.reel-meter-head');
+  var prevSvg   = prevBtn ? prevBtn.querySelector('.spool-svg') : null;
+  var nextSvg   = nextBtn ? nextBtn.querySelector('.spool-svg') : null;
+  var dragMoved = false;
+  var ROT_K     = 0.62; /* degrees of reel rotation per px of film travel */
+
+  function reelMax() { return Math.max(0, vp.scrollWidth - vp.clientWidth); }
+
+  function updateReel() {
+    var max = reelMax();
+    var f = max > 0 ? vp.scrollLeft / max : 0;
+    if (bar) bar.style.transform = 'scaleX(' + f + ')';
+    if (meterFill) meterFill.style.width = (f * 100) + '%';
+    if (meterHead) meterHead.style.left = (f * 100) + '%';
+    if (prevBtn) prevBtn.disabled = vp.scrollLeft <= 1;
+    if (nextBtn) nextBtn.disabled = vp.scrollLeft >= max - 1;
+    /* both reels spin with the strip's actual motion — feels like film feeding through */
+    var deg = vp.scrollLeft * ROT_K;
+    if (prevSvg) prevSvg.style.transform = 'rotate(' + deg + 'deg)';
+    if (nextSvg) nextSvg.style.transform = 'rotate(' + deg + 'deg)';
+  }
+
+  if (vp) {
+    vp.addEventListener('scroll', updateReel, { passive: true });
+
+    /* ── Continuous wind: press-and-hold to glide the strip, release to coast ── */
+    var WIND_MAX   = 5.5;   /* top speed, px/frame */
+    var WIND_ACCEL = 0.275; /* ramp-up per frame */
+    var FRICTION   = 0.90; /* coast decay after release */
+    var winding = 0;       /* -1 rewind, +1 advance, 0 idle */
+    var vel = 0, rafId = null;
+
+    function clampScroll(x) { return Math.max(0, Math.min(reelMax(), x)); }
+
+    function frame() {
+      if (winding !== 0) {
+        vel = Math.min(WIND_MAX, vel + WIND_ACCEL);
+      } else {
+        vel *= FRICTION;
+      }
+      var dir = winding !== 0 ? winding : lastDir;
+      var next = clampScroll(vp.scrollLeft + dir * vel);
+      var atBound = next === vp.scrollLeft && vel > 0;
+      vp.scrollLeft = next;
+      updateReel();
+      if (atBound) { vel = 0; winding = 0; }
+      if (winding === 0 && vel < 0.3) { rafId = null; return; }
+      rafId = requestAnimationFrame(frame);
+    }
+
+    var lastDir = 1;
+    function startWind(dir) {
+      if ((dir < 0 && vp.scrollLeft <= 0) || (dir > 0 && vp.scrollLeft >= reelMax())) return;
+      winding = dir; lastDir = dir;
+      vel = Math.max(vel, 1.75); /* floor so a quick tap still glides */
+      if (!rafId) rafId = requestAnimationFrame(frame);
+    }
+    function stopWind() { winding = 0; if (!rafId) rafId = requestAnimationFrame(frame); }
+
+    [[prevBtn, -1], [nextBtn, 1]].forEach(function (pair) {
+      var btn = pair[0], dir = pair[1];
+      if (!btn) return;
+      btn.addEventListener('pointerdown', function (e) { e.preventDefault(); if (!btn.disabled) startWind(dir); });
+      btn.addEventListener('pointerup', stopWind);
+      btn.addEventListener('pointerleave', stopWind);
+      btn.addEventListener('pointercancel', stopWind);
+      /* keyboard: hold Enter/Space to wind */
+      btn.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && !btn.disabled) { e.preventDefault(); startWind(dir); } });
+      btn.addEventListener('keyup',   function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); stopWind(); } });
+      btn.addEventListener('blur', stopWind);
     });
-  })();
+
+    /* click-and-drag to pan (pointer events) */
+    var down = false, startX = 0, startScroll = 0;
+    vp.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      down = true; dragMoved = false;
+      startX = e.clientX; startScroll = vp.scrollLeft;
+      vp.classList.add('is-grabbing');
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!down) return;
+      var dx = e.clientX - startX;
+      if (Math.abs(dx) > 4) dragMoved = true;
+      vp.scrollLeft = startScroll - dx;
+    });
+    window.addEventListener('pointerup', function () {
+      down = false;
+      vp.classList.remove('is-grabbing');
+      stopWind();
+      setTimeout(function () { dragMoved = false; }, 0);
+    });
+
+    window.addEventListener('resize', updateReel);
+    updateReel();
+  }
+
+  /* ── Lightbox ── */
+  var lb       = document.querySelector('.reel-lb');
+  var lbPlayer = document.querySelector('.reel-lb-player');
+  var lbTtl    = document.querySelector('.reel-lb-ttl');
+  var lbMeta   = document.querySelector('.reel-lb-meta');
+  var lbChips  = document.querySelector('.reel-lb-chips');
+  var lbClose  = document.querySelector('.reel-lb-close');
+  var lbOpen   = false;
+
+  function openLb(frame) {
+    var ytId  = frame.dataset.yt   || null;
+    var ttl   = frame.dataset.ttl  || '';
+    var meta  = frame.dataset.meta || '';
+    var chips = frame.dataset.chips ? frame.dataset.chips.split('|') : [];
+    var isV   = frame.classList.contains('reel-frame--v');
+
+    /* populate info */
+    lbTtl.textContent  = ttl;
+    lbMeta.textContent = meta;
+    lbChips.innerHTML  = chips.map(function (c) {
+      return '<span class="award-chip">' + c + '</span>';
+    }).join('');
+
+    /* populate player */
+    lbPlayer.innerHTML = '';
+    lbPlayer.className = 'reel-lb-player' + (isV ? ' reel-lb-player--v' : '');
+    if (ytId) {
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1';
+      iframe.title = ttl;
+      iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; web-share');
+      iframe.setAttribute('allowfullscreen', '');
+      lbPlayer.appendChild(iframe);
+    } else {
+      /* non-playable: show still at full lightbox size */
+      var img = frame.querySelector('img');
+      if (img) {
+        var si = document.createElement('img');
+        si.src = img.src;
+        si.alt = img.alt;
+        si.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+        lbPlayer.appendChild(si);
+      }
+    }
+
+    lb.setAttribute('aria-hidden', 'false');
+    lb.classList.add('is-open');
+    lbOpen = true;
+    document.body.style.overflow = 'hidden';
+
+    if (window.gsap) {
+      gsap.fromTo(lb, { opacity: 0 }, { opacity: 1, duration: 0.28, ease: 'power2.out' });
+      gsap.fromTo('.reel-lb-inner', { y: 28, scale: 0.97, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.38, ease: 'power3.out', delay: 0.06 });
+    } else {
+      lb.style.opacity = '1';
+    }
+  }
+
+  function closeLb() {
+    if (!lbOpen) return;
+    lbOpen = false;
+    var done = function () {
+      lb.classList.remove('is-open');
+      lb.setAttribute('aria-hidden', 'true');
+      lbPlayer.innerHTML = '';
+      document.body.style.overflow = '';
+    };
+    if (window.gsap) {
+      gsap.to(lb, { opacity: 0, duration: 0.2, ease: 'power2.in', onComplete: done });
+    } else {
+      lb.style.opacity = '0';
+      done();
+    }
+  }
+
+  document.querySelectorAll('.reel-frame').forEach(function (frame) {
+    frame.addEventListener('click', function () { if (dragMoved) return; openLb(frame); });
+    frame.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(frame); } });
+    frame.setAttribute('tabindex', '0');
+    frame.setAttribute('role', 'button');
+    frame.setAttribute('aria-label', (frame.dataset.ttl || 'Film') + (frame.dataset.yt ? ' — click to play' : ' — click to view'));
+  });
+
+  lbClose.addEventListener('click', closeLb);
+  lb.addEventListener('click', function (e) { if (e.target === lb) closeLb(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLb(); });
+
+  /* ── GSAP reel pan ── */
+  if (!window.gsap || !window.ScrollTrigger) return;
+  gsap.registerPlugin(ScrollTrigger);
+  var mm = gsap.matchMedia();
+
+  /* header cold open */
+  mm.add('(prefers-reduced-motion: no-preference)', function () {
+    gsap.timeline({ defaults: { ease: 'power3.out' } })
+      .from('.theatre-hd .eyebrow', { y: 16, autoAlpha: 0, duration: 0.55 }, 0.1)
+      .from('.theatre-hd h1',       { y: 40, autoAlpha: 0, duration: 0.8  }, 0.22)
+      .from('.theatre-hd .sub',     { y: 22, autoAlpha: 0, duration: 0.65 }, 0.44)
+      .from('.reel-cue',            { autoAlpha: 0, duration: 0.5          }, 0.68);
+  });
+
+  /* desktop: compact native-scroll strip — reveal items as the band scrolls into view */
+  mm.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)', function () {
+    var stage = document.querySelector('.reel-stage');
+    if (!stage) return;
+    var anim = gsap.from('.reel-track > *', {
+      autoAlpha: 0, y: 20, duration: 0.55, stagger: 0.06, ease: 'power2.out',
+      scrollTrigger: { trigger: stage, start: 'top 82%', once: true }
+    });
+    return function () { if (anim && anim.scrollTrigger) anim.scrollTrigger.kill(); gsap.set('.reel-track > *', { clearProps: 'opacity,visibility,transform' }); };
+  });
+})();
 </script>
 
 </body>

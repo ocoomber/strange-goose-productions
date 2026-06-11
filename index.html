@@ -61,8 +61,8 @@
   }
 
   /* reel embed */
-  .reel-frame { margin-top: 48px; }
-  .reel-box {
+  .hero-reel { margin-top: 48px; }
+  .hero-reel-box {
     position: relative;
     width: 100%;
     padding-bottom: 56.25%;
@@ -71,7 +71,7 @@
     background: #111;
     cursor: pointer;
   }
-  .reel-box img {
+  .hero-reel-box img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -79,7 +79,7 @@
     object-fit: cover;
     display: block;
   }
-  .reel-box .play {
+  .hero-reel-box .play {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
@@ -88,7 +88,7 @@
     border-radius: 50%;
     pointer-events: none;
   }
-  .reel-box .play::after {
+  .hero-reel-box .play::after {
     content: '';
     position: absolute;
     top: 50%; left: 54%;
@@ -98,7 +98,7 @@
     border-top: 13px solid transparent;
     border-bottom: 13px solid transparent;
   }
-  .reel-box iframe {
+  .hero-reel-box iframe {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -107,7 +107,7 @@
   }
 </style>
 </head>
-<body data-screen-label="01 Home">
+<body class="theatre" data-screen-label="01 Home">
 
 <nav class="top">
   <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose Productions</span></a>
@@ -132,9 +132,9 @@
       <a href="work.html" class="arrow-link">See our work →</a>
     </div>
 
-    <div class="reel-frame">
-      <div class="reel-box" id="reel" data-yt="SihEIj_EKik">
-        <img src="https://i.ytimg.com/vi/SihEIj_EKik/maxresdefault.jpg" alt="Strange Goose Productions — Commercial Reel" loading="lazy">
+    <div class="hero-reel">
+      <div class="hero-reel-box" id="reel" data-yt="XDqIPun8S-0">
+        <img src="https://i.ytimg.com/vi/XDqIPun8S-0/maxresdefault.jpg" alt="Strange Goose Productions — Commercial Reel" loading="lazy">
         <span class="play" aria-hidden="true"></span>
       </div>
     </div>
@@ -172,23 +172,20 @@
     </div>
 
     <div class="cap-grid">
-      <a class="cap-card" href="services.html">
+      <a class="cap-card" href="work.html">
         <span class="cap-num">01</span>
         <h3>Commercial &amp; Branded</h3>
         <p>Cinematic content for brands that want to look like they spent ten times more than they did. Genuine craft, honest pricing, real timelines.</p>
-        <span class="arrow-link">View commercial work →</span>
       </a>
       <a class="cap-card" href="work.html">
         <span class="cap-num">02</span>
         <h3>Short Film</h3>
         <p>Festival-ready narrative shorts. Award-winning. We've had films screened live on three continents. We treat every short like it's going somewhere. It usually does.</p>
-        <span class="arrow-link">View short films →</span>
       </a>
       <a class="cap-card" href="work.html">
         <span class="cap-num">03</span>
         <h3>Music Video</h3>
         <p>From commissioned competition winners to independent artists. We treat every music video like a short film. The song deserves a proper visual story.</p>
-        <span class="arrow-link">View music videos →</span>
       </a>
     </div>
   </div>
@@ -277,7 +274,7 @@
   <div class="wrap-tight">
     <h2 class="display" style="font-size: clamp(40px, 6vw, 84px);">Got a project? <em>Let's talk.</em></h2>
     <p>Whether you need a brand film, a music video, or you're not quite sure what you need yet, start with a conversation. No pitch, no hard sell.</p>
-    <a href="mailto:info@strangegoose.co.uk" class="btn primary lg">Talk to us about your project</a>
+    <a href="/cdn-cgi/l/email-protection#bed7d0d8d1fecdcaccdfd0d9dbd9d1d1cddb90ddd190cbd5" class="btn primary lg">Talk to us about your project</a>
   </div>
 </section>
 
@@ -302,7 +299,7 @@
     <div class="footer-col">
       <h4>Contact</h4>
       <div class="fcol-links">
-        <a href="mailto:info@strangegoose.co.uk">info@strangegoose.co.uk</a>
+        <a href="/cdn-cgi/l/email-protection#0960676f66497a7d7b68676e6c6e66667a6c276a66277c62"><span class="__cf_email__" data-cfemail="2940474f46695a5d5b48474e4c4e46465a4c074a46075c42">[email&#160;protected]</span></a>
         <a href="https://instagram.com/strange_goose_productions" target="_blank" rel="noopener">instagram.com/strange_goose_productions</a>
         <a href="https://youtube.com/@strange_goose_productions" target="_blank" rel="noopener">youtube.com/@strange_goose_productions</a>
       </div>
@@ -314,7 +311,7 @@
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   (function () {
     var box = document.getElementById('reel');
     if (!box) return;
