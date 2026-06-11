@@ -1119,10 +1119,10 @@ body.theatre .reel-viewport {
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  cursor: grab;
 }
 body.theatre .reel-viewport::-webkit-scrollbar { display: none; }
 body.theatre .reel-viewport.is-pinned { overflow: hidden; }
-body.theatre .reel-viewport { cursor: grab; }
 body.theatre .reel-viewport.is-grabbing,
 body.theatre .reel-viewport.is-grabbing * { cursor: grabbing !important; }
 
@@ -1195,7 +1195,6 @@ body.theatre .reel-frame img {
 }
 body.theatre .reel-frame:hover img { transform: scale(1.04); }
 
-/* film title (sits in top padding zone, above the image) */
 /* film title (sits in top padding zone, above the image) */
 body.theatre .reel-idx {
   position: absolute;
