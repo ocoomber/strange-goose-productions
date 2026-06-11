@@ -1420,3 +1420,137 @@ body.theatre .reel-lb-close::before { content: '×'; font-size: 18px; font-famil
   body.theatre .reel-lb-player--v { width: min(80vw, 340px); }
   body.theatre .reel-lb-close { top: -38px; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   DARK SITE-WIDE · inner pages adopt the theatre palette.
+   Shared inner-page components (page-hd, svc, process, dark-section,
+   cta-closer) re-skinned for body.theatre. Colours/borders only —
+   layout grids stay with the base + responsive rules.
+   ════════════════════════════════════════════════════════════ */
+
+/* inner-page hero: reuse .theatre-hd, but tighten the bottom rule */
+body.theatre .page-hd { border-bottom: 1px solid var(--hairline); }
+
+/* ── shared light-hardcoded borders → hairline on dark ── */
+body.theatre .creds { border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
+body.theatre .cap-card { border: 1px solid var(--hairline); }
+body.theatre .award-group { border-top: 1px solid var(--hairline); }
+body.theatre .contact-detail .row { border-bottom: 1px solid var(--hairline); }
+body.theatre .contact-detail .row:first-child { border-top: 1px solid var(--hairline); }
+body.theatre .contact-big { border-bottom: 1px solid rgba(246,241,230,0.25); }
+body.theatre .footer-bottom { border-top: 1px solid var(--hairline); }
+body.theatre .txt-link { border-bottom: 1px solid rgba(246,241,230,0.25); }
+
+/* cinematic framing for team portraits (about) */
+body.theatre .member .member-photo {
+  border: 1px solid var(--hairline);
+  box-shadow: 0 24px 60px -36px rgba(0,0,0,0.9);
+}
+body.theatre .member .member-photo img { filter: grayscale(0.15) brightness(0.96); }
+
+/* contact "end card" closer */
+body.theatre .end-card {
+  text-align: center;
+  padding: clamp(60px, 12vh, 140px) 0 clamp(40px, 8vh, 90px);
+  border-top: 1px solid var(--hairline);
+}
+body.theatre .end-card .fin {
+  font-size: clamp(56px, 9vw, 120px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-style: italic;
+  color: var(--ink);
+}
+body.theatre .end-card .fin-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 22px;
+}
+
+/* lead-in marker + intro */
+body.theatre .svc-lead { padding: clamp(40px, 6vh, 64px) 0 8px; }
+body.theatre .svc-intro { padding: 20px 0 0; }
+
+/* ── SERVICES · the offer reads as a shot list ── */
+body.theatre .svc { border-top: 1px solid var(--hairline); }
+body.theatre .svc:first-of-type { border-top: none; }
+body.theatre .svc-deliver li { border-bottom: 1px solid var(--hairline); }
+body.theatre .svc-aside .svc-num {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+body.theatre .svc-aside .svc-num::before {
+  content: '';
+  width: 22px; height: 1px; background: var(--accent);
+}
+
+/* ── feature band: lift the dark-section off the near-black page ── */
+body.theatre .dark-section {
+  background: #1c1813;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  background-image: radial-gradient(ellipse 64% 80% at 50% 0%, rgba(255,199,138,0.05), transparent 70%);
+}
+/* base .dark-section paints text var(--paper) (cream on light) — on the
+   dark theme that resolves near-black, so restore cream ink throughout */
+body.theatre .dark-section { color: var(--ink); }
+body.theatre .dark-section .display { color: var(--ink); }
+
+/* ── PRODUCTION TIMELINE · services process (signature device) ── */
+body.theatre .timeline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(22px, 3.4vw, 48px);
+  margin-top: clamp(40px, 6vh, 60px);
+  position: relative;
+}
+body.theatre .timeline::before {
+  content: '';
+  position: absolute;
+  left: 19px; right: 19px; top: 19px;
+  height: 1px;
+  background: var(--hairline);
+}
+body.theatre .tl-step { position: relative; }
+body.theatre .tl-dot {
+  position: relative;
+  z-index: 1;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: var(--paper);
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 24px;
+}
+body.theatre .tl-step h3 {
+  font-size: 21px;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+body.theatre .tl-step p {
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-3);
+  max-width: 34ch;
+}
+@media (max-width: 760px) {
+  body.theatre .timeline { grid-template-columns: 1fr; gap: 30px; }
+  body.theatre .timeline::before {
+    left: 19px; right: auto; top: 19px; bottom: 19px;
+    width: 1px; height: auto;
+  }
+  body.theatre .tl-step { padding-left: 0; }
+}
