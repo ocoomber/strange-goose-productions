@@ -21,6 +21,7 @@ Website for Strange Goose Productions. Static HTML/CSS, no build step, no depend
 
 - **`site/styles.css`** — shared stylesheet used by all pages
 - **`img/`** — all images (portfolio stills, headshots, AI page images). All in one folder, no subfolders.
+- **`testing/`** — a full clone of the live site for previewing redesigns. Mirrors the root structure exactly: `testing/site/styles.css` and `testing/img/`. See Testing Workflow.
 - **`CNAME`** — GitHub Pages custom domain config, do not edit
 
 No shared header or footer components. Each page is fully self-contained HTML.
@@ -52,11 +53,11 @@ Max content width: `1280px` (`.wrap`), `960px` (`.wrap-tight`).
 
 ## Video Embeds
 
-All videos use a poster/click-to-play pattern — thumbnail shown first, iframe loads on click with autoplay. This keeps YouTube UI hidden until the user chooses to play.
+Videos use a click-to-play pattern — thumbnail shown first, iframe loads on click with autoplay. This keeps YouTube UI hidden until the user chooses to play. Each clickable element carries a `data-yt="VIDEO_ID"` attribute.
 
 - Thumbnails pulled from `https://i.ytimg.com/vi/VIDEO_ID/maxresdefault.jpg` — update the thumbnail on YouTube and it updates on the site automatically.
-- The click handler in `work.html` handles all `.player[data-yt]` elements.
-- The homepage reel (`index.html`) has its own equivalent inline script.
+- **`work.html`** uses the film-reel redesign: a horizontal strip of frames (GSAP + ScrollTrigger, loaded from a CDN) that open into a lightbox modal player (`.reel-lb`). Clicking a `.reel-frame[data-yt]` loads the iframe into the modal.
+- **`index.html`** homepage reel has its own equivalent inline script for its single embed.
 
 ---
 
@@ -76,7 +77,27 @@ Owen syncs to GitHub via GitHub Desktop. Pushing to `main` deploys to strangegoo
 
 ## Testing Workflow
 
-For UI changes that need real device testing (mobile layout, video embeds etc): create a named test file in `main` (e.g. `work-test.html`), let Owen test it at strangegoose.co.uk/work-test.html on his phone or desktop, then apply the change to the real file and delete the test file in a single commit. This avoids spinning up a branch for small UI tests.
+There are two ways to test, depending on scale.
+
+### `testing/` folder — for redesigns and multi-page work
+
+`testing/` is a complete clone of the live site, served at **strangegoose.co.uk/testing/**. Owen can test it on his PC and phone exactly as it will look live. The folder mirrors the root structure (`testing/site/styles.css`, `testing/img/`), so **testing pages use the same relative paths as live** (`site/styles.css`, `img/...`) — no path rewriting between the two.
+
+**Workflow:**
+1. Build the redesign inside `testing/` (or Owen pushes new versions there himself).
+2. Owen reviews at strangegoose.co.uk/testing/ on his devices.
+3. Once approved, **promote to live**: straight-copy the changed `testing/` files to root (no path changes needed, structure mirrors). Then push to `main`.
+4. **Re-sync `testing/` to match live** at the same time, so it stays a clean baseline for the next redesign. (Same straight copy in reverse.)
+
+**Promotion checklist — always run before pushing to main:**
+- **Email obfuscation:** grep the promoted files for `cdn-cgi`, `__cf_email__`, `email-decode` and any malformed `mailto:`. Replace with plain `mailto:info@strangegoose.co.uk`. Cloudflare encoding sneaks in when Owen saves pages from a CF-proxied copy.
+- **Image paths:** every local `src`/`href` must be `img/filename` — watch for bare filenames missing the `img/` prefix (e.g. `src="owen.jpg"` should be `src="img/owen.jpg"`).
+- **Stylesheet path:** every page links `site/styles.css`.
+- After pushing, confirm the live page loads and `testing/` still works.
+
+### Single test file — for quick one-page checks
+
+For a small UI tweak on one page: create a named test file in `main` (e.g. `work-test.html`), let Owen test it at strangegoose.co.uk/work-test.html, then apply the change to the real file and delete the test file in a single commit. Avoids spinning up a branch.
 
 ---
 
