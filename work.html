@@ -319,8 +319,7 @@
   function updateReel() {
     var max = reelMax();
     var f = max > 0 ? vp.scrollLeft / max : 0;
-    if (bar) bar.style.transform = 'scaleX(' + f + ')';
-    if (meterFill) meterFill.style.width = (f * 100) + '%';
+if (meterFill) meterFill.style.width = (f * 100) + '%';
     if (meterHead) meterHead.style.left = (f * 100) + '%';
     if (prevBtn) prevBtn.disabled = vp.scrollLeft <= 1;
     if (nextBtn) nextBtn.disabled = vp.scrollLeft >= max - 1;
