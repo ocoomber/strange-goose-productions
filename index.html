@@ -201,13 +201,15 @@
         <p>Traditional production companies charge six figures and take three months. Solo operators cut corners you'll notice later. We sit in neither place.</p>
         <p>Strange Goose is a professional film team with a modern production pipeline. That means faster turnarounds, leaner budgets, and no sacrifice on the craft. The craft is why we exist.</p>
         <a href="about.html" class="arrow-link">About the team →</a>
-        <aside class="ai-aside">
+        <!-- FEATURE FLAG: ai-consultancy — set to true/false to show/hide -->
+        <aside class="ai-aside" id="ai-consultancy-section" style="display:none">
           <div class="ai-aside-main">
             <span class="ai-aside-label"><span class="ai-aside-dot"></span>Independent AI consultancy</span>
             <p>Working in production and trying to work out what AI can realistically do, and what it can't? We consult.</p>
           </div>
           <a href="ai.html" class="ai-aside-link">Find out more →</a>
         </aside>
+        <script>var AI_CONSULTANCY = true; if (AI_CONSULTANCY) document.getElementById('ai-consultancy-section').style.display = '';</script>
       </div>
     </div>
 
