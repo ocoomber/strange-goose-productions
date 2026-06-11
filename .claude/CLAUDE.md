@@ -101,6 +101,18 @@ For a small UI tweak on one page: create a named test file in `main` (e.g. `work
 
 ---
 
+## Feature Flags
+
+Feature flags in `index.html` are inline `<script>` tags immediately after the relevant element. To toggle, set the variable to `true` or `false` and push to main.
+
+| Flag | Variable | Location | Current state |
+|------|----------|----------|---------------|
+| AI consultancy aside | `AI_CONSULTANCY` | `index.html` after `.ai-aside` | off |
+
+To turn a section on or off, just say "turn on/off the [name] section."
+
+---
+
 ## Conventions
 
 - Plain HTML5, no frameworks, no templating
