@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="site/styles.css">
 <style>
   /* AI consultancy aside — quiet callout inside the dark differentiator */
   .ai-aside {
@@ -61,8 +61,8 @@
   }
 
   /* reel embed */
-  .reel-frame { margin-top: 48px; }
-  .reel-box {
+  .hero-reel { margin-top: 48px; }
+  .hero-reel-box {
     position: relative;
     width: 100%;
     padding-bottom: 56.25%;
@@ -71,7 +71,7 @@
     background: #111;
     cursor: pointer;
   }
-  .reel-box img {
+  .hero-reel-box img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -79,7 +79,7 @@
     object-fit: cover;
     display: block;
   }
-  .reel-box .play {
+  .hero-reel-box .play {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
@@ -88,7 +88,7 @@
     border-radius: 50%;
     pointer-events: none;
   }
-  .reel-box .play::after {
+  .hero-reel-box .play::after {
     content: '';
     position: absolute;
     top: 50%; left: 54%;
@@ -98,7 +98,7 @@
     border-top: 13px solid transparent;
     border-bottom: 13px solid transparent;
   }
-  .reel-box iframe {
+  .hero-reel-box iframe {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -107,7 +107,7 @@
   }
 </style>
 </head>
-<body data-screen-label="01 Home">
+<body class="theatre" data-screen-label="01 Home">
 
 <nav class="top">
   <a href="index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose Productions</span></a>
@@ -132,9 +132,9 @@
       <a href="work.html" class="arrow-link">See our work →</a>
     </div>
 
-    <div class="reel-frame">
-      <div class="reel-box" id="reel" data-yt="SihEIj_EKik">
-        <img src="https://i.ytimg.com/vi/SihEIj_EKik/maxresdefault.jpg" alt="Strange Goose Productions — Commercial Reel" loading="lazy">
+    <div class="hero-reel">
+      <div class="hero-reel-box" id="reel" data-yt="XDqIPun8S-0">
+        <img src="https://i.ytimg.com/vi/XDqIPun8S-0/maxresdefault.jpg" alt="Strange Goose Productions — Commercial Reel" loading="lazy">
         <span class="play" aria-hidden="true"></span>
       </div>
     </div>
@@ -237,7 +237,7 @@
 
     <div class="sw-grid">
       <a class="sw-card featured" href="work.html">
-        <img src="../img/fairytale-farm.jpg" alt="Fairytale Farm" loading="lazy">
+        <img src="img/fairytale-farm.jpg" alt="Fairytale Farm" loading="lazy">
         <div class="sw-overlay">
           <span class="sw-tag"><span class="dot"></span>Short Film · 2025</span>
           <span class="sw-ttl">Fairytale Farm</span>
@@ -245,7 +245,7 @@
         </div>
       </a>
       <a class="sw-card" href="work.html">
-        <img src="../img/family-time.jpg" alt="Family Time" loading="lazy">
+        <img src="img/family-time.jpg" alt="Family Time" loading="lazy">
         <div class="sw-overlay">
           <span class="sw-tag"><span class="dot"></span>48hr Film · 2025</span>
           <span class="sw-ttl">Family Time</span>
@@ -253,7 +253,7 @@
         </div>
       </a>
       <a class="sw-card" href="work.html">
-        <img src="../img/getting-over.jpg" alt="Getting Over Going Under" loading="lazy">
+        <img src="img/getting-over.jpg" alt="Getting Over Going Under" loading="lazy">
         <div class="sw-overlay">
           <span class="sw-tag"><span class="dot"></span>Music Video · 2026</span>
           <span class="sw-ttl">Getting Over Going Under</span>
@@ -261,7 +261,7 @@
         </div>
       </a>
       <a class="sw-card" href="work.html">
-        <img src="../img/subject-1410.jpg" alt="Subject 1410" loading="lazy">
+        <img src="img/subject-1410.jpg" alt="Subject 1410" loading="lazy">
         <div class="sw-overlay">
           <span class="sw-tag"><span class="dot"></span>48hr Film · 2024</span>
           <span class="sw-ttl">Subject 1410</span>
@@ -277,7 +277,7 @@
   <div class="wrap-tight">
     <h2 class="display" style="font-size: clamp(40px, 6vw, 84px);">Got a project? <em>Let's talk.</em></h2>
     <p>Whether you need a brand film, a music video, or you're not quite sure what you need yet, start with a conversation. No pitch, no hard sell.</p>
-    <a href="mailto:info@strangegoose.co.uk" class="btn primary lg">Talk to us about your project</a>
+    <a href="/cdn-cgi/l/email-protection#7811161e17380b0c0a19161f1d1f17170b1d561b17560d13" class="btn primary lg">Talk to us about your project</a>
   </div>
 </section>
 
@@ -302,7 +302,7 @@
     <div class="footer-col">
       <h4>Contact</h4>
       <div class="fcol-links">
-        <a href="mailto:info@strangegoose.co.uk">info@strangegoose.co.uk</a>
+        <a href="/cdn-cgi/l/email-protection#b2dbdcd4ddf2c1c6c0d3dcd5d7d5ddddc1d79cd1dd9cc7d9"><span class="__cf_email__" data-cfemail="660f0800092615121407080103010909150348050948130d">[email&#160;protected]</span></a>
         <a href="https://instagram.com/strange_goose_productions" target="_blank" rel="noopener">instagram.com/strange_goose_productions</a>
         <a href="https://youtube.com/@strange_goose_productions" target="_blank" rel="noopener">youtube.com/@strange_goose_productions</a>
       </div>
@@ -314,7 +314,7 @@
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   (function () {
     var box = document.getElementById('reel');
     if (!box) return;
