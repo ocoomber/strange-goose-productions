@@ -235,6 +235,27 @@ button.btn.ghost:disabled {
   gap: 12px;
 }
 
+/* collapsible admin stage blocks */
+.stage.collapsible > .stage-top {
+  cursor: pointer;
+  position: relative;
+  padding-right: 28px;
+  user-select: none;
+}
+.stage.collapsible > .stage-top::after {
+  content: '▾';
+  position: absolute;
+  right: 4px;
+  top: 0;
+  color: var(--muted);
+  font-size: 12px;
+  transition: transform 0.15s ease;
+}
+.stage.collapsible.collapsed > .stage-top::after { transform: rotate(-90deg); }
+.stage.collapsible.collapsed > .stage-top { margin: 0; }
+.stage.collapsed > .stage-collapse { display: none; }
+.stage.collapsible:not(.collapsed) > .stage-top { margin-bottom: 4px; }
+
 /* client "what happens next" banner */
 .next-up {
   margin-top: 18px;
