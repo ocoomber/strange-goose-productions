@@ -198,6 +198,33 @@ begin
   update public.projects set status = 'active' where id = p_project;
 end $$;
 
+-- Admin-only correction: undo the single most recent approval on a project,
+-- reverting that stage to pending (and re-locking anything after it). For
+-- accidental approvals — the client still can't undo their own; only admin.
+create or replace function public.revert_last_approval(p_project uuid)
+returns void language plpgsql security definer set search_path = public as $$
+declare k int;
+begin
+  if auth.uid() is not null and not public.is_admin() then
+    raise exception 'Admin only';
+  end if;
+  select max(stage_index) into k from public.stages
+  where project_id = p_project and state = 'approved';
+  if k is null then
+    raise exception 'No approved stage to undo';
+  end if;
+  delete from public.approvals a using public.stages s
+  where a.stage_id = s.id and s.project_id = p_project and s.stage_index >= k;
+  perform set_config('sgp.resetting', '1', true);
+  update public.stages
+  set state = case when stage_index = k then 'pending'
+                   when stage_index > k then 'locked'
+                   else state end
+  where project_id = p_project;
+  perform set_config('sgp.resetting', '', true);
+  update public.projects set status = 'active' where id = p_project;
+end $$;
+
 -- ── Row Level Security ──────────────────────────────────────
 
 alter table public.profiles  enable row level security;
