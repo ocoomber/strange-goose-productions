@@ -185,8 +185,19 @@
 
     var list = document.getElementById('stage-list');
     list.innerHTML = '';
-    (st.data || []).forEach(function (s) {
-      var card = el('div', 'stage ' + s.state);
+    var visible = st.data || [];
+    // Expand only what matters now: the stage awaiting the client, the
+    // released deliverables, or (while waiting on SGP) the latest completed
+    // stage. Everything else collapses to its header.
+    var currentStage = visible.find(function (s) { return s.state === 'pending'; });
+    if (!currentStage && project.status === 'complete') {
+      currentStage = visible.find(function (s) { return s.stage_index === 7; });
+    }
+    if (!currentStage) {
+      currentStage = visible.filter(function (s) { return s.state === 'approved'; }).pop();
+    }
+    visible.forEach(function (s) {
+      var card = el('div', 'stage collapsible ' + s.state);
       var top = el('div', 'stage-top');
       top.appendChild(el('span', 'stage-num', '0' + s.stage_index));
       top.appendChild(el('h3', null, s.name));
@@ -252,11 +263,12 @@
       }
 
       card.appendChild(body);
+      if (!currentStage || s.id !== currentStage.id) card.classList.add('collapsed');
+      top.addEventListener('click', function () { card.classList.toggle('collapsed'); });
       list.appendChild(card);
     });
 
     // Nothing currently needs the client's action — tell them what we're doing
-    var visible = st.data || [];
     var nothingPending = !visible.some(function (s) { return s.state === 'pending'; });
     if (nothingPending && project.status !== 'complete') {
       var lastApproved = visible.filter(function (s) { return s.state === 'approved'; }).pop();

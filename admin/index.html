@@ -297,15 +297,19 @@
       var collapse = el('div', 'stage-collapse');
       var tools = el('div', 'admin-tools');
       var frozen = (s.state === 'approved');  // content locked once client approves
+      // Documents only belong on the brief; later stages are video
+      var hasDocs = (s.stage_index === 1);
 
       if (frozen) {
         tools.appendChild(el('p', 'hint',
           'Approved by the client — the content below is locked as the permanent record of what was approved.'));
-        var docBox = el('div');
-        docBox.appendChild(el('p', 'eyebrow', 'Document links (Google Drive)'));
-        if ((s.doc_links || []).length) docBox.appendChild(linkList(s.doc_links));
-        else docBox.appendChild(el('p', 'hint', 'None'));
-        tools.appendChild(docBox);
+        if (hasDocs || (s.doc_links || []).length) {
+          var docBox = el('div');
+          docBox.appendChild(el('p', 'eyebrow', 'Document links (Google Drive)'));
+          if ((s.doc_links || []).length) docBox.appendChild(linkList(s.doc_links));
+          else docBox.appendChild(el('p', 'hint', 'None'));
+          tools.appendChild(docBox);
+        }
         if (s.note) {
           var noteRO = el('div');
           noteRO.appendChild(el('p', 'eyebrow', 'Note to client'));
@@ -313,7 +317,9 @@
           tools.appendChild(noteRO);
         }
       } else {
-        tools.appendChild(linkEditor(s, 'doc_links', id, 'Document links (Google Drive)'));
+        if (hasDocs) {
+          tools.appendChild(linkEditor(s, 'doc_links', id, 'Document links (Google Drive)'));
+        }
 
         var noteBox = el('div');
         if (s.note) {
