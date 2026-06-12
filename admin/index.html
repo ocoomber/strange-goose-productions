@@ -296,8 +296,37 @@
         if ((s.doc_links || []).length) docBox.appendChild(linkList(s.doc_links));
         else docBox.appendChild(el('p', 'hint', 'None'));
         tools.appendChild(docBox);
+        if (s.note) {
+          var noteRO = el('div');
+          noteRO.appendChild(el('p', 'eyebrow', 'Note to client'));
+          noteRO.appendChild(el('p', 'stage-note', s.note));
+          tools.appendChild(noteRO);
+        }
       } else {
         tools.appendChild(linkEditor(s, 'doc_links', id, 'Document links (Google Drive)'));
+
+        var noteBox = el('div');
+        noteBox.appendChild(el('p', 'eyebrow', 'Note to client (e.g. what changed in response to feedback)'));
+        var noteForm = el('form');
+        var noteArea = el('textarea');
+        noteArea.rows = 3;
+        noteArea.placeholder = 'e.g. As per your feedback, Scene 3 is now longer and Scene 5 uses more close-ups.';
+        noteArea.value = s.note || '';
+        var noteSave = el('button', 'btn ghost', 'Save note');
+        noteSave.type = 'submit';
+        noteSave.style.marginTop = '8px';
+        var noteErr = el('p', 'form-error'); noteErr.hidden = true;
+        noteForm.appendChild(noteArea);
+        noteForm.appendChild(noteSave);
+        noteForm.appendChild(noteErr);
+        noteForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var res = await sb.from('stages')
+            .update({ note: noteArea.value.trim() || null }).eq('id', s.id);
+          if (res.error) showError(noteErr, res.error); else renderProject(id);
+        });
+        noteBox.appendChild(noteForm);
+        tools.appendChild(noteBox);
 
         var vidBox = el('div');
         vidBox.appendChild(el('p', 'eyebrow', 'Video (paste YouTube link or ID)'));

@@ -31,6 +31,7 @@ create table public.stages (
   state text not null default 'locked' check (state in ('locked','pending','approved')),
   doc_links jsonb not null default '[]',          -- [{"label":"...","url":"..."}]
   video_id text,                                  -- YouTube video ID
+  note text,                                      -- admin note to client (e.g. what changed)
   deliverable_links jsonb not null default '[]',  -- stage 7 only
   unique (project_id, stage_index)
 );
@@ -110,7 +111,8 @@ begin
   -- change. (deliverable_links stay editable: they are added after approval.)
   if old.state = 'approved' then
     if new.doc_links is distinct from old.doc_links
-       or new.video_id is distinct from old.video_id then
+       or new.video_id is distinct from old.video_id
+       or new.note is distinct from old.note then
       raise exception 'Cannot change the content of an approved stage';
     end if;
   end if;
