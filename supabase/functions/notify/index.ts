@@ -9,11 +9,20 @@
 //
 // Secrets required: RESEND_API_KEY, ADMIN_EMAIL, WEBHOOK_SECRET
 // (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are provided automatically.)
+//
+// Self-contained: paste this whole file into the Supabase dashboard editor.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { corsHeaders, sendEmail } from '../_shared/email.ts';
 
 const PORTAL_URL = 'https://www.strangegoose.co.uk/client/';
+const FROM = 'Strange Goose Productions <portal@strangegoose.co.uk>';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type, x-webhook-secret',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
 
 // Mirrors STAGE_ACTIONS[x].done in site/portal.js
 const DONE_LABEL: Record<number, string> = {
@@ -112,6 +121,35 @@ Deno.serve(async (req) => {
     return json({ error: String(err) }, 500);
   }
 });
+
+async function sendEmail(opts: { to: string; subject: string; text: string }): Promise<void> {
+  const apiKey = Deno.env.get('RESEND_API_KEY');
+  if (!apiKey) throw new Error('RESEND_API_KEY not set');
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: FROM,
+      to: opts.to,
+      subject: opts.subject,
+      text: opts.text,
+      html: '<div style="font-family:sans-serif;white-space:pre-wrap">' +
+        escapeHtml(opts.text) + '</div>',
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Resend failed (${res.status}): ${body}`);
+  }
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/[&<>]/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c] as string));
+}
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
