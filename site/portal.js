@@ -22,6 +22,48 @@ var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 var STAGE_COUNT = 7;
 
+/* Per-stage client action wording. The underlying record is identical
+   (timestamped, account-tied, permanent); only the meaning/labels differ.
+   Stage 7 (Deliverables) has no client action — it's file handover. */
+var STAGE_ACTIONS = {
+  1: {
+    btn: 'Approve brief',
+    done: 'Approved',
+    note: 'Review the linked brief, then approve to confirm it as agreed.',
+    confirm: 'Approve this brief as the agreed basis for the project?'
+  },
+  2: {
+    btn: 'Confirm feedback sent — proceed',
+    done: 'Feedback confirmed',
+    note: 'Watch Edit v1 and send any feedback to us by email, then confirm here to use feedback round 1 of 2.',
+    confirm: 'Confirm you have sent your feedback on Edit v1 and are happy to proceed? This uses feedback round 1 of 2.'
+  },
+  3: {
+    btn: 'Confirm feedback sent — proceed',
+    done: 'Feedback confirmed',
+    note: 'Watch Edit v2 and send any feedback to us by email, then confirm here to use feedback round 2 of 2.',
+    confirm: 'Confirm you have sent your feedback on Edit v2 and are happy to proceed? This uses your second and final included feedback round.'
+  },
+  4: {
+    btn: 'Acknowledge picture lock',
+    done: 'Acknowledged',
+    note: 'This is the locked picture. Your two included feedback rounds are complete — any further edit changes from here are a separate, chargeable request.',
+    confirm: 'Acknowledge this as the locked picture? Further edit changes after this point fall outside the agreement and are chargeable.'
+  },
+  5: {
+    btn: 'Confirm feedback sent — proceed',
+    done: 'Feedback confirmed',
+    note: 'Watch the colour & sound version and send any feedback by email, then confirm here to use your one included round.',
+    confirm: 'Confirm you have sent your feedback on the colour & sound version and are happy to proceed? This uses your one included round.'
+  },
+  6: {
+    btn: 'Accept final version',
+    done: 'Accepted',
+    note: 'This is the finished film. Accepting confirms you are happy with the final version; we will then issue the final invoice.',
+    confirm: 'Accept this as the final, finished version of your film?'
+  }
+};
+
 async function getSession() {
   var res = await sb.auth.getSession();
   return res.data.session || null;

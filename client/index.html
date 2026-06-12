@@ -192,14 +192,15 @@
       top.appendChild(el('h3', null, s.name));
       var a = approvals[s.id];
       var isDeliverables = (s.stage_index === 7);
+      var act = STAGE_ACTIONS[s.stage_index];
       if (s.state === 'approved') {
-        top.appendChild(el('span', 'badge approved', 'Approved'));
+        top.appendChild(el('span', 'badge approved', (act && act.done) || 'Approved'));
         if (a) top.appendChild(el('span', 'stage-when', fmtDate(a.approved_at)));
       } else if (isDeliverables) {
         top.appendChild(el('span', 'badge ' + (project.status === 'complete' ? 'complete' : 'pending'),
           project.status === 'complete' ? 'Ready' : 'In preparation'));
       } else {
-        top.appendChild(el('span', 'badge pending', 'Awaiting your approval'));
+        top.appendChild(el('span', 'badge pending', 'Action needed'));
       }
       card.appendChild(top);
 
@@ -218,14 +219,15 @@
         }
       }
 
-      if (s.state === 'pending' && !isDeliverables) {
+      if (s.state === 'pending' && !isDeliverables && act) {
+        if (act.note) body.appendChild(el('p', 'hint', act.note));
         var errNode = el('p', 'form-error');
         errNode.hidden = true;
-        var btn = el('button', 'btn primary', 'Approve this stage');
+        var btn = el('button', 'btn primary', act.btn);
         btn.type = 'button';
         btn.addEventListener('click', async function () {
-          var msg = 'Approve "' + s.name + '"?\n\nThis approval is permanent and will be ' +
-            'recorded against your account with a timestamp. It cannot be undone.';
+          var msg = act.confirm +
+            '\n\nThis is recorded against your account with a timestamp and is permanent — it cannot be undone.';
           if (!window.confirm(msg)) return;
           btn.disabled = true;
           var res = await sb.from('approvals').insert({ stage_id: s.id });
