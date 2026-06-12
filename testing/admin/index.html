@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Strange Goose Productions</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../site/styles.css">
+<link rel="stylesheet" href="../site/portal.css">
+</head>
+<body>
+
+<nav class="top">
+  <a href="../index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose Productions</span></a>
+  <div class="links">
+    <span class="eyebrow" style="margin:0;">Admin</span>
+  </div>
+  <a href="#" class="cta" id="nav-signout" hidden><span class="cta-text">Sign out</span></a>
+</nav>
+
+<main class="portal-main">
+  <div class="wrap-tight">
+
+    <!-- login -->
+    <section id="view-login" hidden>
+      <div class="auth-card">
+        <p class="eyebrow">Admin</p>
+        <h2 style="margin-top:14px;">Sign in</h2>
+        <p class="hint">Admin access only.</p>
+        <form id="login-form">
+          <div class="field">
+            <label for="login-email">Email</label>
+            <input id="login-email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password" autocomplete="current-password" required>
+          </div>
+          <p class="form-error" id="login-error" hidden></p>
+          <button class="btn primary full" type="submit" style="margin-top:18px;">Sign in</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- project list -->
+    <section id="view-projects" hidden>
+      <header class="portal-hd">
+        <p class="eyebrow">Admin</p>
+        <h1>Projects</h1>
+        <p class="sub">Client accounts are created in the Supabase dashboard (Authentication → Add user). New accounts appear in the client dropdown below.</p>
+      </header>
+
+      <div class="admin-panel">
+        <h2>New project</h2>
+        <form id="create-form" class="admin-row">
+          <div class="field">
+            <label for="new-title">Project title</label>
+            <input id="new-title" type="text" required>
+          </div>
+          <div class="field">
+            <label for="new-client">Client account</label>
+            <select id="new-client" required></select>
+          </div>
+          <button class="btn primary" type="submit">Create project</button>
+        </form>
+        <p class="form-error" id="create-error" hidden></p>
+      </div>
+
+      <div class="portal-grid" id="project-list" style="margin-top:32px;"></div>
+      <p class="portal-empty" id="projects-empty" hidden>No projects yet.</p>
+    </section>
+
+    <!-- single project -->
+    <section id="view-project" hidden>
+      <header class="portal-hd">
+        <a class="back-link" href="#">← All projects</a>
+        <h1 id="project-title" style="margin-top:18px;"></h1>
+        <p class="sub" id="project-meta"></p>
+        <p style="margin-top:16px;">
+          <button class="btn ghost" type="button" id="toggle-complete"></button>
+        </p>
+        <p class="form-error" id="project-error" hidden></p>
+      </header>
+      <div class="stage-list" id="stage-list"></div>
+    </section>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../site/portal.js"></script>
+<script>
+(function () {
+  var views = ['login', 'projects', 'project'];
+  var profile = null;
+
+  function show(name) {
+    views.forEach(function (v) {
+      document.getElementById('view-' + v).hidden = (v !== name);
+    });
+    document.getElementById('nav-signout').hidden = (name === 'login');
+  }
+
+  document.getElementById('nav-signout').addEventListener('click', function (e) {
+    e.preventDefault();
+    signOut();
+  });
+
+  /* ── login ── */
+  document.getElementById('login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errNode = document.getElementById('login-error');
+    errNode.hidden = true;
+    try {
+      await signIn(
+        document.getElementById('login-email').value.trim(),
+        document.getElementById('login-password').value
+      );
+      profile = await getProfile();
+      if (!profile || profile.role !== 'admin') {
+        await sb.auth.signOut();
+        profile = null;
+        throw { message: 'This account does not have admin access.' };
+      }
+      route();
+    } catch (err) { showError(errNode, err); }
+  });
+
+  /* ── project list ── */
+  async function renderProjects() {
+    var clients = await sb.from('profiles')
+      .select('id, email, display_name').eq('role', 'client').order('email');
+    var sel = document.getElementById('new-client');
+    sel.innerHTML = '';
+    (clients.data || []).forEach(function (c) {
+      var opt = el('option', null, (c.display_name || c.email) + ' — ' + c.email);
+      opt.value = c.id;
+      sel.appendChild(opt);
+    });
+
+    var res = await sb.from('projects')
+      .select('id, title, status, created_at, client_id, profiles(email, display_name), stages(state)')
+      .order('created_at', { ascending: false });
+    var list = document.getElementById('project-list');
+    list.innerHTML = '';
+    var projects = res.data || [];
+    document.getElementById('projects-empty').hidden = projects.length > 0;
+    projects.forEach(function (p) {
+      var stages = p.stages || [];
+      var approved = stages.filter(function (s) { return s.state === 'approved'; }).length;
+      var pending = stages.filter(function (s) { return s.state === 'pending'; }).length;
+      var card = el('a', 'project-card');
+      card.href = '#project/' + p.id;
+      card.appendChild(el('h3', null, p.title));
+      var meta = el('div', 'meta');
+      meta.appendChild(el('span', 'badge ' + p.status, p.status === 'complete' ? 'Complete' : 'Active'));
+      meta.appendChild(el('span', null, 'Client: ' + ((p.profiles && p.profiles.email) || '—')));
+      meta.appendChild(el('span', null, approved + '/' + STAGE_COUNT + ' approved' +
+        (pending ? ' · awaiting client approval' : '')));
+      card.appendChild(meta);
+      list.appendChild(card);
+    });
+    show('projects');
+  }
+
+  document.getElementById('create-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errNode = document.getElementById('create-error');
+    errNode.hidden = true;
+    var res = await sb.from('projects').insert({
+      title: document.getElementById('new-title').value.trim(),
+      client_id: document.getElementById('new-client').value
+    });
+    if (res.error) { showError(errNode, res.error); return; }
+    document.getElementById('new-title').value = '';
+    renderProjects();
+  });
+
+  /* ── single project ── */
+  function linkEditor(stage, field, projectId, heading) {
+    var box = el('div');
+    box.appendChild(el('p', 'eyebrow', heading));
+    var links = stage[field] || [];
+    var errNode = el('p', 'form-error');
+    errNode.hidden = true;
+
+    async function save(newLinks) {
+      var patch = {};
+      patch[field] = newLinks;
+      var res = await sb.from('stages').update(patch).eq('id', stage.id);
+      if (res.error) showError(errNode, res.error); else renderProject(projectId);
+    }
+
+    var ul = el('ul', 'portal-links');
+    links.forEach(function (l, i) {
+      var li = el('li');
+      var a = el('a', null, (l.label || l.url));
+      a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
+      li.appendChild(a);
+      var rm = el('button', 'btn ghost', 'Remove');
+      rm.type = 'button';
+      rm.style.cssText = 'margin-left:12px;padding:3px 10px;font-size:10px;';
+      rm.addEventListener('click', function () {
+        save(links.filter(function (_, j) { return j !== i; }));
+      });
+      li.appendChild(rm);
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+
+    var form = el('form', 'inline-form');
+    var label = el('input'); label.placeholder = 'Label'; label.type = 'text';
+    var url = el('input'); url.placeholder = 'https://drive.google.com/…'; url.type = 'url'; url.required = true;
+    var add = el('button', 'btn ghost', 'Add link'); add.type = 'submit';
+    form.appendChild(label); form.appendChild(url); form.appendChild(add);
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      save(links.concat([{ label: label.value.trim() || url.value.trim(), url: url.value.trim() }]));
+    });
+    box.appendChild(form);
+    box.appendChild(errNode);
+    return box;
+  }
+
+  async function renderProject(id) {
+    var pr = await sb.from('projects')
+      .select('*, profiles(email, display_name)').eq('id', id).single();
+    if (pr.error || !pr.data) { location.hash = ''; return; }
+    var project = pr.data;
+    var st = await sb.from('stages').select('*').eq('project_id', id).order('stage_index');
+    var ap = await sb.from('approvals').select('*').eq('project_id', id);
+    var approvals = {};
+    (ap.data || []).forEach(function (a) { approvals[a.stage_id] = a; });
+    var stages = st.data || [];
+    var projErr = document.getElementById('project-error');
+    projErr.hidden = true;
+
+    document.getElementById('project-title').textContent = project.title;
+    document.getElementById('project-meta').textContent =
+      'Client: ' + ((project.profiles && project.profiles.email) || '—') +
+      ' · Created ' + fmtDate(project.created_at);
+
+    var toggle = document.getElementById('toggle-complete');
+    toggle.textContent = project.status === 'complete' ? 'Reopen project' : 'Mark project complete';
+    toggle.onclick = async function () {
+      var res = await sb.from('projects')
+        .update({ status: project.status === 'complete' ? 'active' : 'complete' })
+        .eq('id', id);
+      if (res.error) showError(projErr, res.error); else renderProject(id);
+    };
+
+    var list = document.getElementById('stage-list');
+    list.innerHTML = '';
+    stages.forEach(function (s, idx) {
+      var card = el('div', 'stage ' + s.state);
+      var top = el('div', 'stage-top');
+      top.appendChild(el('span', 'stage-num', '0' + s.stage_index));
+      top.appendChild(el('h3', null, s.name));
+      var a = approvals[s.id];
+      if (s.state === 'approved') {
+        top.appendChild(el('span', 'badge approved', 'Approved'));
+        if (a) top.appendChild(el('span', 'stage-when', fmtDate(a.approved_at)));
+      } else if (s.state === 'pending') {
+        top.appendChild(el('span', 'badge pending', 'Awaiting client approval'));
+      } else {
+        top.appendChild(el('span', 'badge locked', 'Locked'));
+      }
+      card.appendChild(top);
+
+      var tools = el('div', 'admin-tools');
+
+      tools.appendChild(linkEditor(s, 'doc_links', id, 'Document links (Google Drive)'));
+
+      var vidBox = el('div');
+      vidBox.appendChild(el('p', 'eyebrow', 'Video (YouTube ID)'));
+      var vidForm = el('form', 'inline-form');
+      var vidInput = el('input');
+      vidInput.type = 'text';
+      vidInput.placeholder = 'e.g. XDqIPun8S-0 (blank to remove)';
+      vidInput.value = s.video_id || '';
+      var vidSave = el('button', 'btn ghost', 'Save video'); vidSave.type = 'submit';
+      var vidErr = el('p', 'form-error'); vidErr.hidden = true;
+      vidForm.appendChild(vidInput); vidForm.appendChild(vidSave);
+      vidForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var res = await sb.from('stages')
+          .update({ video_id: vidInput.value.trim() || null }).eq('id', s.id);
+        if (res.error) showError(vidErr, res.error); else renderProject(id);
+      });
+      vidBox.appendChild(vidForm);
+      vidBox.appendChild(vidErr);
+      tools.appendChild(vidBox);
+      if (s.video_id) tools.appendChild(ytEmbed(s.video_id));
+
+      if (s.stage_index === 7) {
+        tools.appendChild(linkEditor(s, 'deliverable_links', id,
+          'Deliverable download links (shown to client once project is marked complete)'));
+      }
+
+      // Advance button on the first locked stage, enabled when previous stage approved
+      var firstLocked = stages.find(function (x) { return x.state === 'locked'; });
+      if (firstLocked && firstLocked.id === s.id) {
+        var prevApproved = idx === 0 || stages[idx - 1].state === 'approved';
+        var advBox = el('div');
+        var adv = el('button', 'btn primary', 'Advance — unlock this stage for the client');
+        adv.type = 'button';
+        adv.disabled = !prevApproved;
+        var advErr = el('p', 'form-error'); advErr.hidden = true;
+        if (!prevApproved) {
+          advBox.appendChild(el('p', 'hint',
+            'Available once the client approves "' + stages[idx - 1].name + '".'));
+        }
+        adv.addEventListener('click', async function () {
+          var res = await sb.from('stages').update({ state: 'pending' }).eq('id', s.id);
+          if (res.error) showError(advErr, res.error); else renderProject(id);
+        });
+        advBox.appendChild(adv);
+        advBox.appendChild(advErr);
+        tools.appendChild(advBox);
+      }
+
+      card.appendChild(tools);
+      list.appendChild(card);
+    });
+    show('project');
+  }
+
+  /* ── routing ── */
+  async function route() {
+    var session = await getSession();
+    if (!session) { show('login'); return; }
+    if (!profile) profile = await getProfile();
+    if (!profile || profile.role !== 'admin') {
+      await sb.auth.signOut();
+      profile = null;
+      show('login');
+      return;
+    }
+    var m = location.hash.match(/^#project\/(.+)$/);
+    if (m) renderProject(m[1]); else renderProjects();
+  }
+
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body>
+</html>
