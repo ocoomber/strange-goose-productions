@@ -262,6 +262,7 @@
       <span class="reel-lb-ttl"></span>
       <span class="reel-lb-meta"></span>
       <div class="reel-lb-chips"></div>
+      <p class="reel-lb-festival">Currently on the festival circuit — not yet available for public viewing.</p>
     </div>
   </div>
 </div>
@@ -410,7 +411,8 @@ if (meterFill) meterFill.style.width = (f * 100) + '%';
   var lbTtl    = document.querySelector('.reel-lb-ttl');
   var lbMeta   = document.querySelector('.reel-lb-meta');
   var lbChips  = document.querySelector('.reel-lb-chips');
-  var lbClose  = document.querySelector('.reel-lb-close');
+  var lbClose    = document.querySelector('.reel-lb-close');
+  var lbFestival = document.querySelector('.reel-lb-festival');
   var lbOpen   = false;
 
   function openLb(frame) {
@@ -430,6 +432,8 @@ if (meterFill) meterFill.style.width = (f * 100) + '%';
     /* populate player */
     lbPlayer.innerHTML = '';
     lbPlayer.className = 'reel-lb-player' + (isV ? ' reel-lb-player--v' : '');
+    if (lbFestival) lbFestival.style.display = ytId ? 'none' : '';
+
     if (ytId) {
       var iframe = document.createElement('iframe');
       iframe.src = 'https://www.youtube-nocookie.com/embed/' + ytId + '?autoplay=1&rel=0&modestbranding=1';
