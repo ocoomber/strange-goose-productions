@@ -43,25 +43,19 @@
   outline-offset: -1px;
 }
 
-/* password Show/Hide toggle */
-.pw-wrap { position: relative; display: block; }
-.pw-wrap input { width: 100%; padding-right: 62px; }
+/* password Show/Hide toggle (sits below the field) */
 .pw-toggle {
-  position: absolute;
-  right: 4px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
   color: var(--ink-3);
-  padding: 6px 8px;
+  cursor: pointer;
+  user-select: none;
+  width: max-content;
 }
-.pw-toggle:hover { color: var(--accent-strong); }
+.pw-toggle input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); cursor: pointer; }
 .form-error {
   color: oklch(48% 0.18 28);
   font-size: 13px;

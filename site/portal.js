@@ -182,28 +182,28 @@ function showError(node, err) {
   node.hidden = false;
 }
 
-/* Add a Show/Hide toggle to every password input (helps on phones). */
+/* Add a Show/Hide password toggle beneath every password input. Placed below
+   the field (not inside it) so it never collides with the browser's own
+   password-reveal icon — which is what breaks inside-the-field toggles on
+   Android Chrome. */
 function enablePasswordToggles() {
   var inputs = document.querySelectorAll('input[type="password"]');
   Array.prototype.forEach.call(inputs, function (inp) {
     if (inp.dataset.pwToggled) return;
     inp.dataset.pwToggled = '1';
-    var wrap = document.createElement('span');
-    wrap.className = 'pw-wrap';
-    inp.parentNode.insertBefore(wrap, inp);
-    wrap.appendChild(inp);
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'pw-toggle';
-    btn.textContent = 'Show';
-    btn.setAttribute('aria-label', 'Show password');
-    btn.addEventListener('click', function () {
-      var hidden = inp.type === 'password';
-      inp.type = hidden ? 'text' : 'password';
-      btn.textContent = hidden ? 'Hide' : 'Show';
-      btn.setAttribute('aria-label', hidden ? 'Hide password' : 'Show password');
+    var label = document.createElement('label');
+    label.className = 'pw-toggle';
+    var box = document.createElement('input');
+    box.type = 'checkbox';
+    var text = document.createElement('span');
+    text.textContent = 'Show password';
+    label.appendChild(box);
+    label.appendChild(text);
+    box.addEventListener('change', function () {
+      inp.type = box.checked ? 'text' : 'password';
     });
-    wrap.appendChild(btn);
+    if (inp.nextSibling) inp.parentNode.insertBefore(label, inp.nextSibling);
+    else inp.parentNode.appendChild(label);
   });
 }
 
