@@ -1,0 +1,139 @@
+# SGP Client Portal — Project Memory / Handoff
+
+> Read this first if you're a new Claude session picking up the client portal.
+> It captures architecture, the live Supabase state, decisions, and what's
+> done vs pending. Detailed setup is in `admin/SETUP.md`; the DB is
+> `supabase/schema.sql`.
+
+## What this is
+
+An authenticated client portal bolted onto the existing static SGP site
+(GitHub Pages, repo `ocoomber/strange-goose-productions`, deploys on push to
+`main`). Clients log in, follow their project through a fixed 7-stage
+pipeline, and record permanent, timestamped approvals. Owen runs an admin
+panel to create accounts/projects, paste links/videos, and advance stages.
+**Purpose: dispute protection** — every client action is account-tied,
+timestamped, and immutable, enforced in the database (not just UI).
+
+## Stack & layout
+
+- **Frontend:** vanilla HTML/CSS/JS, no build step, no frameworks.
+  - `client/index.html` — client portal (single page, hash routing, JS views)
+  - `admin/index.html` — admin panel (single page, JS views)
+  - `admin/report.html` — printable end-of-project PDF record (browser print)
+  - `site/portal.js` — shared: Supabase init, auth, `STAGE_ACTIONS` map,
+    helpers (`el`, `fmtDate`, `ytEmbed`, `parseYouTubeId`, `linkList`)
+  - `site/portal.css` — shared styles, extends tokens from `site/styles.css`
+  - URLs: `strangegoose.co.uk/client/` and `/admin/` (unlisted; security is
+    auth + RLS, not obscurity)
+- **Backend:** Supabase free tier (project ref `zawrkuclsdqtvftfothj`).
+  - URL + anon/publishable key are hardcoded near the top of `site/portal.js`
+    (public by design; RLS is the boundary).
+  - **Edge Functions** (Deno, self-contained single files, deployed via the
+    Supabase dashboard editor — Owen is not a CLI user):
+    - `notify` — Database Webhook target; emails on approvals INSERT (→ Owen)
+      and stages locked→pending (→ client). Resend for sending.
+    - `create-client` — admin-only; provisions a client account, emails them
+      a temp password (branded HTML).
+    - `manage-client` — admin-only; actions `update` / `archive` /
+      `unarchive` / `delete`.
+  - **Email:** Resend, domain `strangegoose.co.uk` verified, sends from
+    `portal@strangegoose.co.uk`. 10/10 mail-tester. New-domain reputation
+    means first emails may hit spam until recipients engage.
+  - **Secrets** (Edge Function): `RESEND_API_KEY`, `ADMIN_EMAIL`,
+    `WEBHOOK_SECRET`. Two Database Webhooks (approvals INSERT, stages UPDATE)
+    post to `notify` with the `x-webhook-secret` header.
+
+## Data model (see schema.sql for the authoritative version)
+
+- `profiles` (1:1 with auth.users): role admin|client, `must_change_password`,
+  `archived`. Auto-created by `handle_new_user` trigger.
+- `projects`: client_id → profiles, title, status active|complete.
+- `stages`: 7 per project (seeded by `seed_stages` trigger), stage_index 1–7,
+  state locked|pending|approved, `doc_links` jsonb, `video_id`, `note`,
+  `deliverable_links` jsonb (stage 7).
+- `approvals`: append-only record (stage_id unique, denormalised stage_name +
+  approved_at). **No UPDATE/DELETE granted to anyone** — immutable.
+
+### The 7 stages & client action wording (`STAGE_ACTIONS` in portal.js)
+1. Brief agreed — **Approve brief**
+2. Edit v1 — **Confirm feedback sent** (round 1 of 2)
+3. Edit v2 — **Confirm feedback sent** (round 2 of 2)
+4. Picture lock — **Acknowledge** (boundary: further edits chargeable)
+5. Colour and sound — **Confirm feedback sent** (1 round)
+6. Final approval — **Accept final version** (anchors the final invoice)
+7. Deliverables — **All files downloaded and checked** (completes project)
+
+### Key DB rules (triggers, all SECURITY DEFINER)
+- `guard_stage_update`: blocks reverting approved stages; **freezes
+  doc_links/video_id/note once approved**; enforces in-order locked→pending
+  advance; pending→approved only via an approvals insert (GUC flag).
+- `handle_approval`: validates owner + pending, fills denormalised fields,
+  flips stage to approved.
+- `complete_on_deliverables`: stage-7 approval → project status complete.
+- `guard_profile_update`: non-admins can't change own role/email/id.
+- Admin-only RPCs: `reset_project` (testing), `revert_last_approval`
+  (undo one accidental approval). Both bypass guards via a GUC flag.
+- RLS: clients see only their own projects and **non-locked** stages; admin
+  sees all via `is_admin()`.
+
+## Completion / deliverables flow (current, post-redesign)
+Release and completion are **separate**:
+1. Client accepts final version (stage 6).
+2. Owen adds deliverable links to stage 7, clicks **Release deliverables to
+   client** (bottom panel) → stage 7 locked→pending → client emailed "ready
+   to download" and sees the links.
+3. Client clicks **All files downloaded and checked** → stage 7 approved →
+   project auto-completes. OR Owen clicks **Mark complete (on client's
+   behalf)** if the client ghosts the button.
+4. On complete, the bottom panel reminds Owen to generate the PDF record.
+
+## UX conventions worth preserving
+- Admin & client stage blocks **collapse** to headers; only the active stage
+  is expanded. Admin project list sorts **Your move** first.
+- Approved-stage content is read-only (frozen record). Disabled primary
+  buttons render as a dashed grey outline (distinct from clickable amber).
+- Client never sees locked stages or an Approve button on Deliverables (it's
+  a "files received" confirm, not an approval).
+- Branded HTML emails via a shared `brandedEmail()` template in each function.
+
+## Client lifecycle (Clients panel)
+- **Archive** (primary): hides client + bans login, keeps all records;
+  reversible via **Restore**. Archived clients' projects are also hidden
+  from the admin project list.
+- **Delete permanently** (archived only): destroys account + non-completed
+  projects to free the email; **refused if any completed project exists**;
+  requires typing the client's email. For test accounts only.
+
+## Status vs the roadmap (in the plan file)
+**Done:** MVP (all 7 stages, RLS, immutable approvals, admin+client panels,
+SGP-matched design) · Tier 1 (two-way email notifications, admin account
+creation w/ auto-email, self-service password reset) · client management
+(edit/archive/restore/delete) · printable project record · admin "needs
+attention" sorted list · deliverables release/confirm redesign.
+
+**Pending / next:**
+- **Lockdown before first real client:** remove (or feature-flag) the
+  "Reset project (testing)" button + `reset_project()` so approval
+  permanence has no back door. Owen will say when testing's done.
+- Tier 3: in-portal feedback capture (emails Owen); audit-grade voids
+  (mark approvals voided instead of hard delete) when a real dispute makes
+  the missing trail matter; project duplication/templates.
+- Per-project archiving for *completed projects of still-active clients*
+  (currently only whole-client archive hides projects).
+
+## Gotchas / notes for the next session
+- **Network:** this sandbox's egress often blocks `*.supabase.co`, so live
+  RLS/REST tests may fail with "host not in allowlist" — verify via Owen's
+  browser + real inboxes instead.
+- Edge functions are **self-contained on purpose** (shared helper inlined)
+  so Owen can paste each into the dashboard editor unedited. Keep them that
+  way; don't reintroduce a shared import.
+- After changing a function, Owen must **redeploy it manually** in the
+  dashboard — website pushes don't touch Supabase.
+- After changing schema/triggers, provide the SQL for Owen to paste into the
+  SQL Editor; remember `auth.uid()` is null there (guards must allow that).
+- Verify pattern used all session: `node --check` the inline `<script>` and
+  `node --experimental-strip-types --check` the TS functions before pushing.
+- Push straight to `main` (deploys live). The `testing/` mirror was dropped
+  early in dev.

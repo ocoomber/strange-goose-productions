@@ -2,6 +2,11 @@
 
 Website for Strange Goose Productions. Static HTML/CSS, no build step, no dependencies. Hosted on GitHub Pages at strangegoose.co.uk. Pushing to main makes it live.
 
+> **Client Portal:** There is an authenticated client portal in `client/`,
+> `admin/`, `site/portal.*` and `supabase/`, backed by Supabase. If working on
+> it, **read `PORTAL_NOTES.md` first** (architecture, live state, decisions,
+> what's done/pending) and `admin/SETUP.md` (Supabase/Resend setup).
+
 ---
 
 ## Pages
