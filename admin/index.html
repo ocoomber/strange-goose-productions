@@ -160,7 +160,7 @@
       var meta = el('div', 'meta');
       meta.appendChild(el('span', 'badge ' + p.status, p.status === 'complete' ? 'Complete' : 'Active'));
       meta.appendChild(el('span', null, 'Client: ' + ((p.profiles && p.profiles.email) || '—')));
-      meta.appendChild(el('span', null, approved + '/' + STAGE_COUNT + ' approved' +
+      meta.appendChild(el('span', null, approved + '/' + (STAGE_COUNT - 1) + ' approved' +
         (pending ? ' · awaiting client approval' : '')));
       card.appendChild(meta);
       list.appendChild(card);
