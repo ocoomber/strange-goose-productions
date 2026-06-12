@@ -81,6 +81,7 @@
         <p class="sub" id="project-meta"></p>
         <p style="margin-top:16px;">
           <button class="btn ghost" type="button" id="toggle-complete"></button>
+          <button class="btn ghost" type="button" id="reset-project" style="margin-left:10px;">Reset project (testing)</button>
         </p>
         <p class="form-error" id="project-error" hidden></p>
       </header>
@@ -249,6 +250,14 @@
       var res = await sb.from('projects')
         .update({ status: project.status === 'complete' ? 'active' : 'complete' })
         .eq('id', id);
+      if (res.error) showError(projErr, res.error); else renderProject(id);
+    };
+
+    var reset = document.getElementById('reset-project');
+    reset.onclick = async function () {
+      if (!window.confirm('Reset "' + project.title + '"?\n\nThis permanently deletes all approval ' +
+        'records for this project and relocks every stage (links and videos are kept). For testing only.')) return;
+      var res = await sb.rpc('reset_project', { p_project: id });
       if (res.error) showError(projErr, res.error); else renderProject(id);
     };
 
