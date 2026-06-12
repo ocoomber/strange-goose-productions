@@ -181,3 +181,34 @@ function showError(node, err) {
   node.textContent = (err && err.message) ? err.message : String(err);
   node.hidden = false;
 }
+
+/* Add a Show/Hide toggle to every password input (helps on phones). */
+function enablePasswordToggles() {
+  var inputs = document.querySelectorAll('input[type="password"]');
+  Array.prototype.forEach.call(inputs, function (inp) {
+    if (inp.dataset.pwToggled) return;
+    inp.dataset.pwToggled = '1';
+    var wrap = document.createElement('span');
+    wrap.className = 'pw-wrap';
+    inp.parentNode.insertBefore(wrap, inp);
+    wrap.appendChild(inp);
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pw-toggle';
+    btn.textContent = 'Show';
+    btn.setAttribute('aria-label', 'Show password');
+    btn.addEventListener('click', function () {
+      var hidden = inp.type === 'password';
+      inp.type = hidden ? 'text' : 'password';
+      btn.textContent = hidden ? 'Hide' : 'Show';
+      btn.setAttribute('aria-label', hidden ? 'Hide password' : 'Show password');
+    });
+    wrap.appendChild(btn);
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', enablePasswordToggles);
+} else {
+  enablePasswordToggles();
+}
