@@ -282,13 +282,15 @@
       top.appendChild(el('span', 'stage-num', '0' + s.stage_index));
       top.appendChild(el('h3', null, s.name));
       var a = approvals[s.id];
+      var act = STAGE_ACTIONS[s.stage_index];
       if (s.state === 'approved') {
-        top.appendChild(el('span', 'badge approved', 'Approved'));
+        top.appendChild(el('span', 'badge approved', (act && act.done) || 'Done'));
         if (a) top.appendChild(el('span', 'stage-when', fmtDate(a.approved_at)));
       } else if (s.state === 'pending') {
-        top.appendChild(el('span', 'badge pending', 'Awaiting client approval'));
+        top.appendChild(el('span', 'badge pending',
+          s.stage_index === 7 ? 'With client' : 'Awaiting client'));
       } else {
-        top.appendChild(el('span', 'badge locked', 'Locked'));
+        top.appendChild(el('span', 'badge locked', 'Not yet submitted'));
       }
       card.appendChild(top);
 
@@ -338,13 +340,13 @@
       if (firstLocked && firstLocked.id === s.id) {
         var prevApproved = idx === 0 || stages[idx - 1].state === 'approved';
         var advBox = el('div');
-        var adv = el('button', 'btn primary', 'Advance — unlock this stage for the client');
+        var adv = el('button', 'btn primary', 'Submit to client');
         adv.type = 'button';
         adv.disabled = !prevApproved;
         var advErr = el('p', 'form-error'); advErr.hidden = true;
         if (!prevApproved) {
           advBox.appendChild(el('p', 'hint',
-            'Available once the client approves "' + stages[idx - 1].name + '".'));
+            'Available once the client completes "' + stages[idx - 1].name + '".'));
         }
         adv.addEventListener('click', async function () {
           var res = await sb.from('stages').update({ state: 'pending' }).eq('id', s.id);
