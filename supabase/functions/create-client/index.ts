@@ -83,16 +83,19 @@ const FROM = 'Strange Goose Productions <portal@strangegoose.co.uk>';
 async function sendWelcome(to: string, name: string, tempPassword: string): Promise<void> {
   const apiKey = Deno.env.get('RESEND_API_KEY');
   if (!apiKey) throw new Error('RESEND_API_KEY not set');
-  const hello = name ? `Hello ${name},` : 'Hello,';
-  const text =
-    `${hello}\n\n` +
-    `Strange Goose Productions has set up your client portal, where you can ` +
-    `follow your project and approve each stage.\n\n` +
-    `Sign in here: ${PORTAL_URL}\n\n` +
-    `Email: ${to}\n` +
-    `Temporary password: ${tempPassword}\n\n` +
-    `You'll be asked to choose your own password the first time you sign in.\n\n` +
-    `Strange Goose Productions`;
+  const content = {
+    heading: name ? `Welcome, ${name}` : 'Welcome to your client portal',
+    paragraphs: [
+      'Strange Goose Productions has set up your client portal, where you can ' +
+      'follow your project and approve each stage as it’s ready.',
+    ],
+    button: { label: 'Sign in to your portal', url: PORTAL_URL },
+    info: [
+      { label: 'Email', value: to },
+      { label: 'Temporary password', value: tempPassword },
+    ],
+    outro: 'You’ll be asked to choose your own password the first time you sign in.',
+  };
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -103,16 +106,69 @@ async function sendWelcome(to: string, name: string, tempPassword: string): Prom
       from: FROM,
       to,
       subject: 'Your Strange Goose Productions client portal login',
-      text,
-      html: '<div style="font-family:sans-serif;white-space:pre-wrap">' +
-        text.replace(/[&<>]/g, (c) =>
-          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c] as string)) + '</div>',
+      text: plainEmail(content),
+      html: brandedEmail(content),
     }),
   });
   if (!res.ok) {
     const body = await res.text();
     throw new Error(`Resend failed (${res.status}): ${body}`);
   }
+}
+
+// ── Branded email template (shared shape across SGP portal emails) ──
+type EmailContent = {
+  heading: string;
+  paragraphs?: string[];
+  button?: { label: string; url: string };
+  info?: { label: string; value: string }[];
+  outro?: string;
+};
+
+function esc(s: string): string {
+  return String(s).replace(/[&<>]/g, (c) =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c] as string));
+}
+
+function brandedEmail(o: EmailContent): string {
+  const paras = (o.paragraphs || []).map((p) =>
+    `<p style="margin:0 0 16px;font-size:15px;line-height:1.55;color:#2a2622">${esc(p)}</p>`).join('');
+  const button = o.button
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:4px 0 22px"><tr>` +
+      `<td style="background:#8a4d23;border-radius:3px"><a href="${o.button.url}" ` +
+      `style="display:inline-block;padding:12px 24px;font-size:14px;font-weight:600;` +
+      `color:#f5f2ec;text-decoration:none;font-family:Arial,sans-serif">${esc(o.button.label)}</a></td></tr></table>`
+    : '';
+  const info = (o.info && o.info.length)
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" ` +
+      `style="background:#ebe7dd;border:1px solid #d9d3c6;border-radius:3px;margin:0 0 20px"><tr>` +
+      `<td style="padding:14px 16px;font-family:'Courier New',monospace;font-size:14px;color:#14120f;line-height:1.8">` +
+      o.info.map((r) =>
+        `<span style="color:#5a5449">${esc(r.label)}:</span> ${esc(r.value)}`).join('<br>') +
+      `</td></tr></table>`
+    : '';
+  const outro = o.outro
+    ? `<p style="margin:0 0 4px;font-size:13px;line-height:1.5;color:#5a5449">${esc(o.outro)}</p>`
+    : '';
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#e3dfd3">` +
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e3dfd3;padding:28px 12px"><tr><td align="center">` +
+    `<table role="presentation" width="480" cellpadding="0" cellspacing="0" style="max-width:480px;width:100%;background:#f5f2ec;border:1px solid #d9d3c6;border-radius:4px">` +
+    `<tr><td style="padding:28px 30px;font-family:Arial,sans-serif">` +
+    `<p style="margin:0 0 20px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#8a8376">Strange Goose Productions</p>` +
+    `<h1 style="margin:0 0 18px;font-size:22px;line-height:1.25;color:#14120f">${esc(o.heading)}</h1>` +
+    paras + button + info + outro +
+    `</td></tr></table>` +
+    `<p style="margin:16px 0 0;font-size:11px;color:#8a8376;font-family:Arial,sans-serif">strangegoose.co.uk</p>` +
+    `</td></tr></table></body></html>`;
+}
+
+function plainEmail(o: EmailContent): string {
+  let t = `${o.heading}\n\n`;
+  (o.paragraphs || []).forEach((p) => { t += `${p}\n\n`; });
+  if (o.button) t += `${o.button.label}: ${o.button.url}\n\n`;
+  if (o.info) { o.info.forEach((r) => { t += `${r.label}: ${r.value}\n`; }); t += '\n'; }
+  if (o.outro) t += `${o.outro}\n\n`;
+  return t + 'Strange Goose Productions';
 }
 
 // Readable but strong: three word-like chunks + digits, ~60 bits.
