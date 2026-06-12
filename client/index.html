@@ -205,6 +205,9 @@
       card.appendChild(top);
 
       var body = el('div', 'stage-body');
+      // The deliverables note belongs with the released files, not the
+      // "in preparation" placeholder.
+      if (isDeliverables && project.status !== 'complete') s.note = null;
       if (s.note) {
         var noteEl = el('div', 'stage-note-box');
         noteEl.appendChild(el('p', 'eyebrow', 'Note from Strange Goose'));
@@ -251,6 +254,21 @@
       card.appendChild(body);
       list.appendChild(card);
     });
+
+    // Nothing currently needs the client's action — tell them what we're doing
+    var visible = st.data || [];
+    var nothingPending = !visible.some(function (s) { return s.state === 'pending'; });
+    if (nothingPending && project.status !== 'complete') {
+      var lastApproved = visible.filter(function (s) { return s.state === 'approved'; }).pop();
+      var nextAct = lastApproved && STAGE_ACTIONS[lastApproved.stage_index];
+      if (nextAct && nextAct.next) {
+        var banner = el('div', 'next-up');
+        banner.appendChild(el('p', 'eyebrow', 'What happens next'));
+        banner.appendChild(el('p', null, nextAct.next));
+        list.appendChild(banner);
+      }
+    }
+
     show('project');
   }
 
