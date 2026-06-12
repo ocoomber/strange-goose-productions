@@ -17,6 +17,7 @@
   <a href="../index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose Productions</span></a>
   <div class="links">
     <span class="eyebrow" style="margin:0;">Admin</span>
+    <a href="#" id="nav-password" hidden style="font-size:13px;">Change password</a>
   </div>
   <a href="#" class="cta" id="nav-signout" hidden><span class="cta-text">Sign out</span></a>
 </nav>
@@ -52,6 +53,23 @@
         <h1>Projects</h1>
         <p class="sub">Create client accounts below — new accounts appear in the client dropdown, ready to be assigned a project.</p>
       </header>
+
+      <div class="admin-panel" id="password-panel" hidden>
+        <h2>Change your password</h2>
+        <form id="admin-password-form" class="admin-row">
+          <div class="field">
+            <label for="admin-pw-new">New password</label>
+            <input id="admin-pw-new" type="password" autocomplete="new-password" minlength="8" required>
+          </div>
+          <div class="field">
+            <label for="admin-pw-confirm">Confirm new password</label>
+            <input id="admin-pw-confirm" type="password" autocomplete="new-password" minlength="8" required>
+          </div>
+          <button class="btn primary" type="submit">Update password</button>
+        </form>
+        <p class="form-error" id="admin-pw-error" hidden></p>
+        <p class="hint" id="admin-pw-ok" hidden style="color:oklch(45% 0.12 150);">Password updated.</p>
+      </div>
 
       <div class="admin-panel">
         <h2>New client account</h2>
@@ -133,11 +151,39 @@
       document.getElementById('view-' + v).hidden = (v !== name);
     });
     document.getElementById('nav-signout').hidden = (name === 'login');
+    document.getElementById('nav-password').hidden = (name === 'login');
   }
 
   document.getElementById('nav-signout').addEventListener('click', function (e) {
     e.preventDefault();
     signOut();
+  });
+
+  document.getElementById('nav-password').addEventListener('click', function (e) {
+    e.preventDefault();
+    if (location.hash) { location.hash = ''; }
+    var panel = document.getElementById('password-panel');
+    panel.hidden = !panel.hidden;
+    if (!panel.hidden) document.getElementById('admin-pw-new').focus();
+  });
+
+  document.getElementById('admin-password-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errNode = document.getElementById('admin-pw-error');
+    var okNode = document.getElementById('admin-pw-ok');
+    errNode.hidden = true; okNode.hidden = true;
+    var pw = document.getElementById('admin-pw-new').value;
+    if (pw !== document.getElementById('admin-pw-confirm').value) {
+      showError(errNode, { message: 'Passwords do not match.' });
+      return;
+    }
+    var btn = e.target.querySelector('button[type=submit]');
+    btn.disabled = true;
+    var res = await sb.auth.updateUser({ password: pw });
+    btn.disabled = false;
+    if (res.error) { showError(errNode, res.error); return; }
+    e.target.reset();
+    okNode.hidden = false;
   });
 
   /* ── login ── */
