@@ -50,8 +50,29 @@
       <header class="portal-hd">
         <p class="eyebrow">Admin</p>
         <h1>Projects</h1>
-        <p class="sub">Client accounts are created in the Supabase dashboard (Authentication → Add user). New accounts appear in the client dropdown below.</p>
+        <p class="sub">Create client accounts below — new accounts appear in the client dropdown, ready to be assigned a project.</p>
       </header>
+
+      <div class="admin-panel">
+        <h2>New client account</h2>
+        <form id="client-form" class="admin-row">
+          <div class="field">
+            <label for="client-email">Client email</label>
+            <input id="client-email" type="email" required>
+          </div>
+          <div class="field">
+            <label for="client-name">Display name (optional)</label>
+            <input id="client-name" type="text">
+          </div>
+          <button class="btn primary" type="submit">Create account</button>
+        </form>
+        <p class="form-error" id="client-error" hidden></p>
+        <div class="stage-note-box" id="client-result" hidden style="margin-top:16px;">
+          <p class="eyebrow">Account created — send these credentials to the client</p>
+          <p class="stage-note" id="client-creds"></p>
+          <p class="hint" style="margin-top:8px;">They'll be asked to choose their own password on first sign-in. Portal link: https://www.strangegoose.co.uk/client/</p>
+        </div>
+      </div>
 
       <div class="admin-panel">
         <h2>New project</h2>
@@ -167,6 +188,41 @@
     });
     show('projects');
   }
+
+  document.getElementById('client-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errNode = document.getElementById('client-error');
+    var resultBox = document.getElementById('client-result');
+    errNode.hidden = true;
+    resultBox.hidden = true;
+    var btn = e.target.querySelector('button[type=submit]');
+    btn.disabled = true;
+    var res = await sb.functions.invoke('create-client', {
+      body: {
+        email: document.getElementById('client-email').value.trim(),
+        display_name: document.getElementById('client-name').value.trim()
+      }
+    });
+    btn.disabled = false;
+    var err = res.error || (res.data && res.data.error);
+    if (err) {
+      // FunctionsHttpError hides the body; surface the JSON error if present
+      if (res.error && res.error.context && res.error.context.json) {
+        try {
+          var j = await res.error.context.json();
+          if (j && j.error) err = j;
+        } catch (_) {}
+      }
+      showError(errNode, { message: err.error || err.message || String(err) });
+      return;
+    }
+    document.getElementById('client-creds').textContent =
+      'Email: ' + res.data.email + '\nTemporary password: ' + res.data.temp_password;
+    resultBox.hidden = false;
+    document.getElementById('client-email').value = '';
+    document.getElementById('client-name').value = '';
+    renderProjects();
+  });
 
   document.getElementById('create-form').addEventListener('submit', async function (e) {
     e.preventDefault();
