@@ -306,15 +306,21 @@
         tools.appendChild(linkEditor(s, 'doc_links', id, 'Document links (Google Drive)'));
 
         var noteBox = el('div');
-        noteBox.appendChild(el('p', 'eyebrow', 'Note to client (e.g. what changed in response to feedback)'));
-        var noteForm = el('form');
+        if (s.note) {
+          var preview = el('div', 'stage-note-box');
+          preview.appendChild(el('p', 'eyebrow', 'Note the client will see'));
+          preview.appendChild(el('p', 'stage-note', s.note));
+          noteBox.appendChild(preview);
+        }
+        noteBox.appendChild(el('p', 'eyebrow', s.note
+          ? 'Edit note to client'
+          : 'Note to client (e.g. what changed in response to feedback)'));
+        var noteForm = el('form', 'note-form');
         var noteArea = el('textarea');
-        noteArea.rows = 3;
         noteArea.placeholder = 'e.g. As per your feedback, Scene 3 is now longer and Scene 5 uses more close-ups.';
         noteArea.value = s.note || '';
-        var noteSave = el('button', 'btn ghost', 'Save note');
+        var noteSave = el('button', 'btn ghost', s.note ? 'Update note' : 'Save note');
         noteSave.type = 'submit';
-        noteSave.style.marginTop = '8px';
         var noteErr = el('p', 'form-error'); noteErr.hidden = true;
         noteForm.appendChild(noteArea);
         noteForm.appendChild(noteSave);
@@ -378,6 +384,16 @@
       }
 
       card.appendChild(tools);
+
+      // Repeat the status at the foot of the block — you read down the page,
+      // so each block should end with its outcome.
+      if (s.state === 'approved') {
+        var foot = el('div', 'stage-foot');
+        foot.appendChild(el('span', 'badge approved', (act && act.done) || 'Done'));
+        if (a) foot.appendChild(el('span', 'stage-when', fmtDate(a.approved_at)));
+        card.appendChild(foot);
+      }
+
       list.appendChild(card);
     });
 

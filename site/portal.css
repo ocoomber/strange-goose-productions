@@ -48,7 +48,18 @@
   margin: 10px 0 0;
 }
 button.btn { cursor: pointer; border: 1px solid transparent; font: inherit; }
-button.btn:disabled { opacity: 0.45; cursor: default; }
+button.btn:disabled { cursor: default; }
+/* a disabled primary action looks clearly inert, not just dimmed */
+button.btn.primary:disabled {
+  background: var(--paper-3);
+  color: var(--muted);
+  border: 1px dashed var(--faint);
+}
+button.btn.ghost:disabled {
+  border-color: var(--faint);
+  color: var(--faint);
+  background: transparent;
+}
 .btn.full { width: 100%; justify-content: center; display: inline-flex; }
 
 /* ── cards / lists ── */
@@ -197,6 +208,43 @@ button.btn:disabled { opacity: 0.45; cursor: default; }
   padding: 12px 16px;
 }
 .stage-note-box .eyebrow { margin: 0 0 4px; }
+
+/* admin note editor */
+.note-form textarea {
+  display: block;
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid rgba(20,18,15,0.22);
+  padding: 11px 12px;
+}
+.note-form textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.note-form button { margin-top: 10px; }
+
+/* status repeated at the foot of an admin stage block */
+.stage-foot {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(20,18,15,0.12);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* client "what happens next" banner */
+.next-up {
+  margin-top: 18px;
+  background: var(--paper-2);
+  border: 1px solid rgba(20,18,15,0.12);
+  border-left: 3px solid var(--accent);
+  padding: 18px 22px;
+}
+.next-up .eyebrow { margin-bottom: 6px; }
+.next-up p { color: var(--ink-2); font-size: 14px; }
 
 @media (max-width: 720px) {
   .portal-hd { padding: 40px 0 24px; }
