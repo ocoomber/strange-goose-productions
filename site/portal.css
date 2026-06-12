@@ -214,22 +214,22 @@ button.btn.ghost:disabled {
 .client-info { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 2px; }
 .client-name { font-weight: 600; font-size: 15px; }
 .client-email { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
-.client-actions { display: flex; gap: 8px; }
+.client-actions { display: flex; gap: 8px; align-items: center; }
 .btn.sm { padding: 5px 12px; font-size: 11px; }
-.client-edit {
-  flex-basis: 100%;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 6px;
+.client-fields {
+  flex: 1; min-width: 220px;
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
 }
-.client-edit input {
-  flex: 1; min-width: 160px;
+.client-fields input {
+  flex: 1; min-width: 140px;
   font: inherit; font-size: 14px;
   background: var(--paper); color: var(--ink);
   border: 1px solid rgba(20,18,15,0.22); padding: 8px 10px;
 }
-.client-edit input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.client-fields input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.client-fields .client-email { flex: 0 0 auto; }
+.client-row.archived { opacity: 0.7; }
+.client-row.archived .client-name { font-weight: 500; }
 .hint { color: var(--ink-3); font-size: 13px; }
 .stage-note { white-space: pre-wrap; font-size: 14px; color: var(--ink-2); margin-top: 4px; }
 .stage-note-box {

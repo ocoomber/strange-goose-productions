@@ -12,6 +12,7 @@ create table public.profiles (
   display_name text,
   role text not null default 'client' check (role in ('admin','client')),
   must_change_password boolean not null default true,
+  archived boolean not null default false,
   created_at timestamptz not null default now()
 );
 
@@ -172,6 +173,23 @@ end $$;
 create trigger on_approval
   before insert on public.approvals
   for each row execute function public.handle_approval();
+
+-- When the client confirms the Deliverables stage (stage 7), the project is
+-- complete. (Owen can also complete it manually from the admin panel.)
+create or replace function public.complete_on_deliverables()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare idx int;
+begin
+  select stage_index into idx from public.stages where id = new.stage_id;
+  if idx = 7 then
+    update public.projects set status = 'complete' where id = new.project_id;
+  end if;
+  return new;
+end $$;
+
+create trigger on_deliverables_approved
+  after insert on public.approvals
+  for each row execute function public.complete_on_deliverables();
 
 -- Non-admins may only flip their own must_change_password / display_name.
 -- auth.uid() is null outside the API (SQL editor / service role) — allow those.

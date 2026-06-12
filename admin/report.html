@@ -245,6 +245,9 @@
   document.title = 'Project Record — ' + project.title + ' · Strange Goose Productions';
   status.hidden = true;
   document.getElementById('sheet').hidden = false;
+
+  // Open the print / Save-as-PDF dialog automatically once rendered.
+  setTimeout(function () { window.print(); }, 350);
 })();
 </script>
 </body>
