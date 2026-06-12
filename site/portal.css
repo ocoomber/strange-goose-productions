@@ -253,7 +253,8 @@ button.btn.ghost:disabled {
 }
 .stage.collapsible.collapsed > .stage-top::after { transform: rotate(-90deg); }
 .stage.collapsible.collapsed > .stage-top { margin: 0; }
-.stage.collapsed > .stage-collapse { display: none; }
+.stage.collapsed > .stage-collapse,
+.stage.collapsed > .stage-body { display: none; }
 .stage.collapsible:not(.collapsed) > .stage-top { margin-bottom: 4px; }
 
 /* client "what happens next" banner */
