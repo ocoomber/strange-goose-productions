@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Record · Strange Goose Productions</title>
+<meta name="robots" content="noindex">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #fff;
+    color: #14120f;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .sheet { max-width: 760px; margin: 0 auto; padding: 48px 40px; }
+  .masthead {
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #5a5449;
+    margin-bottom: 6px;
+  }
+  h1 { font-size: 26px; font-weight: normal; margin-bottom: 24px; }
+  .meta-table { width: 100%; border-collapse: collapse; margin-bottom: 36px; }
+  .meta-table td { padding: 6px 0; border-bottom: 1px solid #ddd; vertical-align: top; }
+  .meta-table td:first-child {
+    width: 180px;
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #5a5449;
+    padding-right: 16px;
+  }
+  h2 {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5a5449;
+    margin: 0 0 14px;
+    font-weight: normal;
+  }
+  .stage-rec {
+    border: 1px solid #ccc;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+  }
+  .stage-rec h3 { font-size: 16px; font-weight: normal; margin-bottom: 2px; }
+  .stage-rec .num {
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: #8a8376;
+  }
+  .rec-row { display: flex; gap: 14px; margin-top: 10px; }
+  .rec-row .k {
+    flex: 0 0 150px;
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5a5449;
+    padding-top: 2px;
+  }
+  .rec-row .v { flex: 1; word-break: break-word; }
+  .v a { color: #14120f; }
+  .recorded {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #f2efe9;
+    border-left: 3px solid #8a4d23;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+  }
+  .recorded .never { color: #5a5449; font-style: italic; }
+  .statement {
+    margin-top: 36px;
+    padding-top: 16px;
+    border-top: 1px solid #ccc;
+    font-size: 11px;
+    color: #5a5449;
+  }
+  .toolbar {
+    position: sticky;
+    top: 0;
+    background: #14120f;
+    padding: 12px 40px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .toolbar button {
+    font: 600 13px Arial, sans-serif;
+    background: #c66b35;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    cursor: pointer;
+  }
+  .toolbar span { color: #c7c1b3; font-family: Arial, sans-serif; font-size: 12px; }
+  #status { padding: 60px 40px; font-family: Arial, sans-serif; }
+  @media print {
+    .toolbar { display: none; }
+    .sheet { padding: 0; max-width: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="window.print()">Print / Save as PDF</button>
+  <span>Use your browser's print dialog and choose "Save as PDF" to keep a copy or email it.</span>
+</div>
+
+<p id="status">Loading project record…</p>
+<div class="sheet" id="sheet" hidden>
+  <p class="masthead">Strange Goose Productions · Project Record</p>
+  <h1 id="r-title"></h1>
+  <table class="meta-table" id="r-meta"></table>
+  <h2>Stage history</h2>
+  <div id="r-stages"></div>
+  <p class="statement">
+    This record was generated from the Strange Goose Productions client portal
+    at <span id="r-generated"></span>. Each recorded action was made by the named
+    account, authenticated by email and password, at the stated date and time
+    (UK time). Recorded actions cannot be edited or deleted through the portal,
+    and the documents, video and notes shown for a recorded stage are locked at
+    the moment of the action.
+  </p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../site/portal.js"></script>
+<script>
+(async function () {
+  var status = document.getElementById('status');
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('p');
+  if (!id) { status.textContent = 'No project specified.'; return; }
+
+  var profile = await getProfile();
+  if (!profile || profile.role !== 'admin') {
+    status.innerHTML = 'Admin access required — <a href="index.html">sign in to the admin panel</a> first, then reopen this report.';
+    return;
+  }
+
+  var pr = await sb.from('projects')
+    .select('*, profiles(email, display_name)').eq('id', id).single();
+  if (pr.error || !pr.data) { status.textContent = 'Project not found.'; return; }
+  var project = pr.data;
+  var st = await sb.from('stages').select('*').eq('project_id', id).order('stage_index');
+  var ap = await sb.from('approvals').select('*').eq('project_id', id);
+  var approvals = {};
+  (ap.data || []).forEach(function (a) { approvals[a.stage_id] = a; });
+
+  document.getElementById('r-title').textContent = project.title;
+
+  var clientName = (project.profiles && project.profiles.display_name) || '';
+  var clientEmail = (project.profiles && project.profiles.email) || '—';
+  var metaRows = [
+    ['Client', clientName ? clientName + ' — ' + clientEmail : clientEmail],
+    ['Project created', fmtDate(project.created_at)],
+    ['Project status', project.status === 'complete' ? 'Complete' : 'In progress'],
+    ['Production company', 'Strange Goose Productions — strangegoose.co.uk']
+  ];
+  var metaTable = document.getElementById('r-meta');
+  metaRows.forEach(function (r) {
+    var tr = document.createElement('tr');
+    var k = document.createElement('td'); k.textContent = r[0];
+    var v = document.createElement('td'); v.textContent = r[1];
+    tr.appendChild(k); tr.appendChild(v);
+    metaTable.appendChild(tr);
+  });
+
+  var stagesBox = document.getElementById('r-stages');
+  (st.data || []).forEach(function (s) {
+    var act = STAGE_ACTIONS[s.stage_index];
+    var rec = document.createElement('div');
+    rec.className = 'stage-rec';
+    var num = document.createElement('p');
+    num.className = 'num';
+    num.textContent = 'Stage ' + s.stage_index + ' of 7';
+    var h = document.createElement('h3');
+    h.textContent = s.name;
+    rec.appendChild(num); rec.appendChild(h);
+
+    function row(k, vNode) {
+      var r = document.createElement('div'); r.className = 'rec-row';
+      var kk = document.createElement('div'); kk.className = 'k'; kk.textContent = k;
+      var vv = document.createElement('div'); vv.className = 'v';
+      vv.appendChild(vNode);
+      r.appendChild(kk); r.appendChild(vv);
+      rec.appendChild(r);
+    }
+    function textNode(t) { return document.createTextNode(t); }
+
+    if ((s.doc_links || []).length) {
+      var docs = document.createElement('div');
+      s.doc_links.forEach(function (l) {
+        var d = document.createElement('div');
+        d.textContent = (l.label ? l.label + ' — ' : '') + l.url;
+        docs.appendChild(d);
+      });
+      row('Documents presented', docs);
+    }
+    if (s.video_id) {
+      row('Video presented', textNode('https://www.youtube.com/watch?v=' + s.video_id));
+    }
+    if (s.note) row('Note to client', textNode(s.note));
+    if (s.stage_index === 7 && (s.deliverable_links || []).length) {
+      var dls = document.createElement('div');
+      s.deliverable_links.forEach(function (l) {
+        var d = document.createElement('div');
+        d.textContent = (l.label ? l.label + ' — ' : '') + l.url;
+        dls.appendChild(d);
+      });
+      row('Deliverables', dls);
+    }
+
+    var recorded = document.createElement('div');
+    recorded.className = 'recorded';
+    var a = approvals[s.id];
+    if (s.state === 'approved' && a) {
+      recorded.textContent = ((act && act.done) || 'Approved') + ' — recorded against ' +
+        (clientName || clientEmail) + ' (' + clientEmail + ') at ' + fmtDate(a.approved_at);
+    } else if (s.stage_index === 7) {
+      recorded.innerHTML = '<span class="never">' + (project.status === 'complete'
+        ? 'Deliverables released to the client.'
+        : 'Deliverables not yet released.') + '</span>';
+    } else if (s.state === 'pending') {
+      recorded.innerHTML = '<span class="never">Submitted to the client — awaiting their action at the time of this report.</span>';
+    } else {
+      recorded.innerHTML = '<span class="never">Not yet reached at the time of this report.</span>';
+    }
+    rec.appendChild(recorded);
+    stagesBox.appendChild(rec);
+  });
+
+  document.getElementById('r-generated').textContent = fmtDate(new Date().toISOString());
+  document.title = 'Project Record — ' + project.title + ' · Strange Goose Productions';
+  status.hidden = true;
+  document.getElementById('sheet').hidden = false;
+})();
+</script>
+</body>
+</html>

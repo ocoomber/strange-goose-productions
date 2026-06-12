@@ -84,10 +84,17 @@ Deno.serve(async (req) => {
   }
 
   if (body.action === 'delete') {
-    // Remove the client's project data first (FKs would otherwise block).
+    // Completed projects are a permanent business record — a client with any
+    // completed project cannot be deleted. Delete is for edge cases only
+    // (test accounts, projects abandoned before real work, etc.).
     const { data: projects } = await admin.from('projects')
-      .select('id').eq('client_id', id);
+      .select('id, status').eq('client_id', id);
     const projectIds = (projects || []).map((p) => p.id);
+    if ((projects || []).some((p) => p.status === 'complete')) {
+      return json({
+        error: 'This client has a completed project — their record cannot be deleted.',
+      }, 400);
+    }
     let deletedProjects = 0;
     if (projectIds.length) {
       await admin.from('approvals').delete().in('project_id', projectIds);
