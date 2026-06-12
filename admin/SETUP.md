@@ -37,18 +37,82 @@ Supabase project. Follow these steps once.
    `https://www.strangegoose.co.uk` .
 4. Push to `main`.
 
-## 5. Day-to-day
+## 5. Edge Functions — emails + account creation (one-time)
+
+These power email notifications, the admin "New client account" form, and
+self-service password reset. All free tier.
+
+### 5a. Resend (email sending)
+
+1. Sign up at [resend.com](https://resend.com) (free tier: 100 emails/day).
+2. **Domains → Add domain** — `strangegoose.co.uk`. Add the DNS records it
+   shows you (at your domain registrar) and wait for "Verified".
+3. **API Keys → Create** — copy the key (starts `re_`).
+
+### 5b. Create the two Edge Functions
+
+In the Supabase dashboard, **Edge Functions → Deploy a new function →
+Via Editor**, twice:
+
+1. Function name **`notify`** — paste the contents of
+   `supabase/functions/notify/index.ts`, but first **inline the import**:
+   replace the line `import { corsHeaders, sendEmail } from '../_shared/email.ts';`
+   by pasting the contents of `supabase/functions/_shared/email.ts` at the
+   top of the file (minus its `export` keywords) — the dashboard editor is
+   single-file. Deploy.
+2. Function name **`create-client`** — same drill with
+   `supabase/functions/create-client/index.ts`. Deploy.
+
+(If you ever use the Supabase CLI instead, the files deploy as-is —
+`supabase functions deploy notify create-client`.)
+
+### 5c. Secrets
+
+**Edge Functions → Secrets** (or Project Settings → Edge Functions), add:
+
+| Name | Value |
+|------|-------|
+| `RESEND_API_KEY` | the `re_…` key from 5a |
+| `ADMIN_EMAIL` | your inbox, e.g. `info@strangegoose.co.uk` |
+| `WEBHOOK_SECRET` | any long random string — generate one and keep it for 5d |
+
+### 5d. Database Webhooks (what fires the notification emails)
+
+**Database → Webhooks → Create a new hook**, twice:
+
+1. Name `notify-approvals` · table `approvals` · events: **Insert** ·
+   type: **Supabase Edge Function** → `notify` ·
+   HTTP headers: add `x-webhook-secret` = your `WEBHOOK_SECRET` value.
+2. Name `notify-stages` · table `stages` · events: **Update** ·
+   same function + header. (The function ignores updates that aren't a
+   stage being submitted to the client.)
+
+### 5e. Password reset redirect
+
+**Authentication → URL Configuration → Redirect URLs** — add:
+`https://www.strangegoose.co.uk/client/`
+
+### What you get
+
+- Client acts on a stage → **you get an email** saying who did what.
+- You submit a stage → **the client gets an email** that it's ready.
+- **New client account** form in the admin panel (no more Supabase dashboard).
+- **Forgot password?** on the client login page — resets handle themselves.
+
+## 6. Day-to-day
 
 - **Admin panel:** strangegoose.co.uk/admin/
 - **Client portal (send this to clients):** strangegoose.co.uk/client/
 
 ### Adding a new client
 
-1. Supabase dashboard → **Authentication → Users → Add user** — client's
-   email + a temporary password. Tick "Auto confirm user".
-2. Email the client their credentials and the portal link. They'll be made
-   to choose a new password on first sign-in.
-3. In the admin panel, create a project and pick their account.
+1. In the admin panel, use the **New client account** form — type their
+   email (and optional display name). A temporary password is generated
+   and shown to you.
+2. Email the client the credentials and the portal link. They'll be made
+   to choose a new password on first sign-in. (Clients can also reset a
+   forgotten password themselves via "Forgot password?" on the login page.)
+3. Create a project and pick their account.
 
 ### Running a project
 

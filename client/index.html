@@ -41,6 +41,10 @@
           </div>
           <p class="form-error" id="login-error" hidden></p>
           <button class="btn primary full" type="submit" style="margin-top:18px;">Sign in</button>
+          <p style="margin-top:14px;text-align:center;">
+            <a href="#" id="forgot-link" class="hint" style="text-decoration:underline;">Forgot password?</a>
+          </p>
+          <p class="hint" id="forgot-sent" hidden style="margin-top:10px;">If that email has an account, a reset link is on its way — check your inbox.</p>
         </form>
       </div>
     </section>
@@ -109,6 +113,31 @@
     signOut();
   });
 
+  /* ── password recovery (from emailed reset link) ── */
+  var recoveryMode = false;
+  sb.auth.onAuthStateChange(function (event) {
+    if (event === 'PASSWORD_RECOVERY') {
+      recoveryMode = true;
+      show('password');
+    }
+  });
+
+  document.getElementById('forgot-link').addEventListener('click', async function (e) {
+    e.preventDefault();
+    var errNode = document.getElementById('login-error');
+    errNode.hidden = true;
+    var email = document.getElementById('login-email').value.trim();
+    if (!email) {
+      showError(errNode, { message: 'Enter your email address above first, then click "Forgot password?".' });
+      return;
+    }
+    var res = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    if (res.error) { showError(errNode, res.error); return; }
+    document.getElementById('forgot-sent').hidden = false;
+  });
+
   /* ── login ── */
   document.getElementById('login-form').addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -135,7 +164,8 @@
     }
     try {
       await changePassword(pw);
-      profile.must_change_password = false;
+      recoveryMode = false;
+      if (profile) profile.must_change_password = false;
       route();
     } catch (err) { showError(errNode, err); }
   });
@@ -286,6 +316,7 @@
 
   /* ── routing ── */
   async function route() {
+    if (recoveryMode) { show('password'); return; }
     var session = await getSession();
     if (!session) { show('login'); return; }
     if (!profile || profile.id !== session.user.id) profile = await getProfile();
