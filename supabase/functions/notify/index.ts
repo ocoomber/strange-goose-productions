@@ -99,17 +99,16 @@ Deno.serve(async (req) => {
       const isDeliverables = rec.stage_index === 7;
       await sendEmail(to,
         isDeliverables
-          ? `Your deliverables are being prepared — ${project?.title}`
+          ? `Your files are ready to download — ${project?.title}`
           : `Ready for your review — ${project?.title}`,
         isDeliverables
           ? {
-            heading: 'Your deliverables are being prepared',
+            heading: 'Your files are ready to download',
             paragraphs: [
-              `Your project “${project?.title}” has reached the Deliverables stage. ` +
-              'We’re preparing your final files — you’ll find the download links in ' +
-              'the portal once they’re released.',
+              `The final files for your project “${project?.title}” are ready in the portal. ` +
+              'Please download and check everything, then confirm you have it all.',
             ],
-            button: { label: 'Open your portal', url: PORTAL_URL },
+            button: { label: 'Download your files', url: PORTAL_URL },
           }
           : {
             heading: 'Ready for your review',

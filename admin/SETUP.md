@@ -113,15 +113,31 @@ file, no edits needed:
    forgotten password themselves via "Forgot password?" on the login page.)
 3. Create a project and pick their account.
 
-### Editing or deleting a client
+### Editing, archiving or deleting a client
 
 In the admin panel's **Clients** panel:
-- **Edit** — fix a typo'd name or change their email. Email changes update
-  their login too.
-- **Delete** — removes the account. If the client has projects, deleting
-  also permanently removes those projects and their approval records (you'll
-  be warned with the count first). Use for cleaning up test accounts; for a
-  real client, only delete when you genuinely want their record gone.
+- **Edit** — the name and email are always editable inline; **Save** lights
+  up when you change something. Email changes update their login too.
+- **Archive** — hides the client and blocks their sign-in, but keeps all
+  their records. This is the normal way to "remove" a client (offboarding,
+  abandoned projects). Archived clients appear in a separate list with
+  **Restore**.
+- **Delete permanently** (archived clients only) — destroys the account and
+  any non-completed projects, freeing up the email address. Blocked for any
+  client with a completed project. Use it only to reclaim test emails.
+
+### Finishing a project
+
+1. Client accepts the final version (stage 6).
+2. Add the deliverable download links to the Deliverables stage, then click
+   **Release deliverables to client** in the bottom panel once you've been
+   paid. The client is emailed that their files are ready.
+3. The client downloads and clicks **All files downloaded and checked**,
+   which completes the project automatically — or, if they don't get round
+   to it, check in with them and click **Mark project complete (on client's
+   behalf)**.
+4. When complete, generate the end-of-project PDF record (button in the
+   completion panel) and send the client a copy.
 
 ### Running a project
 

@@ -163,10 +163,12 @@
   /* ── project list ── */
   async function renderProjects() {
     var clients = await sb.from('profiles')
-      .select('id, email, display_name').eq('role', 'client').order('email');
+      .select('id, email, display_name, archived').eq('role', 'client').order('email');
+    var allClients = clients.data || [];
+    var activeClients = allClients.filter(function (c) { return !c.archived; });
     var sel = document.getElementById('new-client');
     sel.innerHTML = '';
-    (clients.data || []).forEach(function (c) {
+    activeClients.forEach(function (c) {
       var opt = el('option', null, (c.display_name || c.email) + ' — ' + c.email);
       opt.value = c.id;
       sel.appendChild(opt);
@@ -195,91 +197,131 @@
       list.appendChild(card);
     });
 
-    // Project counts per client, for the Clients panel delete warning.
+    // Project counts (and whether any are complete) per client.
     var counts = {};
-    projects.forEach(function (p) { counts[p.client_id] = (counts[p.client_id] || 0) + 1; });
-    renderClients(clients.data || [], counts);
+    var hasComplete = {};
+    projects.forEach(function (p) {
+      counts[p.client_id] = (counts[p.client_id] || 0) + 1;
+      if (p.status === 'complete') hasComplete[p.client_id] = true;
+    });
+    renderClients(allClients, counts, hasComplete);
 
     show('projects');
   }
 
-  function renderClients(clients, counts) {
+  function renderClients(clients, counts, hasComplete) {
     var wrap = document.getElementById('clients-list');
     wrap.innerHTML = '';
     document.getElementById('clients-empty').hidden = clients.length > 0;
     var cErr = document.getElementById('clients-error');
-    clients.forEach(function (c) {
-      var n = counts[c.id] || 0;
-      var row = el('div', 'client-row');
-      var info = el('div', 'client-info');
-      info.appendChild(el('span', 'client-name', c.display_name || '(no name)'));
-      info.appendChild(el('span', 'client-email', c.email +
-        (n ? '  ·  ' + n + ' project' + (n === 1 ? '' : 's') : '')));
-      row.appendChild(info);
+    var active = clients.filter(function (c) { return !c.archived; });
+    var archived = clients.filter(function (c) { return c.archived; });
 
-      var actions = el('div', 'client-actions');
-      var editBtn = el('button', 'btn ghost sm', 'Edit');
-      editBtn.type = 'button';
-      var delBtn = el('button', 'btn ghost sm', 'Delete');
-      delBtn.type = 'button';
-      actions.appendChild(editBtn);
-      actions.appendChild(delBtn);
-      row.appendChild(actions);
+    active.forEach(function (c) { wrap.appendChild(activeRow(c, cErr, counts)); });
 
-      // Inline edit form (hidden until Edit)
-      var form = el('form', 'client-edit');
-      form.hidden = true;
-      var nameIn = el('input'); nameIn.type = 'text'; nameIn.placeholder = 'Display name'; nameIn.value = c.display_name || '';
-      var emailIn = el('input'); emailIn.type = 'email'; emailIn.placeholder = 'Email'; emailIn.value = c.email || '';
-      var save = el('button', 'btn primary sm', 'Save'); save.type = 'submit';
-      var cancel = el('button', 'btn ghost sm', 'Cancel'); cancel.type = 'button';
-      form.appendChild(nameIn); form.appendChild(emailIn);
-      form.appendChild(save); form.appendChild(cancel);
-      row.appendChild(form);
+    if (archived.length) {
+      wrap.appendChild(el('p', 'eyebrow', 'Archived (hidden, cannot sign in)'));
+      archived.forEach(function (c) {
+        wrap.appendChild(archivedRow(c, cErr, counts, hasComplete));
+      });
+    }
+  }
 
-      editBtn.addEventListener('click', function () {
-        form.hidden = !form.hidden;
-      });
-      cancel.addEventListener('click', function () {
-        nameIn.value = c.display_name || ''; emailIn.value = c.email || '';
-        form.hidden = true;
-      });
-      form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        cErr.hidden = true;
-        save.disabled = true;
-        var res = await callManage({
-          action: 'update', id: c.id,
-          display_name: nameIn.value.trim(), email: emailIn.value.trim()
-        });
-        save.disabled = false;
-        if (res.error) { showError(cErr, { message: res.error }); return; }
-        save.textContent = 'Saved ✓';
-        setTimeout(function () { renderProjects(); }, 600);
-      });
-      delBtn.addEventListener('click', async function () {
-        cErr.hidden = true;
-        var msg = 'Deleting an account is for edge cases only (test accounts, ' +
-          'projects abandoned before real work). Clients with a completed project cannot be deleted.\n\n';
-        if (n) msg += 'This permanently deletes ' + (c.display_name || c.email) + "'s account, their " +
-          n + ' project' + (n === 1 ? '' : 's') + ' and all approval records.\n\n';
-        else msg += 'This permanently deletes the account for ' + (c.display_name || c.email) + '.\n\n';
-        msg += 'Type the client’s email address to confirm:';
-        var typed = window.prompt(msg);
-        if (typed === null) return;
-        if (typed.trim().toLowerCase() !== (c.email || '').toLowerCase()) {
-          showError(cErr, { message: 'Email did not match — nothing was deleted.' });
-          return;
-        }
-        delBtn.disabled = true;
-        var res = await callManage({ action: 'delete', id: c.id });
-        delBtn.disabled = false;
-        if (res.error) { showError(cErr, { message: res.error }); return; }
-        renderProjects();
-      });
+  function activeRow(c, cErr, counts) {
+    var n = counts[c.id] || 0;
+    var row = el('div', 'client-row');
 
-      wrap.appendChild(row);
+    var nameIn = el('input'); nameIn.type = 'text'; nameIn.placeholder = 'Display name'; nameIn.value = c.display_name || '';
+    var emailIn = el('input'); emailIn.type = 'email'; emailIn.placeholder = 'Email'; emailIn.value = c.email || '';
+    var fields = el('div', 'client-fields');
+    fields.appendChild(nameIn); fields.appendChild(emailIn);
+    if (n) fields.appendChild(el('span', 'client-email', n + ' project' + (n === 1 ? '' : 's')));
+    row.appendChild(fields);
+
+    var save = el('button', 'btn primary sm', 'Save'); save.type = 'button'; save.disabled = true;
+    var archiveBtn = el('button', 'btn ghost sm', 'Archive'); archiveBtn.type = 'button';
+    var actions = el('div', 'client-actions');
+    actions.appendChild(save); actions.appendChild(archiveBtn);
+    row.appendChild(actions);
+
+    function dirty() {
+      var changed = nameIn.value.trim() !== (c.display_name || '') ||
+        emailIn.value.trim().toLowerCase() !== (c.email || '').toLowerCase();
+      save.disabled = !changed;
+      if (changed) save.textContent = 'Save';
+    }
+    nameIn.addEventListener('input', dirty);
+    emailIn.addEventListener('input', dirty);
+
+    save.addEventListener('click', async function () {
+      cErr.hidden = true; save.disabled = true;
+      var res = await callManage({
+        action: 'update', id: c.id,
+        display_name: nameIn.value.trim(), email: emailIn.value.trim()
+      });
+      if (res.error) { showError(cErr, { message: res.error }); save.disabled = false; return; }
+      save.textContent = 'Saved ✓';
+      setTimeout(function () { renderProjects(); }, 700);
     });
+    archiveBtn.addEventListener('click', async function () {
+      cErr.hidden = true;
+      if (!window.confirm('Archive ' + (c.display_name || c.email) + '?\n\nThey\'ll be hidden ' +
+        'here and won\'t be able to sign in, but all their records are kept. You can restore them later.')) return;
+      archiveBtn.disabled = true;
+      var res = await callManage({ action: 'archive', id: c.id });
+      archiveBtn.disabled = false;
+      if (res.error) { showError(cErr, { message: res.error }); return; }
+      renderProjects();
+    });
+    return row;
+  }
+
+  function archivedRow(c, cErr, counts, hasComplete) {
+    var n = counts[c.id] || 0;
+    var row = el('div', 'client-row archived');
+    var info = el('div', 'client-info');
+    info.appendChild(el('span', 'client-name', c.display_name || '(no name)'));
+    info.appendChild(el('span', 'client-email', c.email +
+      (n ? '  ·  ' + n + ' project' + (n === 1 ? '' : 's') : '')));
+    row.appendChild(info);
+
+    var restore = el('button', 'btn ghost sm', 'Restore'); restore.type = 'button';
+    var del = el('button', 'btn ghost sm', 'Delete permanently'); del.type = 'button';
+    var actions = el('div', 'client-actions');
+    actions.appendChild(restore); actions.appendChild(del);
+    row.appendChild(actions);
+
+    restore.addEventListener('click', async function () {
+      cErr.hidden = true; restore.disabled = true;
+      var res = await callManage({ action: 'unarchive', id: c.id });
+      restore.disabled = false;
+      if (res.error) { showError(cErr, { message: res.error }); return; }
+      renderProjects();
+    });
+    del.addEventListener('click', async function () {
+      cErr.hidden = true;
+      if (hasComplete[c.id]) {
+        showError(cErr, { message: c.email + ' has a completed project — their record cannot be deleted. Leave them archived.' });
+        return;
+      }
+      var msg = 'Permanently delete ' + (c.display_name || c.email) + '?\n\n' +
+        'This destroys the account' + (n ? ', their ' + n + ' project' + (n === 1 ? '' : 's') +
+        ' and all approval records' : '') + ' — it cannot be undone. ' +
+        'Only use this to free up an email address (e.g. test accounts).\n\n' +
+        'Type the client’s email address to confirm:';
+      var typed = window.prompt(msg);
+      if (typed === null) return;
+      if (typed.trim().toLowerCase() !== (c.email || '').toLowerCase()) {
+        showError(cErr, { message: 'Email did not match — nothing was deleted.' });
+        return;
+      }
+      del.disabled = true;
+      var res = await callManage({ action: 'delete', id: c.id });
+      del.disabled = false;
+      if (res.error) { showError(cErr, { message: res.error }); return; }
+      renderProjects();
+    });
+    return row;
   }
 
   // Invoke the manage-client function, surfacing JSON error bodies.
@@ -458,13 +500,17 @@
       var a = approvals[s.id];
       var act = STAGE_ACTIONS[s.stage_index];
       if (s.state === 'approved') {
-        top.appendChild(el('span', 'badge approved', (act && act.done) || 'Done'));
+        top.appendChild(el('span', 'badge approved',
+          s.stage_index === 7 ? 'Files confirmed' : ((act && act.done) || 'Done')));
         if (a) top.appendChild(el('span', 'stage-when', fmtDate(a.approved_at)));
+      } else if (s.stage_index === 7 && project.status === 'complete') {
+        top.appendChild(el('span', 'badge complete', 'Delivered'));
       } else if (s.state === 'pending') {
         top.appendChild(el('span', 'badge pending',
-          s.stage_index === 7 ? 'With client' : 'Awaiting client'));
+          s.stage_index === 7 ? 'Released — awaiting client' : 'Awaiting client'));
       } else {
-        top.appendChild(el('span', 'badge locked', 'Not yet submitted'));
+        top.appendChild(el('span', 'badge locked',
+          s.stage_index === 7 ? 'Not yet released' : 'Not yet submitted'));
       }
       card.appendChild(top);
 
@@ -546,14 +592,15 @@
       }
       if (s.video_id) tools.appendChild(ytEmbed(s.video_id));
 
-      if (s.stage_index === 7) {
+      if (s.stage_index === 7 && s.state !== 'approved' && project.status !== 'complete') {
         tools.appendChild(linkEditor(s, 'deliverable_links', id,
-          'Deliverable download links (shown to client once project is marked complete)'));
+          'Deliverable download links (released to the client from the panel at the bottom)'));
       }
 
-      // Advance button on the first locked stage, enabled when previous stage approved
+      // Submit button on the first locked stage, enabled when previous stage
+      // approved. Stage 7 (Deliverables) is released from the bottom panel, not here.
       var firstLocked = stages.find(function (x) { return x.state === 'locked'; });
-      if (firstLocked && firstLocked.id === s.id) {
+      if (firstLocked && firstLocked.id === s.id && s.stage_index !== 7) {
         var prevApproved = idx === 0 || stages[idx - 1].state === 'approved';
         var advBox = el('div');
         var adv = el('button', 'btn primary', 'Submit to client');
@@ -593,29 +640,27 @@
       list.appendChild(card);
     });
 
-    // Release deliverables / close the project — at the end of the chain
+    // Deliverables release & project completion — at the end of the chain
     var zone = document.getElementById('complete-zone');
     zone.innerHTML = '';
     var panel = el('div', 'admin-panel');
-    // Only reachable once the Deliverables stage itself has been submitted.
-    var deliverablesStage = stages.find(function (s) { return s.stage_index === 7; });
-    var deliverablesReached = deliverablesStage && deliverablesStage.state === 'pending';
-    var hasDeliverableLinks = deliverablesStage && (deliverablesStage.deliverable_links || []).length > 0;
+    var d7 = stages.find(function (s) { return s.stage_index === 7; });
+    var finalAccepted = (stages.find(function (s) { return s.stage_index === 6; }) || {}).state === 'approved';
+    var hasLinks = d7 && (d7.deliverable_links || []).length > 0;
+
     if (project.status === 'complete') {
       panel.appendChild(el('h2', null, 'Project complete'));
       panel.appendChild(el('p', 'hint',
-        'Deliverables are released — the client can download their files.'));
+        'The deliverables are released and the project is closed.'));
       var remind = el('div', 'stage-note-box');
       remind.style.margin = '14px 0 16px';
       remind.appendChild(el('p', 'eyebrow', 'To do'));
       remind.appendChild(el('p', 'stage-note',
-        'Generate the end-of-project record now, save it as PDF, email a copy to the client and keep one for SGP.'));
+        'Generate the end-of-project record, save it as PDF, email a copy to the client and keep one for SGP.'));
       var reportBtn = el('a', 'btn primary', 'Generate project record (PDF)');
       reportBtn.href = 'report.html?p=' + id;
-      reportBtn.target = '_blank';
-      reportBtn.rel = 'noopener';
-      reportBtn.style.marginTop = '10px';
-      reportBtn.style.display = 'inline-block';
+      reportBtn.target = '_blank'; reportBtn.rel = 'noopener';
+      reportBtn.style.cssText = 'margin-top:10px;display:inline-block;';
       remind.appendChild(reportBtn);
       panel.appendChild(remind);
       var reopen = el('button', 'btn ghost', 'Reopen project');
@@ -625,23 +670,43 @@
         if (res.error) showError(projErr, res.error); else renderProject(id);
       };
       panel.appendChild(reopen);
-    } else {
+
+    } else if (d7 && d7.state === 'locked') {
+      // Not released yet.
       panel.appendChild(el('h2', null, 'Release deliverables'));
       panel.appendChild(el('p', 'hint',
-        !deliverablesReached
-          ? 'Available at the Deliverables stage — submit it to the client first (after they accept the final version).'
-          : !hasDeliverableLinks
-            ? 'Add the deliverable download links to the Deliverables stage above, then release them here once the money is in the bank.'
-            : 'Once the money is in the bank, mark the project complete to release the deliverable download links to the client.'));
-      var done = el('button', 'btn primary', 'Mark complete — release deliverables');
-      done.type = 'button';
-      done.disabled = !(deliverablesReached && hasDeliverableLinks);
-      done.onclick = async function () {
-        if (!window.confirm('Mark "' + project.title + '" complete and release the deliverables to the client?')) return;
+        !finalAccepted
+          ? 'Available once the client accepts the final version (stage 6).'
+          : !hasLinks
+            ? 'Add the deliverable download links to the Deliverables stage above first.'
+            : 'Once the money is in the bank, release the files so the client can download them.'));
+      var release = el('button', 'btn primary', 'Release deliverables to client');
+      release.type = 'button';
+      release.disabled = !(finalAccepted && hasLinks);
+      release.onclick = async function () {
+        if (!window.confirm('Release the deliverables for "' + project.title + '"? ' +
+          'The client will be emailed that their files are ready to download.')) return;
+        var res = await sb.from('stages').update({ state: 'pending' }).eq('id', d7.id);
+        if (res.error) showError(projErr, res.error); else renderProject(id);
+      };
+      panel.appendChild(release);
+
+    } else {
+      // Released (stage 7 pending) — waiting on the client's "got everything".
+      panel.appendChild(el('h2', null, 'Awaiting the client'));
+      panel.appendChild(el('p', 'hint',
+        'The deliverables are released and the client can download them. The project ' +
+        'completes automatically when they confirm they have everything — you’ll be emailed. ' +
+        'If they don’t get round to it, check in with them and mark it complete on their behalf.'));
+      var complete = el('button', 'btn primary', 'Mark project complete (on client’s behalf)');
+      complete.type = 'button';
+      complete.onclick = async function () {
+        if (!window.confirm('Mark "' + project.title + '" complete on the client’s behalf? ' +
+          'Do this once you’ve confirmed with them that they have all their files.')) return;
         var res = await sb.from('projects').update({ status: 'complete' }).eq('id', id);
         if (res.error) showError(projErr, res.error); else renderProject(id);
       };
-      panel.appendChild(done);
+      panel.appendChild(complete);
     }
     zone.appendChild(panel);
 

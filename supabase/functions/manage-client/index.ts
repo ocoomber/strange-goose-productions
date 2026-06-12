@@ -83,6 +83,19 @@ Deno.serve(async (req) => {
     return json({ ok: true });
   }
 
+  if (body.action === 'archive' || body.action === 'unarchive') {
+    const archived = body.action === 'archive';
+    // Disable/enable login by banning the auth user (keeps all their data).
+    const { error: banErr } = await admin.auth.admin.updateUserById(id, {
+      ban_duration: archived ? '876000h' : 'none',
+    });
+    if (banErr) return json({ error: banErr.message }, 400);
+    const { error: profErr } = await admin.from('profiles')
+      .update({ archived }).eq('id', id);
+    if (profErr) return json({ error: profErr.message }, 400);
+    return json({ ok: true });
+  }
+
   if (body.action === 'delete') {
     // Completed projects are a permanent business record — a client with any
     // completed project cannot be deleted. Delete is for edge cases only
