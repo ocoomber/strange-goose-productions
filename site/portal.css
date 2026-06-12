@@ -72,6 +72,7 @@ button.btn.ghost:disabled {
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 .project-card:hover { border-color: var(--accent); background: var(--paper-3); }
+.project-card.your-move { border-left: 3px solid var(--accent); }
 .project-card h3 { font-size: 19px; margin-bottom: 8px; }
 .project-card .meta {
   font-family: var(--mono);

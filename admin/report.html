@@ -226,12 +226,17 @@
     recorded.className = 'recorded';
     var a = approvals[s.id];
     if (s.state === 'approved' && a) {
-      recorded.textContent = ((act && act.done) || 'Approved') + ' — recorded against ' +
+      var doneLabel = s.stage_index === 7
+        ? 'All files downloaded and checked — confirmed'
+        : ((act && act.done) || 'Approved');
+      recorded.textContent = doneLabel + ' — recorded against ' +
         (clientName || clientEmail) + ' (' + clientEmail + ') at ' + fmtDate(a.approved_at);
     } else if (s.stage_index === 7) {
       recorded.innerHTML = '<span class="never">' + (project.status === 'complete'
-        ? 'Deliverables released to the client.'
-        : 'Deliverables not yet released.') + '</span>';
+        ? 'Deliverables released; project completed by Strange Goose Productions on the client’s behalf after checking in with them.'
+        : s.state === 'pending'
+          ? 'Deliverables released — awaiting the client’s confirmation at the time of this report.'
+          : 'Deliverables not yet released.') + '</span>';
     } else if (s.state === 'pending') {
       recorded.innerHTML = '<span class="never">Submitted to the client — awaiting their action at the time of this report.</span>';
     } else {

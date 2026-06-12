@@ -175,25 +175,45 @@
     });
 
     var res = await sb.from('projects')
-      .select('id, title, status, created_at, client_id, profiles(email, display_name), stages(state)')
+      .select('id, title, status, created_at, client_id, profiles(email, display_name), stages(state, stage_index)')
       .order('created_at', { ascending: false });
     var list = document.getElementById('project-list');
     list.innerHTML = '';
     var projects = res.data || [];
     document.getElementById('projects-empty').hidden = projects.length > 0;
+
+    // Whose move is it? Sort your-move projects to the top.
+    function turnOf(p) {
+      if (p.status === 'complete') return 'complete';
+      var stages = p.stages || [];
+      var pendingStage = stages.find(function (s) { return s.state === 'pending'; });
+      return pendingStage ? 'client' : 'you';
+    }
+    var order = { you: 0, client: 1, complete: 2 };
+    projects.sort(function (a, b) {
+      var d = order[turnOf(a)] - order[turnOf(b)];
+      return d !== 0 ? d : (a.created_at < b.created_at ? 1 : -1);
+    });
+
     projects.forEach(function (p) {
       var stages = p.stages || [];
       var approved = stages.filter(function (s) { return s.state === 'approved'; }).length;
-      var pending = stages.filter(function (s) { return s.state === 'pending'; }).length;
+      var turn = turnOf(p);
       var card = el('a', 'project-card');
       card.href = '#project/' + p.id;
       card.appendChild(el('h3', null, p.title));
       var meta = el('div', 'meta');
-      meta.appendChild(el('span', 'badge ' + p.status, p.status === 'complete' ? 'Complete' : 'Active'));
+      if (turn === 'complete') {
+        meta.appendChild(el('span', 'badge complete', 'Complete'));
+      } else if (turn === 'you') {
+        meta.appendChild(el('span', 'badge pending', 'Your move'));
+      } else {
+        meta.appendChild(el('span', 'badge locked', 'Awaiting client'));
+      }
       meta.appendChild(el('span', null, 'Client: ' + ((p.profiles && p.profiles.email) || '—')));
-      meta.appendChild(el('span', null, approved + '/' + (STAGE_COUNT - 1) + ' approved' +
-        (pending ? ' · awaiting client approval' : '')));
+      meta.appendChild(el('span', null, approved + '/' + (STAGE_COUNT - 1) + ' approved'));
       card.appendChild(meta);
+      if (turn === 'you') card.classList.add('your-move');
       list.appendChild(card);
     });
 
