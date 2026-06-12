@@ -200,6 +200,36 @@ button.btn.ghost:disabled {
 .back-link:hover { color: var(--accent-strong); }
 
 .portal-empty { color: var(--muted); margin-top: 28px; }
+
+/* client management rows (admin) */
+.client-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(20,18,15,0.1);
+}
+.client-row:last-child { border-bottom: none; }
+.client-info { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 2px; }
+.client-name { font-weight: 600; font-size: 15px; }
+.client-email { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+.client-actions { display: flex; gap: 8px; }
+.btn.sm { padding: 5px 12px; font-size: 11px; }
+.client-edit {
+  flex-basis: 100%;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.client-edit input {
+  flex: 1; min-width: 160px;
+  font: inherit; font-size: 14px;
+  background: var(--paper); color: var(--ink);
+  border: 1px solid rgba(20,18,15,0.22); padding: 8px 10px;
+}
+.client-edit input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
 .hint { color: var(--ink-3); font-size: 13px; }
 .stage-note { white-space: pre-wrap; font-size: 14px; color: var(--ink-2); margin-top: 4px; }
 .stage-note-box {
