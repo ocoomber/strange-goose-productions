@@ -108,7 +108,8 @@
         <h1 id="project-title" style="margin-top:18px;"></h1>
         <p class="sub" id="project-meta"></p>
         <p style="margin-top:16px;">
-          <button class="btn ghost" type="button" id="undo-approval" hidden>Undo last approval</button>
+          <a class="btn ghost" id="report-link" href="#" target="_blank" rel="noopener">Generate project record (PDF)</a>
+          <button class="btn ghost" type="button" id="undo-approval" style="margin-left:10px;" hidden>Undo last approval</button>
           <button class="btn ghost" type="button" id="reset-project" style="margin-left:10px;">Reset project (testing)</button>
         </p>
         <p class="form-error" id="project-error" hidden></p>
@@ -253,15 +254,23 @@
         });
         save.disabled = false;
         if (res.error) { showError(cErr, { message: res.error }); return; }
-        renderProjects();
+        save.textContent = 'Saved ✓';
+        setTimeout(function () { renderProjects(); }, 600);
       });
       delBtn.addEventListener('click', async function () {
         cErr.hidden = true;
-        var msg = 'Delete the account for ' + (c.display_name || c.email) + '?';
-        if (n) msg += '\n\nThis also permanently deletes their ' + n + ' project' +
-          (n === 1 ? '' : 's') + ' and all approval records — this cannot be undone.';
-        else msg += '\n\nThis cannot be undone.';
-        if (!window.confirm(msg)) return;
+        var msg = 'Deleting an account is for edge cases only (test accounts, ' +
+          'projects abandoned before real work). Clients with a completed project cannot be deleted.\n\n';
+        if (n) msg += 'This permanently deletes ' + (c.display_name || c.email) + "'s account, their " +
+          n + ' project' + (n === 1 ? '' : 's') + ' and all approval records.\n\n';
+        else msg += 'This permanently deletes the account for ' + (c.display_name || c.email) + '.\n\n';
+        msg += 'Type the client’s email address to confirm:';
+        var typed = window.prompt(msg);
+        if (typed === null) return;
+        if (typed.trim().toLowerCase() !== (c.email || '').toLowerCase()) {
+          showError(cErr, { message: 'Email did not match — nothing was deleted.' });
+          return;
+        }
         delBtn.disabled = true;
         var res = await callManage({ action: 'delete', id: c.id });
         delBtn.disabled = false;
@@ -407,6 +416,8 @@
     document.getElementById('project-meta').textContent =
       'Client: ' + ((project.profiles && project.profiles.email) || '—') +
       ' · Created ' + fmtDate(project.created_at);
+
+    document.getElementById('report-link').href = 'report.html?p=' + id;
 
     var hasApproved = stages.some(function (s) { return s.state === 'approved'; });
     var undo = document.getElementById('undo-approval');
@@ -593,7 +604,20 @@
     if (project.status === 'complete') {
       panel.appendChild(el('h2', null, 'Project complete'));
       panel.appendChild(el('p', 'hint',
-        'Deliverables are released — the client can download their files. Reopen only if you need to make changes.'));
+        'Deliverables are released — the client can download their files.'));
+      var remind = el('div', 'stage-note-box');
+      remind.style.margin = '14px 0 16px';
+      remind.appendChild(el('p', 'eyebrow', 'To do'));
+      remind.appendChild(el('p', 'stage-note',
+        'Generate the end-of-project record now, save it as PDF, email a copy to the client and keep one for SGP.'));
+      var reportBtn = el('a', 'btn primary', 'Generate project record (PDF)');
+      reportBtn.href = 'report.html?p=' + id;
+      reportBtn.target = '_blank';
+      reportBtn.rel = 'noopener';
+      reportBtn.style.marginTop = '10px';
+      reportBtn.style.display = 'inline-block';
+      remind.appendChild(reportBtn);
+      panel.appendChild(remind);
       var reopen = el('button', 'btn ghost', 'Reopen project');
       reopen.type = 'button';
       reopen.onclick = async function () {
