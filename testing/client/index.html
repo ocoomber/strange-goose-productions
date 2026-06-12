@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal · Strange Goose Productions</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../site/styles.css">
+<link rel="stylesheet" href="../site/portal.css">
+</head>
+<body>
+
+<nav class="top">
+  <a href="../index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose Productions</span></a>
+  <div class="links">
+    <span class="eyebrow" style="margin:0;">Client Portal</span>
+  </div>
+  <a href="#" class="cta" id="nav-signout" hidden><span class="cta-text">Sign out</span></a>
+</nav>
+
+<main class="portal-main">
+  <div class="wrap-tight">
+
+    <!-- login -->
+    <section id="view-login" hidden>
+      <div class="auth-card">
+        <p class="eyebrow">Client Portal</p>
+        <h2 style="margin-top:14px;">Sign in</h2>
+        <p class="hint">Use the credentials Strange Goose Productions sent you.</p>
+        <form id="login-form">
+          <div class="field">
+            <label for="login-email">Email</label>
+            <input id="login-email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password" autocomplete="current-password" required>
+          </div>
+          <p class="form-error" id="login-error" hidden></p>
+          <button class="btn primary full" type="submit" style="margin-top:18px;">Sign in</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- forced password change -->
+    <section id="view-password" hidden>
+      <div class="auth-card">
+        <p class="eyebrow">First sign-in</p>
+        <h2 style="margin-top:14px;">Choose a new password</h2>
+        <p class="hint">Please replace the temporary password you were sent.</p>
+        <form id="password-form">
+          <div class="field">
+            <label for="pw-new">New password</label>
+            <input id="pw-new" type="password" autocomplete="new-password" minlength="8" required>
+          </div>
+          <div class="field">
+            <label for="pw-confirm">Confirm new password</label>
+            <input id="pw-confirm" type="password" autocomplete="new-password" minlength="8" required>
+          </div>
+          <p class="form-error" id="pw-error" hidden></p>
+          <button class="btn primary full" type="submit" style="margin-top:18px;">Save password</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- project list -->
+    <section id="view-projects" hidden>
+      <header class="portal-hd">
+        <p class="eyebrow">Client Portal</p>
+        <h1>Your projects</h1>
+        <p class="sub" id="projects-greeting"></p>
+      </header>
+      <div class="portal-grid" id="project-list"></div>
+      <p class="portal-empty" id="projects-empty" hidden>No projects yet — we'll add yours shortly.</p>
+    </section>
+
+    <!-- single project -->
+    <section id="view-project" hidden>
+      <header class="portal-hd">
+        <a class="back-link" href="#">← All projects</a>
+        <h1 id="project-title" style="margin-top:18px;"></h1>
+        <p class="sub" id="project-status"></p>
+      </header>
+      <div class="stage-list" id="stage-list"></div>
+    </section>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../site/portal.js"></script>
+<script>
+(function () {
+  var views = ['login', 'password', 'projects', 'project'];
+  var profile = null;
+
+  function show(name) {
+    views.forEach(function (v) {
+      document.getElementById('view-' + v).hidden = (v !== name);
+    });
+    document.getElementById('nav-signout').hidden = (name === 'login');
+  }
+
+  document.getElementById('nav-signout').addEventListener('click', function (e) {
+    e.preventDefault();
+    signOut();
+  });
+
+  /* ── login ── */
+  document.getElementById('login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errNode = document.getElementById('login-error');
+    errNode.hidden = true;
+    try {
+      await signIn(
+        document.getElementById('login-email').value.trim(),
+        document.getElementById('login-password').value
+      );
+      route();
+    } catch (err) { showError(errNode, err); }
+  });
+
+  /* ── password change ── */
+  document.getElementById('password-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errNode = document.getElementById('pw-error');
+    errNode.hidden = true;
+    var pw = document.getElementById('pw-new').value;
+    if (pw !== document.getElementById('pw-confirm').value) {
+      showError(errNode, { message: 'Passwords do not match.' });
+      return;
+    }
+    try {
+      await changePassword(pw);
+      profile.must_change_password = false;
+      route();
+    } catch (err) { showError(errNode, err); }
+  });
+
+  /* ── project list ── */
+  async function renderProjects() {
+    document.getElementById('projects-greeting').textContent =
+      'Signed in as ' + profile.email + '. Approvals you make here are timestamped and permanent.';
+    var res = await sb.from('projects')
+      .select('id, title, status, created_at, stages(state)')
+      .order('created_at', { ascending: false });
+    var list = document.getElementById('project-list');
+    list.innerHTML = '';
+    var projects = res.data || [];
+    document.getElementById('projects-empty').hidden = projects.length > 0;
+    projects.forEach(function (p) {
+      var approved = (p.stages || []).filter(function (s) { return s.state === 'approved'; }).length;
+      var card = el('a', 'project-card');
+      card.href = '#project/' + p.id;
+      var h = el('h3', null, p.title);
+      var meta = el('div', 'meta');
+      var badge = el('span', 'badge ' + p.status, p.status === 'complete' ? 'Complete' : 'In progress');
+      meta.appendChild(badge);
+      meta.appendChild(el('span', null, approved + ' of ' + STAGE_COUNT + ' stages approved'));
+      card.appendChild(h);
+      card.appendChild(meta);
+      list.appendChild(card);
+    });
+    show('projects');
+  }
+
+  /* ── single project ── */
+  async function renderProject(id) {
+    var pr = await sb.from('projects').select('*').eq('id', id).single();
+    if (pr.error || !pr.data) { location.hash = ''; return; }
+    var project = pr.data;
+    var st = await sb.from('stages').select('*').eq('project_id', id).order('stage_index');
+    var ap = await sb.from('approvals').select('*').eq('project_id', id);
+    var approvals = {};
+    (ap.data || []).forEach(function (a) { approvals[a.stage_id] = a; });
+
+    document.getElementById('project-title').textContent = project.title;
+    document.getElementById('project-status').textContent = project.status === 'complete'
+      ? 'Project complete — your deliverables are available below.'
+      : 'Approved stages are shown with their approval date and time. The current stage is highlighted.';
+
+    var list = document.getElementById('stage-list');
+    list.innerHTML = '';
+    (st.data || []).forEach(function (s) {
+      var card = el('div', 'stage ' + s.state);
+      var top = el('div', 'stage-top');
+      top.appendChild(el('span', 'stage-num', '0' + s.stage_index));
+      top.appendChild(el('h3', null, s.name));
+      var a = approvals[s.id];
+      if (s.state === 'approved') {
+        top.appendChild(el('span', 'badge approved', 'Approved'));
+        if (a) top.appendChild(el('span', 'stage-when', fmtDate(a.approved_at)));
+      } else {
+        top.appendChild(el('span', 'badge pending', 'Awaiting your approval'));
+      }
+      card.appendChild(top);
+
+      var body = el('div', 'stage-body');
+      if ((s.doc_links || []).length) body.appendChild(linkList(s.doc_links));
+      if (s.video_id) body.appendChild(ytEmbed(s.video_id));
+      if (s.stage_index === 7 && (s.deliverable_links || []).length && project.status === 'complete') {
+        var dl = el('div');
+        dl.appendChild(el('p', 'eyebrow', 'Deliverables'));
+        dl.appendChild(linkList(s.deliverable_links));
+        body.appendChild(dl);
+      }
+
+      if (s.state === 'pending') {
+        var errNode = el('p', 'form-error');
+        errNode.hidden = true;
+        var btn = el('button', 'btn primary', 'Approve this stage');
+        btn.type = 'button';
+        btn.addEventListener('click', async function () {
+          var msg = 'Approve "' + s.name + '"?\n\nThis approval is permanent and will be ' +
+            'recorded against your account with a timestamp. It cannot be undone.';
+          if (!window.confirm(msg)) return;
+          btn.disabled = true;
+          var res = await sb.from('approvals').insert({ stage_id: s.id });
+          if (res.error) {
+            btn.disabled = false;
+            showError(errNode, res.error);
+          } else {
+            renderProject(id);
+          }
+        });
+        body.appendChild(btn);
+        body.appendChild(errNode);
+      }
+
+      card.appendChild(body);
+      list.appendChild(card);
+    });
+    show('project');
+  }
+
+  /* ── routing ── */
+  async function route() {
+    var session = await getSession();
+    if (!session) { show('login'); return; }
+    if (!profile || profile.id !== session.user.id) profile = await getProfile();
+    if (!profile) { show('login'); return; }
+    if (profile.role === 'admin') { window.location.href = '../admin/'; return; }
+    if (profile.must_change_password) { show('password'); return; }
+    var m = location.hash.match(/^#project\/(.+)$/);
+    if (m) renderProject(m[1]); else renderProjects();
+  }
+
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body>
+</html>
