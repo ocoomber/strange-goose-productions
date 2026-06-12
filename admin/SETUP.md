@@ -52,18 +52,15 @@ self-service password reset. All free tier.
 ### 5b. Create the two Edge Functions
 
 In the Supabase dashboard, **Edge Functions → Deploy a new function →
-Via Editor**, twice:
+Via Editor**, twice. Each function is self-contained — paste the whole
+file, no edits needed:
 
-1. Function name **`notify`** — paste the contents of
-   `supabase/functions/notify/index.ts`, but first **inline the import**:
-   replace the line `import { corsHeaders, sendEmail } from '../_shared/email.ts';`
-   by pasting the contents of `supabase/functions/_shared/email.ts` at the
-   top of the file (minus its `export` keywords) — the dashboard editor is
-   single-file. Deploy.
-2. Function name **`create-client`** — same drill with
+1. Function name **`notify`** — paste all of
+   `supabase/functions/notify/index.ts`. Deploy.
+2. Function name **`create-client`** — paste all of
    `supabase/functions/create-client/index.ts`. Deploy.
 
-(If you ever use the Supabase CLI instead, the files deploy as-is —
+(If you ever use the Supabase CLI instead, they deploy as-is:
 `supabase functions deploy notify create-client`.)
 
 ### 5c. Secrets
