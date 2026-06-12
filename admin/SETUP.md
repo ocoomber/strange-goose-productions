@@ -59,9 +59,11 @@ file, no edits needed:
    `supabase/functions/notify/index.ts`. Deploy.
 2. Function name **`create-client`** — paste all of
    `supabase/functions/create-client/index.ts`. Deploy.
+3. Function name **`manage-client`** — paste all of
+   `supabase/functions/manage-client/index.ts`. Deploy.
 
 (If you ever use the Supabase CLI instead, they deploy as-is:
-`supabase functions deploy notify create-client`.)
+`supabase functions deploy notify create-client manage-client`.)
 
 ### 5c. Secrets
 
@@ -110,6 +112,16 @@ file, no edits needed:
    to choose a new password on first sign-in. (Clients can also reset a
    forgotten password themselves via "Forgot password?" on the login page.)
 3. Create a project and pick their account.
+
+### Editing or deleting a client
+
+In the admin panel's **Clients** panel:
+- **Edit** — fix a typo'd name or change their email. Email changes update
+  their login too.
+- **Delete** — removes the account. If the client has projects, deleting
+  also permanently removes those projects and their approval records (you'll
+  be warned with the count first). Use for cleaning up test accounts; for a
+  real client, only delete when you genuinely want their record gone.
 
 ### Running a project
 

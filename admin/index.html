@@ -75,6 +75,13 @@
       </div>
 
       <div class="admin-panel">
+        <h2>Clients</h2>
+        <div id="clients-list"></div>
+        <p class="hint" id="clients-empty" hidden>No client accounts yet.</p>
+        <p class="form-error" id="clients-error" hidden></p>
+      </div>
+
+      <div class="admin-panel">
         <h2>New project</h2>
         <form id="create-form" class="admin-row">
           <div class="field">
@@ -186,7 +193,97 @@
       card.appendChild(meta);
       list.appendChild(card);
     });
+
+    // Project counts per client, for the Clients panel delete warning.
+    var counts = {};
+    projects.forEach(function (p) { counts[p.client_id] = (counts[p.client_id] || 0) + 1; });
+    renderClients(clients.data || [], counts);
+
     show('projects');
+  }
+
+  function renderClients(clients, counts) {
+    var wrap = document.getElementById('clients-list');
+    wrap.innerHTML = '';
+    document.getElementById('clients-empty').hidden = clients.length > 0;
+    var cErr = document.getElementById('clients-error');
+    clients.forEach(function (c) {
+      var n = counts[c.id] || 0;
+      var row = el('div', 'client-row');
+      var info = el('div', 'client-info');
+      info.appendChild(el('span', 'client-name', c.display_name || '(no name)'));
+      info.appendChild(el('span', 'client-email', c.email +
+        (n ? '  ·  ' + n + ' project' + (n === 1 ? '' : 's') : '')));
+      row.appendChild(info);
+
+      var actions = el('div', 'client-actions');
+      var editBtn = el('button', 'btn ghost sm', 'Edit');
+      editBtn.type = 'button';
+      var delBtn = el('button', 'btn ghost sm', 'Delete');
+      delBtn.type = 'button';
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
+      row.appendChild(actions);
+
+      // Inline edit form (hidden until Edit)
+      var form = el('form', 'client-edit');
+      form.hidden = true;
+      var nameIn = el('input'); nameIn.type = 'text'; nameIn.placeholder = 'Display name'; nameIn.value = c.display_name || '';
+      var emailIn = el('input'); emailIn.type = 'email'; emailIn.placeholder = 'Email'; emailIn.value = c.email || '';
+      var save = el('button', 'btn primary sm', 'Save'); save.type = 'submit';
+      var cancel = el('button', 'btn ghost sm', 'Cancel'); cancel.type = 'button';
+      form.appendChild(nameIn); form.appendChild(emailIn);
+      form.appendChild(save); form.appendChild(cancel);
+      row.appendChild(form);
+
+      editBtn.addEventListener('click', function () {
+        form.hidden = !form.hidden;
+      });
+      cancel.addEventListener('click', function () {
+        nameIn.value = c.display_name || ''; emailIn.value = c.email || '';
+        form.hidden = true;
+      });
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        cErr.hidden = true;
+        save.disabled = true;
+        var res = await callManage({
+          action: 'update', id: c.id,
+          display_name: nameIn.value.trim(), email: emailIn.value.trim()
+        });
+        save.disabled = false;
+        if (res.error) { showError(cErr, { message: res.error }); return; }
+        renderProjects();
+      });
+      delBtn.addEventListener('click', async function () {
+        cErr.hidden = true;
+        var msg = 'Delete the account for ' + (c.display_name || c.email) + '?';
+        if (n) msg += '\n\nThis also permanently deletes their ' + n + ' project' +
+          (n === 1 ? '' : 's') + ' and all approval records — this cannot be undone.';
+        else msg += '\n\nThis cannot be undone.';
+        if (!window.confirm(msg)) return;
+        delBtn.disabled = true;
+        var res = await callManage({ action: 'delete', id: c.id });
+        delBtn.disabled = false;
+        if (res.error) { showError(cErr, { message: res.error }); return; }
+        renderProjects();
+      });
+
+      wrap.appendChild(row);
+    });
+  }
+
+  // Invoke the manage-client function, surfacing JSON error bodies.
+  async function callManage(body) {
+    var res = await sb.functions.invoke('manage-client', { body: body });
+    var err = res.error || (res.data && res.data.error);
+    if (err) {
+      if (res.error && res.error.context && res.error.context.json) {
+        try { var j = await res.error.context.json(); if (j && j.error) err = j.error; } catch (_) {}
+      }
+      return { error: (err && err.error) || (err && err.message) || String(err) };
+    }
+    return { data: res.data };
   }
 
   document.getElementById('client-form').addEventListener('submit', async function (e) {
