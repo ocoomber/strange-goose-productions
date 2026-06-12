@@ -159,7 +159,8 @@
       var meta = el('div', 'meta');
       var badge = el('span', 'badge ' + p.status, p.status === 'complete' ? 'Complete' : 'In progress');
       meta.appendChild(badge);
-      meta.appendChild(el('span', null, approved + ' of ' + STAGE_COUNT + ' stages approved'));
+      // Stages 1–6 are client approvals; stage 7 is delivery, not approved.
+      meta.appendChild(el('span', null, approved + ' of ' + (STAGE_COUNT - 1) + ' stages approved'));
       card.appendChild(h);
       card.appendChild(meta);
       list.appendChild(card);
@@ -190,9 +191,13 @@
       top.appendChild(el('span', 'stage-num', '0' + s.stage_index));
       top.appendChild(el('h3', null, s.name));
       var a = approvals[s.id];
+      var isDeliverables = (s.stage_index === 7);
       if (s.state === 'approved') {
         top.appendChild(el('span', 'badge approved', 'Approved'));
         if (a) top.appendChild(el('span', 'stage-when', fmtDate(a.approved_at)));
+      } else if (isDeliverables) {
+        top.appendChild(el('span', 'badge ' + (project.status === 'complete' ? 'complete' : 'pending'),
+          project.status === 'complete' ? 'Ready' : 'In preparation'));
       } else {
         top.appendChild(el('span', 'badge pending', 'Awaiting your approval'));
       }
@@ -201,14 +206,19 @@
       var body = el('div', 'stage-body');
       if ((s.doc_links || []).length) body.appendChild(linkList(s.doc_links));
       if (s.video_id) body.appendChild(ytEmbed(s.video_id));
-      if (s.stage_index === 7 && (s.deliverable_links || []).length && project.status === 'complete') {
-        var dl = el('div');
-        dl.appendChild(el('p', 'eyebrow', 'Deliverables'));
-        dl.appendChild(linkList(s.deliverable_links));
-        body.appendChild(dl);
+      if (isDeliverables) {
+        if (project.status === 'complete' && (s.deliverable_links || []).length) {
+          var dl = el('div');
+          dl.appendChild(el('p', 'eyebrow', 'Deliverables'));
+          dl.appendChild(linkList(s.deliverable_links));
+          body.appendChild(dl);
+        } else {
+          body.appendChild(el('p', 'hint',
+            'Your final files are being prepared — the download links will appear here once ready.'));
+        }
       }
 
-      if (s.state === 'pending') {
+      if (s.state === 'pending' && !isDeliverables) {
         var errNode = el('p', 'form-error');
         errNode.hidden = true;
         var btn = el('button', 'btn primary', 'Approve this stage');

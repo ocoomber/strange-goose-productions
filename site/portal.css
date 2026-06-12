@@ -189,6 +189,7 @@ button.btn:disabled { opacity: 0.45; cursor: default; }
 .back-link:hover { color: var(--accent-strong); }
 
 .portal-empty { color: var(--muted); margin-top: 28px; }
+.hint { color: var(--ink-3); font-size: 13px; }
 
 @media (max-width: 720px) {
   .portal-hd { padding: 40px 0 24px; }
