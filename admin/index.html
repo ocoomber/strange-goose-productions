@@ -179,7 +179,12 @@
       .order('created_at', { ascending: false });
     var list = document.getElementById('project-list');
     list.innerHTML = '';
-    var projects = res.data || [];
+    var allProjects = res.data || [];
+    // Hide projects belonging to archived clients (keeps the list uncluttered;
+    // they reappear if the client is restored). Counts below still use all.
+    var archivedIds = {};
+    allClients.forEach(function (c) { if (c.archived) archivedIds[c.id] = true; });
+    var projects = allProjects.filter(function (p) { return !archivedIds[p.client_id]; });
     document.getElementById('projects-empty').hidden = projects.length > 0;
 
     // Whose move is it? Sort your-move projects to the top.
@@ -217,10 +222,11 @@
       list.appendChild(card);
     });
 
-    // Project counts (and whether any are complete) per client.
+    // Project counts (and whether any are complete) per client — over ALL
+    // projects, so an archived client's row still shows their real count.
     var counts = {};
     var hasComplete = {};
-    projects.forEach(function (p) {
+    allProjects.forEach(function (p) {
       counts[p.client_id] = (counts[p.client_id] || 0) + 1;
       if (p.status === 'complete') hasComplete[p.client_id] = true;
     });
