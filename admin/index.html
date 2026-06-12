@@ -216,8 +216,18 @@
       showError(errNode, { message: err.error || err.message || String(err) });
       return;
     }
-    document.getElementById('client-creds').textContent =
-      'Email: ' + res.data.email + '\nTemporary password: ' + res.data.temp_password;
+    var heading = resultBox.querySelector('.eyebrow');
+    var creds = document.getElementById('client-creds');
+    if (res.data.emailed) {
+      heading.textContent = 'Account created — login emailed to the client';
+      creds.textContent = res.data.email +
+        ' has been emailed their temporary password and the portal link. Nothing more to do.';
+    } else {
+      heading.textContent = 'Account created — email failed, send these manually';
+      creds.textContent = 'Email: ' + res.data.email +
+        '\nTemporary password: ' + res.data.temp_password +
+        (res.data.email_error ? '\n\n(' + res.data.email_error + ')' : '');
+    }
     resultBox.hidden = false;
     document.getElementById('client-email').value = '';
     document.getElementById('client-name').value = '';

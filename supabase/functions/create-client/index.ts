@@ -63,8 +63,57 @@ Deno.serve(async (req) => {
   });
   if (createErr) return json({ error: createErr.message }, 400);
 
-  return json({ email, temp_password: tempPassword });
+  // Email the client their login automatically (best effort — if it fails,
+  // Owen still gets the password back to send manually).
+  let emailed = false;
+  let emailError: string | null = null;
+  try {
+    await sendWelcome(email, displayName, tempPassword);
+    emailed = true;
+  } catch (err) {
+    emailError = String(err);
+  }
+
+  return json({ email, temp_password: tempPassword, emailed, email_error: emailError });
 });
+
+const PORTAL_URL = 'https://www.strangegoose.co.uk/client/';
+const FROM = 'Strange Goose Productions <portal@strangegoose.co.uk>';
+
+async function sendWelcome(to: string, name: string, tempPassword: string): Promise<void> {
+  const apiKey = Deno.env.get('RESEND_API_KEY');
+  if (!apiKey) throw new Error('RESEND_API_KEY not set');
+  const hello = name ? `Hello ${name},` : 'Hello,';
+  const text =
+    `${hello}\n\n` +
+    `Strange Goose Productions has set up your client portal, where you can ` +
+    `follow your project and approve each stage.\n\n` +
+    `Sign in here: ${PORTAL_URL}\n\n` +
+    `Email: ${to}\n` +
+    `Temporary password: ${tempPassword}\n\n` +
+    `You'll be asked to choose your own password the first time you sign in.\n\n` +
+    `Strange Goose Productions`;
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: FROM,
+      to,
+      subject: 'Your Strange Goose Productions client portal login',
+      text,
+      html: '<div style="font-family:sans-serif;white-space:pre-wrap">' +
+        text.replace(/[&<>]/g, (c) =>
+          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c] as string)) + '</div>',
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Resend failed (${res.status}): ${body}`);
+  }
+}
 
 // Readable but strong: three word-like chunks + digits, ~60 bits.
 function generatePassword(): string {
