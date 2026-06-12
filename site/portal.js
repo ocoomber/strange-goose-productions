@@ -6,8 +6,8 @@
    Paste these from Supabase → Project Settings → API.
    The anon key is public by design; Row Level Security is the
    actual access control. */
-var SUPABASE_URL = 'PASTE_SUPABASE_PROJECT_URL';
-var SUPABASE_ANON_KEY = 'PASTE_SUPABASE_ANON_KEY';
+var SUPABASE_URL = 'https://zawrkuclsdqtvftfothj.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_-YJbebdIzYbf3JzzbriBGA_VWdiUarh';
 
 if (SUPABASE_URL.indexOf('https://') !== 0) {
   document.addEventListener('DOMContentLoaded', function () {
