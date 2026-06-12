@@ -97,6 +97,9 @@ create trigger on_project_created
 create or replace function public.guard_stage_update()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
+  if coalesce(current_setting('sgp.resetting', true), '') = '1' then
+    return new;  -- admin reset via reset_project(), see below
+  end if;
   if new.project_id <> old.project_id or new.stage_index <> old.stage_index then
     raise exception 'Stage identity cannot change';
   end if;
@@ -176,6 +179,24 @@ end $$;
 create trigger guard_profile_update
   before update on public.profiles
   for each row execute function public.guard_profile_update();
+
+-- Admin-only project reset for testing: wipes approvals, relocks stages
+-- (keeping their links/videos), reactivates the project. The ONE way
+-- around approval permanence — callable only by the admin account.
+create or replace function public.reset_project(p_project uuid)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is not null and not public.is_admin() then
+    raise exception 'Admin only';
+  end if;
+  delete from public.approvals where project_id = p_project;
+  perform set_config('sgp.resetting', '1', true);
+  update public.stages
+  set state = case when stage_index = 1 then 'pending' else 'locked' end
+  where project_id = p_project;
+  perform set_config('sgp.resetting', '', true);
+  update public.projects set status = 'active' where id = p_project;
+end $$;
 
 -- ── Row Level Security ──────────────────────────────────────
 
