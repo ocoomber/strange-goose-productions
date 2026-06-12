@@ -205,6 +205,12 @@
       card.appendChild(top);
 
       var body = el('div', 'stage-body');
+      if (s.note) {
+        var noteEl = el('div', 'stage-note-box');
+        noteEl.appendChild(el('p', 'eyebrow', 'Note from Strange Goose'));
+        noteEl.appendChild(el('p', 'stage-note', s.note));
+        body.appendChild(noteEl);
+      }
       if ((s.doc_links || []).length) body.appendChild(linkList(s.doc_links));
       if (s.video_id) body.appendChild(ytEmbed(s.video_id));
       if (isDeliverables) {

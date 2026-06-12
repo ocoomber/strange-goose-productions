@@ -190,6 +190,13 @@ button.btn:disabled { opacity: 0.45; cursor: default; }
 
 .portal-empty { color: var(--muted); margin-top: 28px; }
 .hint { color: var(--ink-3); font-size: 13px; }
+.stage-note { white-space: pre-wrap; font-size: 14px; color: var(--ink-2); margin-top: 4px; }
+.stage-note-box {
+  background: var(--paper-3);
+  border-left: 3px solid var(--accent);
+  padding: 12px 16px;
+}
+.stage-note-box .eyebrow { margin: 0 0 4px; }
 
 @media (max-width: 720px) {
   .portal-hd { padding: 40px 0 24px; }
