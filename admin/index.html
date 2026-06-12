@@ -267,8 +267,17 @@
 
     var list = document.getElementById('stage-list');
     list.innerHTML = '';
+    // The stage we're actively on: the one awaiting the client, otherwise the
+    // next one ready to submit. That's expanded by default; the rest collapse.
+    var pendingStage = stages.find(function (s) { return s.state === 'pending'; });
+    var nextToSubmit = null;
+    var fl0 = stages.find(function (s) { return s.state === 'locked'; });
+    if (fl0 && (fl0.stage_index === 1 || (stages[fl0.stage_index - 2] || {}).state === 'approved')) {
+      nextToSubmit = fl0;
+    }
+    var currentId = pendingStage ? pendingStage.id : (nextToSubmit ? nextToSubmit.id : null);
     stages.forEach(function (s, idx) {
-      var card = el('div', 'stage ' + s.state);
+      var card = el('div', 'stage collapsible ' + s.state);
       var top = el('div', 'stage-top');
       top.appendChild(el('span', 'stage-num', '0' + s.stage_index));
       top.appendChild(el('h3', null, s.name));
@@ -285,6 +294,7 @@
       }
       card.appendChild(top);
 
+      var collapse = el('div', 'stage-collapse');
       var tools = el('div', 'admin-tools');
       var frozen = (s.state === 'approved');  // content locked once client approves
 
@@ -383,7 +393,7 @@
         tools.appendChild(advBox);
       }
 
-      card.appendChild(tools);
+      collapse.appendChild(tools);
 
       // Repeat the status at the foot of the block — you read down the page,
       // so each block should end with its outcome.
@@ -391,8 +401,14 @@
         var foot = el('div', 'stage-foot');
         foot.appendChild(el('span', 'badge approved', (act && act.done) || 'Done'));
         if (a) foot.appendChild(el('span', 'stage-when', fmtDate(a.approved_at)));
-        card.appendChild(foot);
+        collapse.appendChild(foot);
       }
+
+      card.appendChild(collapse);
+
+      // Collapse every stage except the one we're working on; click to toggle.
+      if (s.id !== currentId) card.classList.add('collapsed');
+      top.addEventListener('click', function () { card.classList.toggle('collapsed'); });
 
       list.appendChild(card);
     });
@@ -401,7 +417,10 @@
     var zone = document.getElementById('complete-zone');
     zone.innerHTML = '';
     var panel = el('div', 'admin-panel');
-    var finalApproved = stages.some(function (s) { return s.stage_index === 6 && s.state === 'approved'; });
+    // Only reachable once the Deliverables stage itself has been submitted.
+    var deliverablesStage = stages.find(function (s) { return s.stage_index === 7; });
+    var deliverablesReached = deliverablesStage && deliverablesStage.state === 'pending';
+    var hasDeliverableLinks = deliverablesStage && (deliverablesStage.deliverable_links || []).length > 0;
     if (project.status === 'complete') {
       panel.appendChild(el('h2', null, 'Project complete'));
       panel.appendChild(el('p', 'hint',
@@ -415,12 +434,15 @@
       panel.appendChild(reopen);
     } else {
       panel.appendChild(el('h2', null, 'Release deliverables'));
-      panel.appendChild(el('p', 'hint', finalApproved
-        ? 'Once the money is in the bank, mark the project complete to unlock the deliverable download links for the client.'
-        : 'Available once the client accepts the final version (stage 6).'));
+      panel.appendChild(el('p', 'hint',
+        !deliverablesReached
+          ? 'Available at the Deliverables stage — submit it to the client first (after they accept the final version).'
+          : !hasDeliverableLinks
+            ? 'Add the deliverable download links to the Deliverables stage above, then release them here once the money is in the bank.'
+            : 'Once the money is in the bank, mark the project complete to release the deliverable download links to the client.'));
       var done = el('button', 'btn primary', 'Mark complete — release deliverables');
       done.type = 'button';
-      done.disabled = !finalApproved;
+      done.disabled = !(deliverablesReached && hasDeliverableLinks);
       done.onclick = async function () {
         if (!window.confirm('Mark "' + project.title + '" complete and release the deliverables to the client?')) return;
         var res = await sb.from('projects').update({ status: 'complete' }).eq('id', id);
