@@ -106,6 +106,14 @@ begin
   if old.state = 'approved' and new.state <> 'approved' then
     raise exception 'Approved stages cannot be reverted';
   end if;
+  -- Once approved, the reviewed content is frozen — what was approved cannot
+  -- change. (deliverable_links stay editable: they are added after approval.)
+  if old.state = 'approved' then
+    if new.doc_links is distinct from old.doc_links
+       or new.video_id is distinct from old.video_id then
+      raise exception 'Cannot change the content of an approved stage';
+    end if;
+  end if;
   if old.state <> new.state then
     if old.state = 'pending' and new.state = 'approved' then
       if coalesce(current_setting('sgp.approving', true), '') <> '1' then

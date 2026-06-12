@@ -293,28 +293,39 @@
       card.appendChild(top);
 
       var tools = el('div', 'admin-tools');
+      var frozen = (s.state === 'approved');  // content locked once client approves
 
-      tools.appendChild(linkEditor(s, 'doc_links', id, 'Document links (Google Drive)'));
+      if (frozen) {
+        tools.appendChild(el('p', 'hint',
+          'Approved by the client — the content below is locked as the permanent record of what was approved.'));
+        var docBox = el('div');
+        docBox.appendChild(el('p', 'eyebrow', 'Document links (Google Drive)'));
+        if ((s.doc_links || []).length) docBox.appendChild(linkList(s.doc_links));
+        else docBox.appendChild(el('p', 'hint', 'None'));
+        tools.appendChild(docBox);
+      } else {
+        tools.appendChild(linkEditor(s, 'doc_links', id, 'Document links (Google Drive)'));
 
-      var vidBox = el('div');
-      vidBox.appendChild(el('p', 'eyebrow', 'Video (paste YouTube link or ID)'));
-      var vidForm = el('form', 'inline-form');
-      var vidInput = el('input');
-      vidInput.type = 'text';
-      vidInput.placeholder = 'https://youtube.com/watch?v=… or video ID (blank to remove)';
-      vidInput.value = s.video_id || '';
-      var vidSave = el('button', 'btn ghost', 'Save video'); vidSave.type = 'submit';
-      var vidErr = el('p', 'form-error'); vidErr.hidden = true;
-      vidForm.appendChild(vidInput); vidForm.appendChild(vidSave);
-      vidForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        var res = await sb.from('stages')
-          .update({ video_id: parseYouTubeId(vidInput.value) || null }).eq('id', s.id);
-        if (res.error) showError(vidErr, res.error); else renderProject(id);
-      });
-      vidBox.appendChild(vidForm);
-      vidBox.appendChild(vidErr);
-      tools.appendChild(vidBox);
+        var vidBox = el('div');
+        vidBox.appendChild(el('p', 'eyebrow', 'Video (paste YouTube link or ID)'));
+        var vidForm = el('form', 'inline-form');
+        var vidInput = el('input');
+        vidInput.type = 'text';
+        vidInput.placeholder = 'https://youtube.com/watch?v=… or video ID (blank to remove)';
+        vidInput.value = s.video_id || '';
+        var vidSave = el('button', 'btn ghost', 'Save video'); vidSave.type = 'submit';
+        var vidErr = el('p', 'form-error'); vidErr.hidden = true;
+        vidForm.appendChild(vidInput); vidForm.appendChild(vidSave);
+        vidForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var res = await sb.from('stages')
+            .update({ video_id: parseYouTubeId(vidInput.value) || null }).eq('id', s.id);
+          if (res.error) showError(vidErr, res.error); else renderProject(id);
+        });
+        vidBox.appendChild(vidForm);
+        vidBox.appendChild(vidErr);
+        tools.appendChild(vidBox);
+      }
       if (s.video_id) tools.appendChild(ytEmbed(s.video_id));
 
       if (s.stage_index === 7) {
