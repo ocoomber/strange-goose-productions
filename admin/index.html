@@ -275,11 +275,11 @@
       tools.appendChild(linkEditor(s, 'doc_links', id, 'Document links (Google Drive)'));
 
       var vidBox = el('div');
-      vidBox.appendChild(el('p', 'eyebrow', 'Video (YouTube ID)'));
+      vidBox.appendChild(el('p', 'eyebrow', 'Video (paste YouTube link or ID)'));
       var vidForm = el('form', 'inline-form');
       var vidInput = el('input');
       vidInput.type = 'text';
-      vidInput.placeholder = 'e.g. XDqIPun8S-0 (blank to remove)';
+      vidInput.placeholder = 'https://youtube.com/watch?v=… or video ID (blank to remove)';
       vidInput.value = s.video_id || '';
       var vidSave = el('button', 'btn ghost', 'Save video'); vidSave.type = 'submit';
       var vidErr = el('p', 'form-error'); vidErr.hidden = true;
@@ -287,7 +287,7 @@
       vidForm.addEventListener('submit', async function (e) {
         e.preventDefault();
         var res = await sb.from('stages')
-          .update({ video_id: vidInput.value.trim() || null }).eq('id', s.id);
+          .update({ video_id: parseYouTubeId(vidInput.value) || null }).eq('id', s.id);
         if (res.error) showError(vidErr, res.error); else renderProject(id);
       });
       vidBox.appendChild(vidForm);

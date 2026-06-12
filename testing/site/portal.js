@@ -79,7 +79,19 @@ function escapeHtml(s) {
 
 /* Click-to-play YouTube embed — same pattern as the main site:
    thumbnail first, iframe with autoplay on click. */
-function ytEmbed(videoId) {
+/* Accept a bare video ID or any common YouTube URL and return the ID. */
+function parseYouTubeId(input) {
+  if (!input) return '';
+  var s = String(input).trim();
+  if (/^[\w-]{11}$/.test(s)) return s;                 // already a bare ID
+  var m = s.match(/(?:v=|\/embed\/|youtu\.be\/|\/shorts\/)([\w-]{11})/);
+  if (m) return m[1];
+  var tail = s.match(/([\w-]{11})(?:[?&].*)?$/);        // last-resort: 11-char tail
+  return tail ? tail[1] : s;
+}
+
+function ytEmbed(rawId) {
+  var videoId = parseYouTubeId(rawId);
   var box = el('div', 'portal-yt');
   box.setAttribute('data-yt', videoId);
   var img = el('img');
