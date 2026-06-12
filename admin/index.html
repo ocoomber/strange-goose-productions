@@ -81,6 +81,7 @@
         <p class="sub" id="project-meta"></p>
         <p style="margin-top:16px;">
           <button class="btn ghost" type="button" id="toggle-complete"></button>
+          <button class="btn ghost" type="button" id="undo-approval" style="margin-left:10px;" hidden>Undo last approval</button>
           <button class="btn ghost" type="button" id="reset-project" style="margin-left:10px;">Reset project (testing)</button>
         </p>
         <p class="form-error" id="project-error" hidden></p>
@@ -250,6 +251,18 @@
       var res = await sb.from('projects')
         .update({ status: project.status === 'complete' ? 'active' : 'complete' })
         .eq('id', id);
+      if (res.error) showError(projErr, res.error); else renderProject(id);
+    };
+
+    var hasApproved = stages.some(function (s) { return s.state === 'approved'; });
+    var undo = document.getElementById('undo-approval');
+    undo.hidden = !hasApproved;
+    undo.onclick = async function () {
+      var last = stages.filter(function (s) { return s.state === 'approved'; }).pop();
+      if (!window.confirm('Undo the most recent approval ("' + (last ? last.name : '') + '")?\n\n' +
+        'This reverts that stage to awaiting approval — use it to correct an accidental approval. ' +
+        'Earlier approvals are kept.')) return;
+      var res = await sb.rpc('revert_last_approval', { p_project: id });
       if (res.error) showError(projErr, res.error); else renderProject(id);
     };
 
