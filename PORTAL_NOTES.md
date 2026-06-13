@@ -63,6 +63,15 @@ to the existing account by verified-email match (one user, two identities — no
 duplicate profile, `handle_new_user` doesn't fire a second time). Dashboard
 setup is in `admin/SETUP.md` §5f. No schema change was needed.
 
+**Status: live and verified (2026-06-13).** Canonical domain is **non-www**
+(`https://strangegoose.co.uk`); Site URL is set to it. Redirect URLs must list
+www **and** non-www `/client/` plus `/**` wildcards — otherwise OAuth falls back
+to the Site URL and lands the user on the homepage with the token stuck in the
+URL hash (the redirect bug hit during setup; wildcards fixed it). Sessions
+persist in a normal browser; private-window logout-on-close is expected, not a
+bug. The portal's `redirectTo` is `window.location.origin + '/client/'`, so it
+follows whichever host the client started on — both must stay allowlisted.
+
 ## Data model (see schema.sql for the authoritative version)
 
 - `profiles` (1:1 with auth.users): role admin|client, `must_change_password`,
@@ -129,7 +138,8 @@ Release and completion are **separate**:
 SGP-matched design) · Tier 1 (two-way email notifications, admin account
 creation w/ auto-email, self-service password reset) · client management
 (edit/archive/restore/delete) · printable project record · admin "needs
-attention" sorted list · deliverables release/confirm redesign.
+attention" sorted list · deliverables release/confirm redesign · Google
+sign-in for clients (see "Client sign-in" above).
 
 **Pending / next:**
 - **Lockdown before first real client:** remove (or feature-flag) the

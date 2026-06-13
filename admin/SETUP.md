@@ -111,14 +111,35 @@ account you already provisioned. No random signups (see the toggle in step 3).
    turn **OFF** "Allow new users to sign up". This is what keeps strangers out:
    a Google login whose email you didn't pre-create is rejected, while your
    admin **New client account** form still works (it creates users directly).
-4. **Supabase → Authentication → URL Configuration → Redirect URLs** — make sure
-   `https://www.strangegoose.co.uk/client/` is listed (already added in 5e).
+4. **Supabase → Authentication → URL Configuration:**
+   - **Site URL** = `https://strangegoose.co.uk` (the canonical **non-www**
+     domain — what the live site settles on in the address bar).
+   - **Redirect URLs** — list all four (covers www/non-www for both the portal
+     and password reset, so OAuth can never fall back to the homepage):
+     ```
+     https://strangegoose.co.uk/client/
+     https://www.strangegoose.co.uk/client/
+     https://strangegoose.co.uk/**
+     https://www.strangegoose.co.uk/**
+     ```
+
+   > **Gotcha (this bit the first setup):** if the redirect URL the portal
+   > requests isn't in this list, Supabase silently falls back to the **Site
+   > URL** and dumps the user on the homepage with the token stuck in the URL
+   > (`strangegoose.co.uk/#access_token=…`) — login appears to "do nothing".
+   > The wildcards above prevent it regardless of www/non-www.
 
 **How it links up:** because accounts are created with a verified email
 (`email_confirm: true`), Supabase automatically attaches the Google identity to
 the matching existing account — same login, same projects, no duplicate. The
 client simply clicks **Continue with Google instead** on the first-login screen
 (or **Sign in with Google** on the login screen next time).
+
+**Status: live and verified (2026-06-13).** Tested end-to-end — a client
+created with a Gmail address signs in with Google, lands on their project list,
+and appears as **one** user with **two identities** (email + google) in Auth →
+Users. Sessions persist in a normal browser (auto-refresh); a private/incognito
+window logs out on close, which is expected.
 
 **Test it:** create a test client with your own Gmail, click Continue with
 Google, confirm you land on the project list and that **Auth → Users** shows
