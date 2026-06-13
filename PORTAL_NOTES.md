@@ -151,8 +151,8 @@ sign-in for clients (see "Client sign-in" above).
 - Per-project archiving for *completed projects of still-active clients*
   (currently only whole-client archive hides projects).
 
-## Phase 2 (built on branch `claude/amazing-ride-l1swcn`, 2026-06-13)
-Eight changes, each its own commit, **not yet merged to `main`** (so not live).
+## Phase 2 (merged to `main` / live 2026-06-13)
+Eight changes, each its own commit, built on `claude/amazing-ride-l1swcn`.
 Built admin-side first (they share one new column), then client-side, then
 additive features. Decisions locked with Owen: overdue is **admin-only**, the
 four-state status is **derived in code** (no stored status column), the overdue
