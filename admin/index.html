@@ -132,6 +132,30 @@
           <p class="form-error" id="clients-error" hidden></p>
         </div>
       </details>
+
+      <!-- Change 8: bulk export of completion records by date range. -->
+      <details class="admin-secondary" id="export-panel">
+        <summary>Export completion records</summary>
+        <div class="admin-panel">
+          <h2>Completion records (CSV)</h2>
+          <p class="hint">Export every approval from projects completed within a
+            date range — one row per approval — for accounts, annual review, or a
+            legal request spanning multiple jobs. Leave a date blank for open-ended.</p>
+          <form id="export-form" class="admin-row">
+            <div class="field">
+              <label for="export-from">Completed from</label>
+              <input id="export-from" type="date">
+            </div>
+            <div class="field">
+              <label for="export-to">Completed to</label>
+              <input id="export-to" type="date">
+            </div>
+            <button class="btn primary" type="submit">Export CSV</button>
+          </form>
+          <p class="form-error" id="export-error" hidden></p>
+          <p class="hint" id="export-ok" hidden></p>
+        </div>
+      </details>
     </section>
 
     <!-- single project -->
@@ -571,6 +595,62 @@
     if (res.error) { showError(errNode, res.error); return; }
     document.getElementById('new-title').value = '';
     renderProjects();
+  });
+
+  /* ── completion records export (Change 8) ── */
+  function csvCell(v) {
+    var s = (v == null ? '' : String(v));
+    return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  document.getElementById('export-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errN = document.getElementById('export-error');
+    var okN = document.getElementById('export-ok');
+    errN.hidden = true; okN.hidden = true;
+    var from = document.getElementById('export-from').value;
+    var to = document.getElementById('export-to').value;
+
+    var q = sb.from('projects')
+      .select('title, completed_at, profiles(display_name, email), approvals(stage_name, approved_at)')
+      .eq('status', 'complete')
+      .order('completed_at', { ascending: true });
+    if (from) q = q.gte('completed_at', from);
+    if (to) q = q.lte('completed_at', to + 'T23:59:59.999Z');
+    var res = await q;
+    if (res.error) { showError(errN, res.error); return; }
+
+    var rows = [['Project', 'Client', 'Client email', 'Stage', 'Approved at', 'Project completed at']];
+    (res.data || []).forEach(function (p) {
+      var cname = (p.profiles && p.profiles.display_name) || '';
+      var cemail = (p.profiles && p.profiles.email) || '';
+      var aps = (p.approvals || []).slice().sort(function (a, b) {
+        return new Date(a.approved_at) - new Date(b.approved_at);
+      });
+      if (aps.length) {
+        aps.forEach(function (a) {
+          rows.push([p.title, cname, cemail, a.stage_name, a.approved_at, p.completed_at]);
+        });
+      } else {
+        rows.push([p.title, cname, cemail, '(no approvals recorded)', '', p.completed_at]);
+      }
+    });
+    if (rows.length === 1) {
+      showError(errN, { message: 'No completed projects in that range.' });
+      return;
+    }
+
+    var csv = rows.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'sgp-completion-records' + (from ? '_' + from : '') + (to ? '_' + to : '') + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    okN.textContent = 'Exported ' + (rows.length - 1) + ' approval row' +
+      (rows.length - 1 === 1 ? '' : 's') + ' from completed projects.';
+    okN.hidden = false;
   });
 
   /* ── single project ── */
