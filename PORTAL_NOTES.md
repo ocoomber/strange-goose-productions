@@ -171,21 +171,22 @@ the chase log is **admin-screen only** (never on the PDF record).
   `sgp_landed`); multiple sort by last activity; completed go in a collapsed
   "Past projects" section (`client/index.html`).
 - **Ch.2 chase log:** admin-only append-only `project_notes`; UI in the project
-  view (defensive if the table is missing). **DB migration NOT yet applied.**
+  view (defensive if the table is missing). **DB migration applied 2026-06-13.**
 - **Ch.6 client search/filter:** name/email search + All/active filter on the
   Clients panel.
 - **Ch.7 schema review:** global archive search (title, client name/email, date
   range) needs no restructure; added `projects.completed_at` (+ trigger,
-  backfill, index) for reliable date-range queries. **DB migration NOT applied.**
+  backfill, index) for reliable date-range queries. **DB migration applied 2026-06-13.**
 - **Ch.8 bulk export:** date-range CSV of completion records (one row per
   approval) on the admin home, filtered by `completed_at`.
 
-**⚠️ Two SQL migrations still to run** (Supabase SQL Editor or via connector
-when write is unblocked) — until then, chase log + export degrade gracefully:
-`supabase/migrations/2026-06-13-change2-project-notes.sql` and
-`…-change7-completed-at.sql`. The Change 4 migration (`…-change4-pending-since.sql`)
-is already applied. After running them, merge the branch to `main` to deploy.
-Verify pattern used: `node --check` of the inline `<script>` in each page.
+**All three Phase 2 migrations are applied to the live DB** (change4
+pending_since, change2 project_notes, change7 completed_at), verified clean via
+the security advisor (no new warnings beyond the known-benign four). Migration
+files are in `supabase/migrations/` and reflected in `schema.sql`. **Remaining
+step: merge `claude/amazing-ride-l1swcn` → `main` to deploy the panels (GitHub
+Pages goes live on push to main).** Verify pattern used: `node --check` of the
+inline `<script>` in each page.
 
 ## Security posture (public repo)
 The repo is public (it hosts the live site), so treat everything in it as
