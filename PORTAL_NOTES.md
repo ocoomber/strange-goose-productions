@@ -122,6 +122,20 @@ attention" sorted list · deliverables release/confirm redesign.
 - Per-project archiving for *completed projects of still-active clients*
   (currently only whole-client archive hides projects).
 
+## Security posture (public repo)
+The repo is public (it hosts the live site), so treat everything in it as
+world-readable. This is fine by design: no secrets live in the repo or its
+git history. Real secrets (`RESEND_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
+`WEBHOOK_SECRET`, `ADMIN_EMAIL`) live only in Supabase Edge Function env
+vars. The `SUPABASE_URL` + anon/publishable key in `site/portal.js` are
+public by design — **RLS is the real boundary**, so the safety of the whole
+portal depends on RLS staying enabled on every `public` table. A `.gitignore`
+guards against accidentally committing a secret file (`.env`, `*.key`, etc).
+Hardening items still open (none urgent, no real client yet): tighten Edge
+Function CORS from `*` to `https://www.strangegoose.co.uk`; remove the
+`reset_project()` back door before the first real client (intentionally kept
+for now while testing).
+
 ## Gotchas / notes for the next session
 - **Network:** this sandbox's egress often blocks `*.supabase.co`, so live
   RLS/REST tests may fail with "host not in allowlist" — verify via Owen's
