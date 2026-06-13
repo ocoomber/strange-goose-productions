@@ -142,6 +142,7 @@
       </header>
       <div class="stage-list" id="stage-list"></div>
       <div id="complete-zone" style="margin-top:24px;"></div>
+      <div id="chase-log" style="margin-top:24px;"></div>
     </section>
 
   </div>
@@ -864,7 +865,61 @@
     }
     zone.appendChild(panel);
 
+    await renderChaseLog(id);
     show('project');
+  }
+
+  // Change 2 — internal chase log: private, append-only contact record per
+  // project. Admin-only (RLS). Defensive: if the project_notes table isn't
+  // there yet, the panel quietly hides rather than breaking the project view.
+  async function renderChaseLog(id) {
+    var box = document.getElementById('chase-log');
+    box.innerHTML = '';
+    var res = await sb.from('project_notes')
+      .select('*').eq('project_id', id).order('created_at', { ascending: false });
+    if (res.error) return;  // table not migrated yet — show nothing
+
+    var panel = el('div', 'admin-panel');
+    panel.appendChild(el('h2', null, 'Chase log'));
+    panel.appendChild(el('p', 'hint',
+      'Private to you — the client never sees this. Record contact attempts ' +
+      '(call, email) when a project stalls. Entries are timestamped and cannot ' +
+      'be edited or deleted.'));
+
+    var notes = res.data || [];
+    if (notes.length) {
+      var ul = el('ul', 'chase-list');
+      notes.forEach(function (n) {
+        var li = el('li');
+        li.appendChild(el('span', 'chase-when', fmtDate(n.created_at)));
+        li.appendChild(el('span', 'chase-body', n.body));
+        ul.appendChild(li);
+      });
+      panel.appendChild(ul);
+    } else {
+      panel.appendChild(el('p', 'hint', 'No entries yet.'));
+    }
+
+    var form = el('form', 'note-form');
+    var area = el('textarea');
+    area.placeholder = 'e.g. Emailed client to chase final approval — no reply yet.';
+    area.required = true;
+    var save = el('button', 'btn primary', 'Add log entry'); save.type = 'submit';
+    var errN = el('p', 'form-error'); errN.hidden = true;
+    form.appendChild(area); form.appendChild(save); form.appendChild(errN);
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var body = area.value.trim();
+      if (!body) return;
+      save.disabled = true;
+      var ins = await sb.from('project_notes')
+        .insert({ project_id: id, author_id: profile && profile.id, body: body });
+      save.disabled = false;
+      if (ins.error) { showError(errN, ins.error); return; }
+      renderChaseLog(id);
+    });
+    panel.appendChild(form);
+    box.appendChild(panel);
   }
 
   /* ── routing ── */
