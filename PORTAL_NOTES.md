@@ -151,6 +151,42 @@ sign-in for clients (see "Client sign-in" above).
 - Per-project archiving for *completed projects of still-active clients*
   (currently only whole-client archive hides projects).
 
+## Phase 2 (built on branch `claude/amazing-ride-l1swcn`, 2026-06-13)
+Eight changes, each its own commit, **not yet merged to `main`** (so not live).
+Built admin-side first (they share one new column), then client-side, then
+additive features. Decisions locked with Owen: overdue is **admin-only**, the
+four-state status is **derived in code** (no stored status column), the overdue
+threshold is a **JS constant** (`OVERDUE_DAYS = 7` in `admin/index.html`), and
+the chase log is **admin-screen only** (never on the PDF record).
+
+- **Ch.4 status model:** statuses `you / stalled / client / complete` derived in
+  `admin/index.html` (`statusOf`/`overdueDays`/`waitingSince`) from stage data +
+  new `stages.pending_since` (set on locked→pending by the guard trigger /
+  seed / reset / revert). **Migration applied to live DB.**
+- **Ch.1 overdue flag:** `Overdue · Nd` badge on the project card, project-detail
+  header, and client rows. Visual only.
+- **Ch.3 my-turn home:** project grid leads the page with a summary line; setup +
+  client list moved into a collapsed `<details class="admin-secondary">`.
+- **Ch.5 client landing:** single active project auto-lands (once/session via
+  `sgp_landed`); multiple sort by last activity; completed go in a collapsed
+  "Past projects" section (`client/index.html`).
+- **Ch.2 chase log:** admin-only append-only `project_notes`; UI in the project
+  view (defensive if the table is missing). **DB migration NOT yet applied.**
+- **Ch.6 client search/filter:** name/email search + All/active filter on the
+  Clients panel.
+- **Ch.7 schema review:** global archive search (title, client name/email, date
+  range) needs no restructure; added `projects.completed_at` (+ trigger,
+  backfill, index) for reliable date-range queries. **DB migration NOT applied.**
+- **Ch.8 bulk export:** date-range CSV of completion records (one row per
+  approval) on the admin home, filtered by `completed_at`.
+
+**⚠️ Two SQL migrations still to run** (Supabase SQL Editor or via connector
+when write is unblocked) — until then, chase log + export degrade gracefully:
+`supabase/migrations/2026-06-13-change2-project-notes.sql` and
+`…-change7-completed-at.sql`. The Change 4 migration (`…-change4-pending-since.sql`)
+is already applied. After running them, merge the branch to `main` to deploy.
+Verify pattern used: `node --check` of the inline `<script>` in each page.
+
 ## Security posture (public repo)
 The repo is public (it hosts the live site), so treat everything in it as
 world-readable. This is fine by design: no secrets live in the repo or its
