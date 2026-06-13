@@ -299,6 +299,32 @@ revoke update, delete on public.approvals from anon, authenticated;
 -- Projects and stages are never deleted through the API either:
 revoke delete on public.projects, public.stages from anon, authenticated;
 
+-- ------------------------------------------------------------
+-- Function EXECUTE grants (lock down the SECURITY DEFINER functions).
+-- By default Postgres grants EXECUTE on new functions to PUBLIC, which
+-- exposes them via the REST API to the anon (logged-out) and authenticated
+-- roles. That is dangerous here: the admin RPCs below delete approval
+-- records, and their internal "admin only" check is skipped when there is
+-- no logged-in user (auth.uid() is null) — i.e. exactly the anon case.
+-- So we revoke public/anon execute and re-grant only to authenticated;
+-- the in-function is_admin() check then blocks non-admin signed-in users.
+revoke execute on function public.reset_project(uuid)        from public, anon;
+grant  execute on function public.reset_project(uuid)        to authenticated;
+revoke execute on function public.revert_last_approval(uuid) from public, anon;
+grant  execute on function public.revert_last_approval(uuid) to authenticated;
+
+-- Trigger functions are only ever meant to fire as triggers, never to be
+-- called directly through the API. Revoking EXECUTE does NOT stop triggers
+-- from firing; it just removes them from the exposed REST surface.
+revoke execute on function public.handle_new_user()          from public, anon, authenticated;
+revoke execute on function public.handle_approval()          from public, anon, authenticated;
+revoke execute on function public.guard_stage_update()       from public, anon, authenticated;
+revoke execute on function public.guard_profile_update()     from public, anon, authenticated;
+revoke execute on function public.complete_on_deliverables() from public, anon, authenticated;
+revoke execute on function public.seed_stages()              from public, anon, authenticated;
+-- Note: is_admin() intentionally stays executable by anon/authenticated —
+-- the RLS policies above call it, so the querying role needs EXECUTE on it.
+
 -- ============================================================
 -- AFTER RUNNING: create Owen's auth user (Authentication → Add user),
 -- then promote it to admin by running:
