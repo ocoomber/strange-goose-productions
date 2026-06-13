@@ -76,6 +76,24 @@ button.btn.ghost:disabled {
 }
 .btn.full { width: 100%; justify-content: center; display: inline-flex; }
 
+/* "or" divider between the password form and the Google button */
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+.auth-or::before, .auth-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--faint);
+}
+
 /* ── cards / lists ── */
 .portal-grid { display: grid; gap: 18px; margin-top: 28px; }
 .project-card {

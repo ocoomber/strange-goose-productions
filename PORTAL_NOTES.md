@@ -44,6 +44,25 @@ timestamped, and immutable, enforced in the database (not just UI).
     `WEBHOOK_SECRET`. Two Database Webhooks (approvals INSERT, stages UPDATE)
     post to `notify` with the `x-webhook-secret` header.
 
+## Client sign-in (password + Google)
+Owen provisions every account (temp password, `must_change_password=true`).
+Two ways a client can then sign in:
+- **Email + temp password**, then forced to choose a new password (unchanged).
+- **Google** — a "Continue with Google instead" button on the first-login
+  (password-change) screen and a "Sign in with Google" button on the login
+  screen. `signInWithGoogle()` in `portal.js` (`signInWithOAuth`, redirect back
+  to `/client/`). On a Google session the boot logic (`route()` in
+  `client/index.html`) auto-clears `must_change_password` via
+  `clearMustChangePassword()`, so they skip the password screen.
+
+**Allowlist still holds:** "Allow new users to sign up" is turned **OFF** in
+Supabase Auth, so a Google login with an un-provisioned email is rejected;
+`admin.createUser` (the New client form) bypasses that toggle. Accounts are
+created with `email_confirm: true`, so Supabase auto-links the Google identity
+to the existing account by verified-email match (one user, two identities — no
+duplicate profile, `handle_new_user` doesn't fire a second time). Dashboard
+setup is in `admin/SETUP.md` §5f. No schema change was needed.
+
 ## Data model (see schema.sql for the authoritative version)
 
 - `profiles` (1:1 with auth.users): role admin|client, `must_change_password`,

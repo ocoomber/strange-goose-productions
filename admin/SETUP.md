@@ -91,6 +91,39 @@ file, no edits needed:
 **Authentication → URL Configuration → Redirect URLs** — add:
 `https://www.strangegoose.co.uk/client/`
 
+## 5f. Google sign-in for clients (optional but recommended)
+
+Lets a client skip the password and sign in with one Google click. You still
+create every account yourself — Google is only an alternative way *in* to an
+account you already provisioned. No random signups (see the toggle in step 3).
+
+1. **Google Cloud Console** ([console.cloud.google.com](https://console.cloud.google.com)):
+   - Create (or pick) a project. **APIs & Services → OAuth consent screen** —
+     External, app name "Strange Goose Productions Client Portal", your support
+     email; save.
+   - **APIs & Services → Credentials → Create credentials → OAuth client ID →
+     Web application.** Under **Authorized redirect URIs** add exactly:
+     `https://zawrkuclsdqtvftfothj.supabase.co/auth/v1/callback`
+   - Copy the **Client ID** and **Client secret**.
+2. **Supabase → Authentication → Providers → Google** — enable, paste the
+   Client ID + secret, save.
+3. **Supabase → Authentication → Sign In / Providers (or Providers → Email)** —
+   turn **OFF** "Allow new users to sign up". This is what keeps strangers out:
+   a Google login whose email you didn't pre-create is rejected, while your
+   admin **New client account** form still works (it creates users directly).
+4. **Supabase → Authentication → URL Configuration → Redirect URLs** — make sure
+   `https://www.strangegoose.co.uk/client/` is listed (already added in 5e).
+
+**How it links up:** because accounts are created with a verified email
+(`email_confirm: true`), Supabase automatically attaches the Google identity to
+the matching existing account — same login, same projects, no duplicate. The
+client simply clicks **Continue with Google instead** on the first-login screen
+(or **Sign in with Google** on the login screen next time).
+
+**Test it:** create a test client with your own Gmail, click Continue with
+Google, confirm you land on the project list and that **Auth → Users** shows
+**one** user with **two identities** (email + google), not two users.
+
 ### What you get
 
 - Client acts on a stage → **you get an email** saying who did what.
