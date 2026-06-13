@@ -1,0 +1,24 @@
+# Secrets — never commit. The portal's real keys live in Supabase env vars,
+# not in this repo. This guards against accidentally publishing them.
+.env
+.env.*
+*.key
+*.pem
+secrets.*
+
+# Supabase CLI local state (if Owen ever runs the CLI)
+.branches/
+.temp/
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Logs
+*.log
