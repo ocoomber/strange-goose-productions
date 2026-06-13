@@ -136,6 +136,25 @@ button.btn.ghost:disabled {
 .badge.stalled  { color: oklch(55% 0.17 25); background: oklch(55% 0.17 25 / 0.10); }
 .project-card.is-stalled { border-left: 3px solid oklch(55% 0.17 25); }
 
+/* Client list search + filter (admin, Change 6). */
+.client-controls {
+  display: flex;
+  gap: 12px;
+  margin: 4px 0 18px;
+  flex-wrap: wrap;
+}
+.client-controls input,
+.client-controls select {
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: var(--sans);
+  border: 1px solid var(--faint);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.client-controls input { flex: 1 1 220px; }
+
 /* Chase log (admin, Change 2): timestamped immutable contact entries. */
 .chase-list { list-style: none; margin: 14px 0 18px; padding: 0; }
 .chase-list li {
