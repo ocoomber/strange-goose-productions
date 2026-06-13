@@ -74,6 +74,71 @@ commercially-significant decision an explicit, recorded event.
 
 ---
 
+## What the client sees and does
+
+**Getting in.** The client never signs themselves up — their account is created
+for them. They receive an email with a temporary password, sign in, and are
+asked to set their own password. (They can alternatively continue with a Google
+account instead of managing a password.) From then on it's a normal login.
+
+**What they see.** A clean, branded view of their project as a sequence of
+stages. The current stage is open and front-and-centre; completed stages are
+collapsed into a tidy history they can look back on; stages that haven't been
+reached yet aren't shown. At any moment it's obvious where the project is, what
+has been agreed, and whether the ball is in their court or SGP's.
+
+**The steps they take.** At each stage the client is asked for one clear,
+appropriate action — and nothing moves forward until they take it:
+
+1. **Approve the brief** — confirm the agreed starting point.
+2. **Confirm feedback sent** (first edit) — acknowledge they've sent their notes.
+3. **Confirm feedback sent** (second edit) — the same, for the second round.
+4. **Acknowledge picture lock** — a deliberate boundary: they understand that
+   further changes from here become chargeable.
+5. **Confirm feedback sent** (colour & sound) — final round of notes.
+6. **Accept the final version** — the key sign-off; this is the moment the
+   finished film is agreed.
+7. **Confirm files received** — once SGP releases the deliverables, the client
+   confirms they've downloaded and checked everything, which completes the
+   project.
+
+Each action they take is recorded permanently against their account with a
+timestamp. They never see anything technical — just a simple, reassuring "your
+turn / approved / waiting on SGP" rhythm.
+
+## What the admin (Owen) sees and does
+
+**What he sees.** A private admin panel listing all clients and projects, with
+the projects that need *his* attention sorted to the top — so he can see at a
+glance where he's the one holding things up. Opening a project shows the same
+stage-by-stage structure the client sees, but with the controls to drive it.
+
+**The steps he takes.**
+
+- **Set up the client and project.** Create the client account (which
+  auto-emails them their login), and create their project.
+- **Feed each stage.** Paste in the relevant material as the project
+  progresses — video links, document links, notes — so the client has what they
+  need to act at each stage.
+- **Advance the project.** Move stages forward at the right moments, opening up
+  the next action for the client.
+- **Release the deliverables.** Near the end, attach the final files to the last
+  stage and explicitly release them to the client, which notifies them the files
+  are ready.
+- **Close out if needed.** If the client doesn't click the final confirmation,
+  Owen can mark the project complete on their behalf so it doesn't hang open.
+- **Produce the record.** On completion, generate a clean, printable end-of-
+  project document capturing the full approval history.
+- **Manage clients over time.** Archive finished or inactive clients (hiding
+  them while keeping every record), restore them if needed, or permanently
+  delete test accounts.
+
+Throughout, Owen's actions and the client's actions are kept distinct: the
+client's approvals are the protected record, and Owen's role is to set the stage
+for each of those approvals and keep the project moving.
+
+---
+
 ## The principles behind it (useful for weighing design decisions)
 
 These are the values the portal is built to serve. New features are worth
