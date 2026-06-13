@@ -183,10 +183,50 @@ the chase log is **admin-screen only** (never on the PDF record).
 **All three Phase 2 migrations are applied to the live DB** (change4
 pending_since, change2 project_notes, change7 completed_at), verified clean via
 the security advisor (no new warnings beyond the known-benign four). Migration
-files are in `supabase/migrations/` and reflected in `schema.sql`. **Remaining
-step: merge `claude/amazing-ride-l1swcn` → `main` to deploy the panels (GitHub
-Pages goes live on push to main).** Verify pattern used: `node --check` of the
+files are in `supabase/migrations/` and reflected in `schema.sql`. **Phase 2 is
+merged and live on `main`.** Verify pattern used: `node --check` of the
 inline `<script>` in each page.
+
+## Phase 2.1 / 3 — admin dashboard follow-ups (PLANNED, not started)
+Owen tested the live admin home with seeded data (30 `@example.com` clients / 47
+projects — **test data, see cleanup SQL below**) and asked for clarity,
+sectioning, responsiveness, and raised scale. Full plan:
+`C:\Users\ocoom\.claude\plans\geeting-low-on-credits-purring-tide.md`.
+**Execution rule (Owen): do ONE step, then STOP and ask before the next — never
+the whole thing at once.** All work is `admin/index.html` + `site/portal.css`;
+reuse helpers `statusOf`/`overdueDays`/`waitingSince`/`pendingStageOf` and
+`OVERDUE_DAYS=7`. Branch → push → Owen merges to `main`.
+
+- **Step 1 (do first, quick):** Overdue badge spells out "days". Bug cause: in
+  the site font **"d" and "0" look identical**, so "12d" read as "120". Use one
+  `overdueLabel(p)` → `'Overdue · ' + n + (n===1?' day':' days')` in all 3 places
+  (card, `#project-overdue` header, `activeRow`). Then **ask** re: Step 2.
+- **Step 2:** split the project list into four collapsible `<details>` sections
+  by `statusOf` (Your move / Overdue / Awaiting client / Complete; first three
+  open, Complete collapsed), each with a count + a mono sort caption. Per-section
+  sort: you=longest-waiting (waitingSince asc), overdue=most-overdue (overdueDays
+  desc), client=pending_since asc, complete=completed_at desc. Stable ids
+  `sec-you/sec-stalled/sec-client/sec-complete`. Then **ask** re: Step 3.
+- **Step 3:** make `#project-summary` segments clickable → open + scroll to the
+  matching section (depends on Step 2). Then **ask** re: Step 4.
+- **Step 4:** responsiveness — `@media (max-width:640px)` for `.client-row`,
+  `.admin-row`, `.client-controls`, `.portal-grid` (auto-fill), `nav.top`. Then
+  **ask** re: Step 5.
+- **Step 5 (BIG, likely DEFER):** scale. Answer to "10k×10k — loads them all?":
+  **No** — `renderProjects()` is one unbounded query + browser-side everything;
+  **PostgREST caps at 1000 rows**, so beyond ~1000 projects the dashboard
+  silently truncates and shows **wrong counts** (correctness bug). Fix =
+  `security_invoker` view computing status server-side + per-section pagination
+  (`.range`, `count:'exact'`) + server-side `.ilike` search. Build when nearing
+  ~500–1000 real projects; cheap interim guard: explicit `.limit(1000)` + a
+  "showing first 1000" banner.
+
+**Test-data cleanup** (DB-only fake clients; run when done, needs write window):
+```sql
+delete from public.projects
+  where client_id in (select id from public.profiles where email like 'client%@example.com');
+delete from auth.users where email like 'client%@example.com';
+```
 
 ## Security posture (public repo)
 The repo is public (it hosts the live site), so treat everything in it as
