@@ -51,7 +51,7 @@
       <header class="portal-hd">
         <p class="eyebrow">Admin</p>
         <h1>Projects</h1>
-        <p class="sub">Create client accounts below — new accounts appear in the client dropdown, ready to be assigned a project.</p>
+        <p class="sub">Projects needing your move are listed first. Client accounts and project setup are below.</p>
       </header>
 
       <div class="admin-panel" id="password-panel" hidden>
@@ -71,52 +71,91 @@
         <p class="hint" id="admin-pw-ok" hidden style="color:oklch(45% 0.12 150);">Password updated.</p>
       </div>
 
-      <div class="admin-panel">
-        <h2>New client account</h2>
-        <form id="client-form" class="admin-row">
-          <div class="field">
-            <label for="client-email">Client email</label>
-            <input id="client-email" type="email" required>
-          </div>
-          <div class="field">
-            <label for="client-name">Display name (optional)</label>
-            <input id="client-name" type="text">
-          </div>
-          <button class="btn primary" type="submit">Create account</button>
-        </form>
-        <p class="form-error" id="client-error" hidden></p>
-        <div class="stage-note-box" id="client-result" hidden style="margin-top:16px;">
-          <p class="eyebrow">Account created — send these credentials to the client</p>
-          <p class="stage-note" id="client-creds"></p>
-          <p class="hint" style="margin-top:8px;">They'll be asked to choose their own password on first sign-in. Portal link: https://www.strangegoose.co.uk/client/</p>
-        </div>
-      </div>
-
-      <div class="admin-panel">
-        <h2>Clients</h2>
-        <div id="clients-list"></div>
-        <p class="hint" id="clients-empty" hidden>No client accounts yet.</p>
-        <p class="form-error" id="clients-error" hidden></p>
-      </div>
-
-      <div class="admin-panel">
-        <h2>New project</h2>
-        <form id="create-form" class="admin-row">
-          <div class="field">
-            <label for="new-title">Project title</label>
-            <input id="new-title" type="text" required>
-          </div>
-          <div class="field">
-            <label for="new-client">Client account</label>
-            <select id="new-client" required></select>
-          </div>
-          <button class="btn primary" type="submit">Create project</button>
-        </form>
-        <p class="form-error" id="create-error" hidden></p>
-      </div>
-
-      <div class="portal-grid" id="project-list" style="margin-top:32px;"></div>
+      <!-- Daily focus: what needs Owen right now. -->
+      <p class="portal-summary" id="project-summary" hidden></p>
+      <div class="portal-grid" id="project-list" style="margin-top:18px;"></div>
       <p class="portal-empty" id="projects-empty" hidden>No projects yet.</p>
+
+      <!-- Secondary: account setup and client lookup, not the daily start. -->
+      <details class="admin-secondary" id="setup-panels">
+        <summary>Clients &amp; project setup</summary>
+
+        <div class="admin-panel">
+          <h2>New project</h2>
+          <form id="create-form" class="admin-row">
+            <div class="field">
+              <label for="new-title">Project title</label>
+              <input id="new-title" type="text" required>
+            </div>
+            <div class="field">
+              <label for="new-client">Client account</label>
+              <select id="new-client" required></select>
+            </div>
+            <button class="btn primary" type="submit">Create project</button>
+          </form>
+          <p class="form-error" id="create-error" hidden></p>
+        </div>
+
+        <div class="admin-panel">
+          <h2>New client account</h2>
+          <form id="client-form" class="admin-row">
+            <div class="field">
+              <label for="client-email">Client email</label>
+              <input id="client-email" type="email" required>
+            </div>
+            <div class="field">
+              <label for="client-name">Display name (optional)</label>
+              <input id="client-name" type="text">
+            </div>
+            <button class="btn primary" type="submit">Create account</button>
+          </form>
+          <p class="form-error" id="client-error" hidden></p>
+          <div class="stage-note-box" id="client-result" hidden style="margin-top:16px;">
+            <p class="eyebrow">Account created — send these credentials to the client</p>
+            <p class="stage-note" id="client-creds"></p>
+            <p class="hint" style="margin-top:8px;">They'll be asked to choose their own password on first sign-in. Portal link: https://www.strangegoose.co.uk/client/</p>
+          </div>
+        </div>
+
+        <div class="admin-panel">
+          <h2>Clients</h2>
+          <div class="client-controls">
+            <input id="client-search" type="search" placeholder="Search name or email">
+            <select id="client-filter">
+              <option value="all">All clients</option>
+              <option value="active">With active project</option>
+            </select>
+          </div>
+          <div id="clients-list"></div>
+          <p class="hint" id="clients-empty" hidden>No client accounts yet.</p>
+          <p class="hint" id="clients-none" hidden>No clients match.</p>
+          <p class="form-error" id="clients-error" hidden></p>
+        </div>
+      </details>
+
+      <!-- Change 8: bulk export of completion records by date range. -->
+      <details class="admin-secondary" id="export-panel">
+        <summary>Export completion records</summary>
+        <div class="admin-panel">
+          <h2>Completion records (CSV)</h2>
+          <p class="hint">Export every approval from projects completed within a
+            date range — one row per approval — for accounts, annual review, or a
+            legal request spanning multiple jobs. Leave a date blank for open-ended.</p>
+          <form id="export-form" class="admin-row">
+            <div class="field">
+              <label for="export-from">Completed from</label>
+              <input id="export-from" type="date">
+            </div>
+            <div class="field">
+              <label for="export-to">Completed to</label>
+              <input id="export-to" type="date">
+            </div>
+            <button class="btn primary" type="submit">Export CSV</button>
+          </form>
+          <p class="form-error" id="export-error" hidden></p>
+          <p class="hint" id="export-ok" hidden></p>
+        </div>
+      </details>
     </section>
 
     <!-- single project -->
@@ -125,6 +164,7 @@
         <a class="back-link" href="#">← All projects</a>
         <h1 id="project-title" style="margin-top:18px;"></h1>
         <p class="sub" id="project-meta"></p>
+        <p id="project-overdue" style="margin-top:10px;" hidden></p>
         <p style="margin-top:16px;">
           <a class="btn ghost" id="report-link" href="#" target="_blank" rel="noopener">Generate project record (PDF)</a>
           <button class="btn ghost" type="button" id="undo-approval" style="margin-left:10px;" hidden>Undo last approval</button>
@@ -134,6 +174,7 @@
       </header>
       <div class="stage-list" id="stage-list"></div>
       <div id="complete-zone" style="margin-top:24px;"></div>
+      <div id="chase-log" style="margin-top:24px;"></div>
     </section>
 
   </div>
@@ -145,6 +186,44 @@
 (function () {
   var views = ['login', 'projects', 'project'];
   var profile = null;
+  var clientData = null;  // cached client/project data for the search/filter re-render
+
+  // ── Overdue / status config ──────────────────────────────────
+  // A project that's been the client's turn for longer than this is
+  // flagged "Overdue" so Owen knows to chase it. Change the number and
+  // push to adjust — it's intentionally a one-line code constant.
+  var OVERDUE_DAYS = 7;
+
+  // The stage currently awaiting the client (drives whose-turn + overdue).
+  function pendingStageOf(p) {
+    return (p.stages || []).find(function (s) { return s.state === 'pending'; });
+  }
+
+  // Whole days a project has been waiting on the client (0 if not waiting).
+  function overdueDays(p) {
+    var ps = pendingStageOf(p);
+    if (!ps || !ps.pending_since) return 0;
+    var ms = Date.now() - new Date(ps.pending_since).getTime();
+    return Math.max(0, Math.floor(ms / 86400000));
+  }
+
+  // Four-state project status, derived from stage data + the overdue window.
+  function statusOf(p) {
+    if (p.status === 'complete') return 'complete';
+    var ps = pendingStageOf(p);
+    if (!ps) return 'you';
+    return overdueDays(p) >= OVERDUE_DAYS ? 'stalled' : 'client';
+  }
+
+  // When the project entered its current waiting state, for "longest waiting
+  // first" sorting. Client's turn → when the stage went pending. Owen's turn →
+  // the most recent approval (when the ball came back to him), else created_at.
+  function waitingSince(p) {
+    var ps = pendingStageOf(p);
+    if (ps && ps.pending_since) return new Date(ps.pending_since).getTime();
+    var times = (p.approvals || []).map(function (a) { return new Date(a.approved_at).getTime(); });
+    return times.length ? Math.max.apply(null, times) : new Date(p.created_at).getTime();
+  }
 
   function show(name) {
     views.forEach(function (v) {
@@ -221,7 +300,7 @@
     });
 
     var res = await sb.from('projects')
-      .select('id, title, status, created_at, client_id, profiles(email, display_name), stages(state, stage_index)')
+      .select('id, title, status, created_at, client_id, profiles(email, display_name), stages(state, stage_index, pending_since), approvals(approved_at)')
       .order('created_at', { ascending: false });
     var list = document.getElementById('project-list');
     list.innerHTML = '';
@@ -233,38 +312,56 @@
     var projects = allProjects.filter(function (p) { return !archivedIds[p.client_id]; });
     document.getElementById('projects-empty').hidden = projects.length > 0;
 
-    // Whose move is it? Sort your-move projects to the top.
-    function turnOf(p) {
-      if (p.status === 'complete') return 'complete';
-      var stages = p.stages || [];
-      var pendingStage = stages.find(function (s) { return s.state === 'pending'; });
-      return pendingStage ? 'client' : 'you';
-    }
-    var order = { you: 0, client: 1, complete: 2 };
+    // Four-state status, derived (no stored status column beyond active/complete):
+    //   you      — Owen's turn: no stage is awaiting the client
+    //   client   — client's turn: a stage is pending, within the chase window
+    //   stalled  — client's turn, but pending longer than OVERDUE_DAYS
+    //   complete — project finished
+    var order = { you: 0, stalled: 1, client: 2, complete: 3 };
     projects.sort(function (a, b) {
-      var d = order[turnOf(a)] - order[turnOf(b)];
-      return d !== 0 ? d : (a.created_at < b.created_at ? 1 : -1);
+      var d = order[statusOf(a)] - order[statusOf(b)];
+      if (d !== 0) return d;
+      // Within a status, longest-waiting first (oldest waitingSince first).
+      return waitingSince(a) - waitingSince(b);
     });
+
+    // Summary line: answer "what needs me right now?" before the grid.
+    var tally = { you: 0, stalled: 0, client: 0, complete: 0 };
+    projects.forEach(function (p) { tally[statusOf(p)]++; });
+    var summary = document.getElementById('project-summary');
+    var parts = [];
+    if (tally.you) parts.push(tally.you + ' need your move');
+    if (tally.stalled) parts.push(tally.stalled + ' overdue');
+    if (tally.client) parts.push(tally.client + ' awaiting client');
+    if (parts.length) {
+      summary.textContent = parts.join('  ·  ');
+      summary.hidden = false;
+    } else {
+      summary.hidden = true;
+    }
 
     projects.forEach(function (p) {
       var stages = p.stages || [];
       var approved = stages.filter(function (s) { return s.state === 'approved'; }).length;
-      var turn = turnOf(p);
+      var status = statusOf(p);
       var card = el('a', 'project-card');
       card.href = '#project/' + p.id;
       card.appendChild(el('h3', null, p.title));
       var meta = el('div', 'meta');
-      if (turn === 'complete') {
+      if (status === 'complete') {
         meta.appendChild(el('span', 'badge complete', 'Complete'));
-      } else if (turn === 'you') {
+      } else if (status === 'you') {
         meta.appendChild(el('span', 'badge pending', 'Your move'));
+      } else if (status === 'stalled') {
+        meta.appendChild(el('span', 'badge stalled', 'Overdue · ' + overdueDays(p) + 'd'));
       } else {
         meta.appendChild(el('span', 'badge locked', 'Awaiting client'));
       }
       meta.appendChild(el('span', null, 'Client: ' + ((p.profiles && p.profiles.email) || '—')));
       meta.appendChild(el('span', null, approved + '/' + (STAGE_COUNT - 1) + ' approved'));
       card.appendChild(meta);
-      if (turn === 'you') card.classList.add('your-move');
+      if (status === 'you') card.classList.add('your-move');
+      if (status === 'stalled') card.classList.add('is-stalled');
       list.appendChild(card);
     });
 
@@ -272,34 +369,64 @@
     // projects, so an archived client's row still shows their real count.
     var counts = {};
     var hasComplete = {};
+    var hasActive = {};    // client_id -> has at least one non-complete project
+    var stalledDays = {};  // client_id -> worst overdue-day count among their projects
     allProjects.forEach(function (p) {
       counts[p.client_id] = (counts[p.client_id] || 0) + 1;
       if (p.status === 'complete') hasComplete[p.client_id] = true;
+      else hasActive[p.client_id] = true;
+      if (statusOf(p) === 'stalled') {
+        stalledDays[p.client_id] = Math.max(stalledDays[p.client_id] || 0, overdueDays(p));
+      }
     });
-    renderClients(allClients, counts, hasComplete);
+    clientData = { clients: allClients, counts: counts, hasComplete: hasComplete,
+                   stalledDays: stalledDays, hasActive: hasActive };
+    renderClients();
 
     show('projects');
   }
 
-  function renderClients(clients, counts, hasComplete) {
+  // Change 6 — search + filter. renderClients reads the cached clientData and
+  // the current control values, so typing/toggling just re-renders.
+  function clientMatches(c, term) {
+    if (!term) return true;
+    return ((c.display_name || '') + ' ' + (c.email || '')).toLowerCase().indexOf(term) !== -1;
+  }
+
+  function renderClients() {
+    if (!clientData) return;
+    var clients = clientData.clients, counts = clientData.counts,
+        hasComplete = clientData.hasComplete, stalledDays = clientData.stalledDays || {},
+        hasActive = clientData.hasActive || {};
     var wrap = document.getElementById('clients-list');
     wrap.innerHTML = '';
     document.getElementById('clients-empty').hidden = clients.length > 0;
     var cErr = document.getElementById('clients-error');
-    var active = clients.filter(function (c) { return !c.archived; });
-    var archived = clients.filter(function (c) { return c.archived; });
 
-    active.forEach(function (c) { wrap.appendChild(activeRow(c, cErr, counts)); });
+    var term = (document.getElementById('client-search').value || '').trim().toLowerCase();
+    var activeOnly = document.getElementById('client-filter').value === 'active';
 
+    var active = clients.filter(function (c) {
+      return !c.archived && clientMatches(c, term) && (!activeOnly || hasActive[c.id]);
+    });
+    // The "with active project" filter is about live work, so it hides the
+    // archived section entirely (archived clients are hidden by definition).
+    var archived = activeOnly ? [] : clients.filter(function (c) {
+      return c.archived && clientMatches(c, term);
+    });
+
+    active.forEach(function (c) { wrap.appendChild(activeRow(c, cErr, counts, stalledDays)); });
     if (archived.length) {
       wrap.appendChild(el('p', 'eyebrow', 'Archived (hidden, cannot sign in)'));
       archived.forEach(function (c) {
         wrap.appendChild(archivedRow(c, cErr, counts, hasComplete));
       });
     }
+    document.getElementById('clients-none').hidden =
+      !(clients.length > 0 && active.length === 0 && archived.length === 0);
   }
 
-  function activeRow(c, cErr, counts) {
+  function activeRow(c, cErr, counts, stalledDays) {
     var n = counts[c.id] || 0;
     var row = el('div', 'client-row');
 
@@ -308,6 +435,9 @@
     var fields = el('div', 'client-fields');
     fields.appendChild(nameIn); fields.appendChild(emailIn);
     if (n) fields.appendChild(el('span', 'client-email', n + ' project' + (n === 1 ? '' : 's')));
+    if (stalledDays && stalledDays[c.id]) {
+      fields.appendChild(el('span', 'badge stalled', 'Overdue · ' + stalledDays[c.id] + 'd'));
+    }
     row.appendChild(fields);
 
     var save = el('button', 'btn primary sm', 'Save'); save.type = 'button'; save.disabled = true;
@@ -467,6 +597,62 @@
     renderProjects();
   });
 
+  /* ── completion records export (Change 8) ── */
+  function csvCell(v) {
+    var s = (v == null ? '' : String(v));
+    return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  document.getElementById('export-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errN = document.getElementById('export-error');
+    var okN = document.getElementById('export-ok');
+    errN.hidden = true; okN.hidden = true;
+    var from = document.getElementById('export-from').value;
+    var to = document.getElementById('export-to').value;
+
+    var q = sb.from('projects')
+      .select('title, completed_at, profiles(display_name, email), approvals(stage_name, approved_at)')
+      .eq('status', 'complete')
+      .order('completed_at', { ascending: true });
+    if (from) q = q.gte('completed_at', from);
+    if (to) q = q.lte('completed_at', to + 'T23:59:59.999Z');
+    var res = await q;
+    if (res.error) { showError(errN, res.error); return; }
+
+    var rows = [['Project', 'Client', 'Client email', 'Stage', 'Approved at', 'Project completed at']];
+    (res.data || []).forEach(function (p) {
+      var cname = (p.profiles && p.profiles.display_name) || '';
+      var cemail = (p.profiles && p.profiles.email) || '';
+      var aps = (p.approvals || []).slice().sort(function (a, b) {
+        return new Date(a.approved_at) - new Date(b.approved_at);
+      });
+      if (aps.length) {
+        aps.forEach(function (a) {
+          rows.push([p.title, cname, cemail, a.stage_name, a.approved_at, p.completed_at]);
+        });
+      } else {
+        rows.push([p.title, cname, cemail, '(no approvals recorded)', '', p.completed_at]);
+      }
+    });
+    if (rows.length === 1) {
+      showError(errN, { message: 'No completed projects in that range.' });
+      return;
+    }
+
+    var csv = rows.map(function (r) { return r.map(csvCell).join(','); }).join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'sgp-completion-records' + (from ? '_' + from : '') + (to ? '_' + to : '') + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    okN.textContent = 'Exported ' + (rows.length - 1) + ' approval row' +
+      (rows.length - 1 === 1 ? '' : 's') + ' from completed projects.';
+    okN.hidden = false;
+  });
+
   /* ── single project ── */
   function linkEditor(stage, field, projectId, heading) {
     var box = el('div');
@@ -530,6 +716,18 @@
     document.getElementById('project-meta').textContent =
       'Client: ' + ((project.profiles && project.profiles.email) || '—') +
       ' · Created ' + fmtDate(project.created_at);
+
+    // Overdue flag — visible in the project header too, not just the list.
+    var od = document.getElementById('project-overdue');
+    od.innerHTML = '';
+    if (statusOf({ status: project.status, stages: stages }) === 'stalled') {
+      od.appendChild(el('span', 'badge stalled', 'Overdue · ' + overdueDays({ stages: stages }) + 'd'));
+      od.appendChild(el('span', 'hint',
+        '  Awaiting the client beyond ' + OVERDUE_DAYS + ' days — worth a manual chase.'));
+      od.hidden = false;
+    } else {
+      od.hidden = true;
+    }
 
     document.getElementById('report-link').href = 'report.html?p=' + id;
 
@@ -782,7 +980,61 @@
     }
     zone.appendChild(panel);
 
+    await renderChaseLog(id);
     show('project');
+  }
+
+  // Change 2 — internal chase log: private, append-only contact record per
+  // project. Admin-only (RLS). Defensive: if the project_notes table isn't
+  // there yet, the panel quietly hides rather than breaking the project view.
+  async function renderChaseLog(id) {
+    var box = document.getElementById('chase-log');
+    box.innerHTML = '';
+    var res = await sb.from('project_notes')
+      .select('*').eq('project_id', id).order('created_at', { ascending: false });
+    if (res.error) return;  // table not migrated yet — show nothing
+
+    var panel = el('div', 'admin-panel');
+    panel.appendChild(el('h2', null, 'Chase log'));
+    panel.appendChild(el('p', 'hint',
+      'Private to you — the client never sees this. Record contact attempts ' +
+      '(call, email) when a project stalls. Entries are timestamped and cannot ' +
+      'be edited or deleted.'));
+
+    var notes = res.data || [];
+    if (notes.length) {
+      var ul = el('ul', 'chase-list');
+      notes.forEach(function (n) {
+        var li = el('li');
+        li.appendChild(el('span', 'chase-when', fmtDate(n.created_at)));
+        li.appendChild(el('span', 'chase-body', n.body));
+        ul.appendChild(li);
+      });
+      panel.appendChild(ul);
+    } else {
+      panel.appendChild(el('p', 'hint', 'No entries yet.'));
+    }
+
+    var form = el('form', 'note-form');
+    var area = el('textarea');
+    area.placeholder = 'e.g. Emailed client to chase final approval — no reply yet.';
+    area.required = true;
+    var save = el('button', 'btn primary', 'Add log entry'); save.type = 'submit';
+    var errN = el('p', 'form-error'); errN.hidden = true;
+    form.appendChild(area); form.appendChild(save); form.appendChild(errN);
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var body = area.value.trim();
+      if (!body) return;
+      save.disabled = true;
+      var ins = await sb.from('project_notes')
+        .insert({ project_id: id, author_id: profile && profile.id, body: body });
+      save.disabled = false;
+      if (ins.error) { showError(errN, ins.error); return; }
+      renderChaseLog(id);
+    });
+    panel.appendChild(form);
+    box.appendChild(panel);
   }
 
   /* ── routing ── */
@@ -799,6 +1051,9 @@
     var m = location.hash.match(/^#project\/(.+)$/);
     if (m) renderProject(m[1]); else renderProjects();
   }
+
+  document.getElementById('client-search').addEventListener('input', renderClients);
+  document.getElementById('client-filter').addEventListener('change', renderClients);
 
   window.addEventListener('hashchange', route);
   route();
