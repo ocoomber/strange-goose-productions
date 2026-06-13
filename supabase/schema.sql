@@ -21,7 +21,8 @@ create table public.projects (
   client_id uuid not null references public.profiles(id),
   title text not null,
   status text not null default 'active' check (status in ('active','complete')),
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  completed_at timestamptz   -- set when status first becomes 'complete' (Change 7/8: date-range export/search)
 );
 
 create table public.stages (
@@ -34,6 +35,7 @@ create table public.stages (
   video_id text,                                  -- YouTube video ID
   note text,                                      -- admin note to client (e.g. what changed)
   deliverable_links jsonb not null default '[]',  -- stage 7 only
+  pending_since timestamptz,                      -- when this stage became the client's turn (locked→pending); drives the overdue/stalled logic
   unique (project_id, stage_index)
 );
 
@@ -44,6 +46,17 @@ create table public.approvals (
   client_id uuid not null references public.profiles(id),
   stage_name text not null,   -- denormalised so the record is self-contained
   approved_at timestamptz not null default now()
+);
+
+-- Internal chase log (Change 2): private admin notes per project, append-only.
+-- Records Owen's manual contact attempts when a project stalls. Never visible
+-- to the client.
+create table public.project_notes (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid not null references public.projects(id) on delete cascade,
+  author_id uuid references public.profiles(id),
+  body text not null,
+  created_at timestamptz not null default now()
 );
 
 -- ── Helpers ─────────────────────────────────────────────────
@@ -84,8 +97,10 @@ declare
   i int;
 begin
   for i in 1..7 loop
-    insert into public.stages (project_id, stage_index, name, state)
-    values (new.id, i, names[i], case when i = 1 then 'pending' else 'locked' end);
+    insert into public.stages (project_id, stage_index, name, state, pending_since)
+    values (new.id, i, names[i],
+            case when i = 1 then 'pending' else 'locked' end,
+            case when i = 1 then now() else null end);
   end loop;
   return new;
 end $$;
@@ -131,6 +146,8 @@ begin
       ) then
         raise exception 'Previous stage must be approved before advancing';
       end if;
+      -- Stamp when the ball moved to the client, for the overdue/stalled logic.
+      new.pending_since := now();
     else
       raise exception 'Invalid stage transition: % → %', old.state, new.state;
     end if;
@@ -191,6 +208,20 @@ create trigger on_deliverables_approved
   after insert on public.approvals
   for each row execute function public.complete_on_deliverables();
 
+-- Stamp completed_at when a project first becomes complete (Change 7/8).
+create or replace function public.stamp_completed_at()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if new.status = 'complete' and old.status is distinct from 'complete' then
+    new.completed_at := now();
+  end if;
+  return new;
+end $$;
+
+create trigger stamp_completed_at
+  before update on public.projects
+  for each row execute function public.stamp_completed_at();
+
 -- Non-admins may only flip their own must_change_password / display_name.
 -- auth.uid() is null outside the API (SQL editor / service role) — allow those.
 create or replace function public.guard_profile_update()
@@ -220,7 +251,8 @@ begin
   delete from public.approvals where project_id = p_project;
   perform set_config('sgp.resetting', '1', true);
   update public.stages
-  set state = case when stage_index = 1 then 'pending' else 'locked' end
+  set state = case when stage_index = 1 then 'pending' else 'locked' end,
+      pending_since = case when stage_index = 1 then now() else null end
   where project_id = p_project;
   perform set_config('sgp.resetting', '', true);
   update public.projects set status = 'active' where id = p_project;
@@ -247,7 +279,10 @@ begin
   update public.stages
   set state = case when stage_index = k then 'pending'
                    when stage_index > k then 'locked'
-                   else state end
+                   else state end,
+      pending_since = case when stage_index = k then now()
+                           when stage_index > k then null
+                           else pending_since end
   where project_id = p_project;
   perform set_config('sgp.resetting', '', true);
   update public.projects set status = 'active' where id = p_project;
@@ -255,10 +290,11 @@ end $$;
 
 -- ── Row Level Security ──────────────────────────────────────
 
-alter table public.profiles  enable row level security;
-alter table public.projects  enable row level security;
-alter table public.stages    enable row level security;
-alter table public.approvals enable row level security;
+alter table public.profiles      enable row level security;
+alter table public.projects      enable row level security;
+alter table public.stages        enable row level security;
+alter table public.approvals     enable row level security;
+alter table public.project_notes enable row level security;
 
 -- profiles
 create policy "read own profile or admin reads all" on public.profiles
@@ -299,6 +335,19 @@ revoke update, delete on public.approvals from anon, authenticated;
 -- Projects and stages are never deleted through the API either:
 revoke delete on public.projects, public.stages from anon, authenticated;
 
+-- project_notes (chase log): admin-only, append-only, never seen by the client.
+create policy "admin reads project notes" on public.project_notes
+  for select using (public.is_admin());
+create policy "admin inserts project notes" on public.project_notes
+  for insert with check (public.is_admin());
+revoke update, delete on public.project_notes from anon, authenticated;
+
+-- Helpful indexes for the chase log and date-range completion search.
+create index if not exists project_notes_project_idx
+  on public.project_notes (project_id, created_at desc);
+create index if not exists projects_completed_at_idx
+  on public.projects (completed_at desc);
+
 -- ------------------------------------------------------------
 -- Function EXECUTE grants (lock down the SECURITY DEFINER functions).
 -- By default Postgres grants EXECUTE on new functions to PUBLIC, which
@@ -322,6 +371,7 @@ revoke execute on function public.guard_stage_update()       from public, anon, 
 revoke execute on function public.guard_profile_update()     from public, anon, authenticated;
 revoke execute on function public.complete_on_deliverables() from public, anon, authenticated;
 revoke execute on function public.seed_stages()              from public, anon, authenticated;
+revoke execute on function public.stamp_completed_at()       from public, anon, authenticated;
 -- Note: is_admin() intentionally stays executable by anon/authenticated —
 -- the RLS policies above call it, so the querying role needs EXECUTE on it.
 

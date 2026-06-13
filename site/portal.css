@@ -132,6 +132,90 @@ button.btn.ghost:disabled {
 .badge.locked   { color: var(--muted); }
 .badge.active   { color: var(--accent-strong); }
 .badge.complete { color: oklch(45% 0.12 150); }
+/* Overdue / stalled — a project waiting on the client past the chase window. */
+.badge.stalled  { color: oklch(55% 0.17 25); background: oklch(55% 0.17 25 / 0.10); }
+.project-card.is-stalled { border-left: 3px solid oklch(55% 0.17 25); }
+
+/* Client list search + filter (admin, Change 6). */
+.client-controls {
+  display: flex;
+  gap: 12px;
+  margin: 4px 0 18px;
+  flex-wrap: wrap;
+}
+.client-controls input,
+.client-controls select {
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: var(--sans);
+  border: 1px solid var(--faint);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.client-controls input { flex: 1 1 220px; }
+
+/* Chase log (admin, Change 2): timestamped immutable contact entries. */
+.chase-list { list-style: none; margin: 14px 0 18px; padding: 0; }
+.chase-list li {
+  display: flex;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--paper-3);
+  align-items: baseline;
+}
+.chase-when {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+.chase-body { color: var(--ink-2); white-space: pre-wrap; }
+
+/* Admin home: "what needs me now" summary line above the project grid. */
+.portal-summary {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin: 8px 0 0;
+}
+/* Secondary admin area (client setup + lookup) — collapsed, below the grid. */
+.admin-secondary { margin-top: 40px; border-top: 1px solid var(--faint); }
+.admin-secondary > summary {
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 16px 0;
+}
+.admin-secondary > summary::-webkit-details-marker { display: none; }
+.admin-secondary > summary::before { content: '+  '; }
+.admin-secondary[open] > summary::before { content: '–  '; }
+.admin-secondary[open] > summary { color: var(--ink-2); }
+
+/* Client dashboard: completed projects, collapsed below the active ones. */
+.past-projects { margin-top: 36px; border-top: 1px solid var(--faint); }
+.past-projects > summary {
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 16px 0;
+}
+.past-projects > summary::-webkit-details-marker { display: none; }
+.past-projects > summary::before { content: '+  '; }
+.past-projects[open] > summary::before { content: '–  '; }
+.past-projects[open] > summary { color: var(--ink-2); }
 
 /* ── stage timeline ── */
 .stage-list { margin-top: 32px; display: grid; gap: 0; }
