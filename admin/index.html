@@ -119,8 +119,16 @@
 
         <div class="admin-panel">
           <h2>Clients</h2>
+          <div class="client-controls">
+            <input id="client-search" type="search" placeholder="Search name or email">
+            <select id="client-filter">
+              <option value="all">All clients</option>
+              <option value="active">With active project</option>
+            </select>
+          </div>
           <div id="clients-list"></div>
           <p class="hint" id="clients-empty" hidden>No client accounts yet.</p>
+          <p class="hint" id="clients-none" hidden>No clients match.</p>
           <p class="form-error" id="clients-error" hidden></p>
         </div>
       </details>
@@ -154,6 +162,7 @@
 (function () {
   var views = ['login', 'projects', 'project'];
   var profile = null;
+  var clientData = null;  // cached client/project data for the search/filter re-render
 
   // ── Overdue / status config ──────────────────────────────────
   // A project that's been the client's turn for longer than this is
@@ -336,35 +345,61 @@
     // projects, so an archived client's row still shows their real count.
     var counts = {};
     var hasComplete = {};
+    var hasActive = {};    // client_id -> has at least one non-complete project
     var stalledDays = {};  // client_id -> worst overdue-day count among their projects
     allProjects.forEach(function (p) {
       counts[p.client_id] = (counts[p.client_id] || 0) + 1;
       if (p.status === 'complete') hasComplete[p.client_id] = true;
+      else hasActive[p.client_id] = true;
       if (statusOf(p) === 'stalled') {
         stalledDays[p.client_id] = Math.max(stalledDays[p.client_id] || 0, overdueDays(p));
       }
     });
-    renderClients(allClients, counts, hasComplete, stalledDays);
+    clientData = { clients: allClients, counts: counts, hasComplete: hasComplete,
+                   stalledDays: stalledDays, hasActive: hasActive };
+    renderClients();
 
     show('projects');
   }
 
-  function renderClients(clients, counts, hasComplete, stalledDays) {
+  // Change 6 — search + filter. renderClients reads the cached clientData and
+  // the current control values, so typing/toggling just re-renders.
+  function clientMatches(c, term) {
+    if (!term) return true;
+    return ((c.display_name || '') + ' ' + (c.email || '')).toLowerCase().indexOf(term) !== -1;
+  }
+
+  function renderClients() {
+    if (!clientData) return;
+    var clients = clientData.clients, counts = clientData.counts,
+        hasComplete = clientData.hasComplete, stalledDays = clientData.stalledDays || {},
+        hasActive = clientData.hasActive || {};
     var wrap = document.getElementById('clients-list');
     wrap.innerHTML = '';
     document.getElementById('clients-empty').hidden = clients.length > 0;
     var cErr = document.getElementById('clients-error');
-    var active = clients.filter(function (c) { return !c.archived; });
-    var archived = clients.filter(function (c) { return c.archived; });
 
-    active.forEach(function (c) { wrap.appendChild(activeRow(c, cErr, counts, stalledDays || {})); });
+    var term = (document.getElementById('client-search').value || '').trim().toLowerCase();
+    var activeOnly = document.getElementById('client-filter').value === 'active';
 
+    var active = clients.filter(function (c) {
+      return !c.archived && clientMatches(c, term) && (!activeOnly || hasActive[c.id]);
+    });
+    // The "with active project" filter is about live work, so it hides the
+    // archived section entirely (archived clients are hidden by definition).
+    var archived = activeOnly ? [] : clients.filter(function (c) {
+      return c.archived && clientMatches(c, term);
+    });
+
+    active.forEach(function (c) { wrap.appendChild(activeRow(c, cErr, counts, stalledDays)); });
     if (archived.length) {
       wrap.appendChild(el('p', 'eyebrow', 'Archived (hidden, cannot sign in)'));
       archived.forEach(function (c) {
         wrap.appendChild(archivedRow(c, cErr, counts, hasComplete));
       });
     }
+    document.getElementById('clients-none').hidden =
+      !(clients.length > 0 && active.length === 0 && archived.length === 0);
   }
 
   function activeRow(c, cErr, counts, stalledDays) {
@@ -936,6 +971,9 @@
     var m = location.hash.match(/^#project\/(.+)$/);
     if (m) renderProject(m[1]); else renderProjects();
   }
+
+  document.getElementById('client-search').addEventListener('input', renderClients);
+  document.getElementById('client-filter').addEventListener('change', renderClients);
 
   window.addEventListener('hashchange', route);
   route();
