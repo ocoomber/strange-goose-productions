@@ -146,6 +146,33 @@
   var views = ['login', 'projects', 'project'];
   var profile = null;
 
+  // ── Overdue / status config ──────────────────────────────────
+  // A project that's been the client's turn for longer than this is
+  // flagged "Overdue" so Owen knows to chase it. Change the number and
+  // push to adjust — it's intentionally a one-line code constant.
+  var OVERDUE_DAYS = 7;
+
+  // The stage currently awaiting the client (drives whose-turn + overdue).
+  function pendingStageOf(p) {
+    return (p.stages || []).find(function (s) { return s.state === 'pending'; });
+  }
+
+  // Whole days a project has been waiting on the client (0 if not waiting).
+  function overdueDays(p) {
+    var ps = pendingStageOf(p);
+    if (!ps || !ps.pending_since) return 0;
+    var ms = Date.now() - new Date(ps.pending_since).getTime();
+    return Math.max(0, Math.floor(ms / 86400000));
+  }
+
+  // Four-state project status, derived from stage data + the overdue window.
+  function statusOf(p) {
+    if (p.status === 'complete') return 'complete';
+    var ps = pendingStageOf(p);
+    if (!ps) return 'you';
+    return overdueDays(p) >= OVERDUE_DAYS ? 'stalled' : 'client';
+  }
+
   function show(name) {
     views.forEach(function (v) {
       document.getElementById('view-' + v).hidden = (v !== name);
@@ -221,7 +248,7 @@
     });
 
     var res = await sb.from('projects')
-      .select('id, title, status, created_at, client_id, profiles(email, display_name), stages(state, stage_index)')
+      .select('id, title, status, created_at, client_id, profiles(email, display_name), stages(state, stage_index, pending_since)')
       .order('created_at', { ascending: false });
     var list = document.getElementById('project-list');
     list.innerHTML = '';
@@ -233,38 +260,39 @@
     var projects = allProjects.filter(function (p) { return !archivedIds[p.client_id]; });
     document.getElementById('projects-empty').hidden = projects.length > 0;
 
-    // Whose move is it? Sort your-move projects to the top.
-    function turnOf(p) {
-      if (p.status === 'complete') return 'complete';
-      var stages = p.stages || [];
-      var pendingStage = stages.find(function (s) { return s.state === 'pending'; });
-      return pendingStage ? 'client' : 'you';
-    }
-    var order = { you: 0, client: 1, complete: 2 };
+    // Four-state status, derived (no stored status column beyond active/complete):
+    //   you      — Owen's turn: no stage is awaiting the client
+    //   client   — client's turn: a stage is pending, within the chase window
+    //   stalled  — client's turn, but pending longer than OVERDUE_DAYS
+    //   complete — project finished
+    var order = { you: 0, stalled: 1, client: 2, complete: 3 };
     projects.sort(function (a, b) {
-      var d = order[turnOf(a)] - order[turnOf(b)];
+      var d = order[statusOf(a)] - order[statusOf(b)];
       return d !== 0 ? d : (a.created_at < b.created_at ? 1 : -1);
     });
 
     projects.forEach(function (p) {
       var stages = p.stages || [];
       var approved = stages.filter(function (s) { return s.state === 'approved'; }).length;
-      var turn = turnOf(p);
+      var status = statusOf(p);
       var card = el('a', 'project-card');
       card.href = '#project/' + p.id;
       card.appendChild(el('h3', null, p.title));
       var meta = el('div', 'meta');
-      if (turn === 'complete') {
+      if (status === 'complete') {
         meta.appendChild(el('span', 'badge complete', 'Complete'));
-      } else if (turn === 'you') {
+      } else if (status === 'you') {
         meta.appendChild(el('span', 'badge pending', 'Your move'));
+      } else if (status === 'stalled') {
+        meta.appendChild(el('span', 'badge stalled', 'Overdue · ' + overdueDays(p) + 'd'));
       } else {
         meta.appendChild(el('span', 'badge locked', 'Awaiting client'));
       }
       meta.appendChild(el('span', null, 'Client: ' + ((p.profiles && p.profiles.email) || '—')));
       meta.appendChild(el('span', null, approved + '/' + (STAGE_COUNT - 1) + ' approved'));
       card.appendChild(meta);
-      if (turn === 'you') card.classList.add('your-move');
+      if (status === 'you') card.classList.add('your-move');
+      if (status === 'stalled') card.classList.add('is-stalled');
       list.appendChild(card);
     });
 

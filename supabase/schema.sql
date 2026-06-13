@@ -34,6 +34,7 @@ create table public.stages (
   video_id text,                                  -- YouTube video ID
   note text,                                      -- admin note to client (e.g. what changed)
   deliverable_links jsonb not null default '[]',  -- stage 7 only
+  pending_since timestamptz,                      -- when this stage became the client's turn (locked→pending); drives the overdue/stalled logic
   unique (project_id, stage_index)
 );
 
@@ -84,8 +85,10 @@ declare
   i int;
 begin
   for i in 1..7 loop
-    insert into public.stages (project_id, stage_index, name, state)
-    values (new.id, i, names[i], case when i = 1 then 'pending' else 'locked' end);
+    insert into public.stages (project_id, stage_index, name, state, pending_since)
+    values (new.id, i, names[i],
+            case when i = 1 then 'pending' else 'locked' end,
+            case when i = 1 then now() else null end);
   end loop;
   return new;
 end $$;
@@ -131,6 +134,8 @@ begin
       ) then
         raise exception 'Previous stage must be approved before advancing';
       end if;
+      -- Stamp when the ball moved to the client, for the overdue/stalled logic.
+      new.pending_since := now();
     else
       raise exception 'Invalid stage transition: % → %', old.state, new.state;
     end if;
@@ -220,7 +225,8 @@ begin
   delete from public.approvals where project_id = p_project;
   perform set_config('sgp.resetting', '1', true);
   update public.stages
-  set state = case when stage_index = 1 then 'pending' else 'locked' end
+  set state = case when stage_index = 1 then 'pending' else 'locked' end,
+      pending_since = case when stage_index = 1 then now() else null end
   where project_id = p_project;
   perform set_config('sgp.resetting', '', true);
   update public.projects set status = 'active' where id = p_project;
@@ -247,7 +253,10 @@ begin
   update public.stages
   set state = case when stage_index = k then 'pending'
                    when stage_index > k then 'locked'
-                   else state end
+                   else state end,
+      pending_since = case when stage_index = k then now()
+                           when stage_index > k then null
+                           else pending_since end
   where project_id = p_project;
   perform set_config('sgp.resetting', '', true);
   update public.projects set status = 'active' where id = p_project;
