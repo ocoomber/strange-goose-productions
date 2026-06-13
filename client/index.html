@@ -46,6 +46,9 @@
           </p>
           <p class="hint" id="forgot-sent" hidden style="margin-top:10px;">If that email has an account, a reset link is on its way — check your inbox.</p>
         </form>
+        <div class="auth-or"><span>or</span></div>
+        <button class="btn ghost full" type="button" id="login-google">Sign in with Google</button>
+        <p class="form-error" id="login-google-error" hidden></p>
       </div>
     </section>
 
@@ -67,6 +70,10 @@
           <p class="form-error" id="pw-error" hidden></p>
           <button class="btn primary full" type="submit" style="margin-top:18px;">Save password</button>
         </form>
+        <div class="auth-or"><span>or</span></div>
+        <button class="btn ghost full" type="button" id="pw-google">Continue with Google instead</button>
+        <p class="hint" style="margin-top:10px;text-align:center;">Prefer not to remember a password? Use your Google account to sign in from now on.</p>
+        <p class="form-error" id="pw-google-error" hidden></p>
       </div>
     </section>
 
@@ -136,6 +143,20 @@
     });
     if (res.error) { showError(errNode, res.error); return; }
     document.getElementById('forgot-sent').hidden = false;
+  });
+
+  /* ── Google sign-in (login screen + first-login screen) ── */
+  document.getElementById('login-google').addEventListener('click', async function () {
+    var errNode = document.getElementById('login-google-error');
+    errNode.hidden = true;
+    try { await signInWithGoogle(); }
+    catch (err) { showError(errNode, err); }
+  });
+  document.getElementById('pw-google').addEventListener('click', async function () {
+    var errNode = document.getElementById('pw-google-error');
+    errNode.hidden = true;
+    try { await signInWithGoogle(); }
+    catch (err) { showError(errNode, err); }
   });
 
   /* ── login ── */
@@ -345,6 +366,12 @@
     if (!profile || profile.id !== session.user.id) profile = await getProfile();
     if (!profile) { show('login'); return; }
     if (profile.role === 'admin') { window.location.href = '../admin/'; return; }
+    /* Google sign-ins have no password to change — clear the first-login flag
+       so they skip the "choose a password" screen entirely. */
+    if (profile.must_change_password && signedInWithGoogle(session)) {
+      await clearMustChangePassword();
+      profile.must_change_password = false;
+    }
     if (profile.must_change_password) { show('password'); return; }
     var m = location.hash.match(/^#project\/(.+)$/);
     if (m) renderProject(m[1]); else renderProjects();

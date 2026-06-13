@@ -88,20 +88,43 @@ async function signIn(email, password) {
   return res.data;
 }
 
+async function signInWithGoogle() {
+  var res = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/client/' }
+  });
+  if (res.error) throw res.error;
+  return res.data;
+}
+
+/* True if the current session authenticated via the Google provider. */
+function signedInWithGoogle(session) {
+  if (!session || !session.user) return false;
+  if (session.user.app_metadata && session.user.app_metadata.provider === 'google') return true;
+  var ids = (session.user.identities || []);
+  return ids.some(function (i) { return i.provider === 'google'; });
+}
+
 async function signOut() {
   await sb.auth.signOut();
   window.location.reload();
+}
+
+/* Clear the first-login flag for the current user. */
+async function clearMustChangePassword() {
+  var session = await getSession();
+  if (!session) return;
+  var upd = await sb.from('profiles')
+    .update({ must_change_password: false })
+    .eq('id', session.user.id);
+  if (upd.error) throw upd.error;
 }
 
 /* Forced password change on first login */
 async function changePassword(newPassword) {
   var res = await sb.auth.updateUser({ password: newPassword });
   if (res.error) throw res.error;
-  var session = await getSession();
-  var upd = await sb.from('profiles')
-    .update({ must_change_password: false })
-    .eq('id', session.user.id);
-  if (upd.error) throw upd.error;
+  await clearMustChangePassword();
 }
 
 /* ── small DOM helpers ── */
