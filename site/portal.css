@@ -162,6 +162,23 @@ button.btn.ghost:disabled {
 .admin-secondary[open] > summary::before { content: '–  '; }
 .admin-secondary[open] > summary { color: var(--ink-2); }
 
+/* Client dashboard: completed projects, collapsed below the active ones. */
+.past-projects { margin-top: 36px; border-top: 1px solid var(--faint); }
+.past-projects > summary {
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 16px 0;
+}
+.past-projects > summary::-webkit-details-marker { display: none; }
+.past-projects > summary::before { content: '+  '; }
+.past-projects[open] > summary::before { content: '–  '; }
+.past-projects[open] > summary { color: var(--ink-2); }
+
 /* ── stage timeline ── */
 .stage-list { margin-top: 32px; display: grid; gap: 0; }
 .stage {

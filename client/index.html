@@ -86,6 +86,10 @@
       </header>
       <div class="portal-grid" id="project-list"></div>
       <p class="portal-empty" id="projects-empty" hidden>No projects yet — we'll add yours shortly.</p>
+      <details class="past-projects" id="past-projects" hidden>
+        <summary>Past projects</summary>
+        <div class="portal-grid" id="past-list" style="margin-top:16px;"></div>
+      </details>
     </section>
 
     <!-- single project -->
@@ -192,30 +196,61 @@
   });
 
   /* ── project list ── */
+  // Most recent activity on a project: latest approval, else creation. Used to
+  // order active projects so the one the client touched last is first.
+  function lastActivity(p) {
+    var times = (p.approvals || []).map(function (a) { return new Date(a.approved_at).getTime(); });
+    return times.length ? Math.max.apply(null, times) : new Date(p.created_at).getTime();
+  }
+
+  function projectCard(p) {
+    var approved = (p.stages || []).filter(function (s) { return s.state === 'approved'; }).length;
+    var card = el('a', 'project-card');
+    card.href = '#project/' + p.id;
+    card.appendChild(el('h3', null, p.title));
+    var meta = el('div', 'meta');
+    meta.appendChild(el('span', 'badge ' + p.status, p.status === 'complete' ? 'Complete' : 'In progress'));
+    // Stages 1–6 are client approvals; stage 7 is delivery, not approved.
+    meta.appendChild(el('span', null, approved + ' of ' + (STAGE_COUNT - 1) + ' stages approved'));
+    card.appendChild(meta);
+    return card;
+  }
+
   async function renderProjects() {
     document.getElementById('projects-greeting').textContent =
       'Signed in as ' + profile.email + '. Approvals you make here are timestamped and permanent.';
     var res = await sb.from('projects')
-      .select('id, title, status, created_at, stages(state)')
+      .select('id, title, status, created_at, stages(state), approvals(approved_at)')
       .order('created_at', { ascending: false });
+    var projects = res.data || [];
+    var active = projects.filter(function (p) { return p.status !== 'complete'; });
+    var done = projects.filter(function (p) { return p.status === 'complete'; });
+    active.sort(function (a, b) { return lastActivity(b) - lastActivity(a); });
+
+    // A client with a single active project lands straight on it — no
+    // intermediate one-item list. Once per session, so "back" still reaches
+    // the dashboard (where past projects live).
+    if (active.length === 1 && !sessionStorage.getItem('sgp_landed')) {
+      sessionStorage.setItem('sgp_landed', '1');
+      location.hash = '#project/' + active[0].id;
+      return;
+    }
+
     var list = document.getElementById('project-list');
     list.innerHTML = '';
-    var projects = res.data || [];
     document.getElementById('projects-empty').hidden = projects.length > 0;
-    projects.forEach(function (p) {
-      var approved = (p.stages || []).filter(function (s) { return s.state === 'approved'; }).length;
-      var card = el('a', 'project-card');
-      card.href = '#project/' + p.id;
-      var h = el('h3', null, p.title);
-      var meta = el('div', 'meta');
-      var badge = el('span', 'badge ' + p.status, p.status === 'complete' ? 'Complete' : 'In progress');
-      meta.appendChild(badge);
-      // Stages 1–6 are client approvals; stage 7 is delivery, not approved.
-      meta.appendChild(el('span', null, approved + ' of ' + (STAGE_COUNT - 1) + ' stages approved'));
-      card.appendChild(h);
-      card.appendChild(meta);
-      list.appendChild(card);
-    });
+    active.forEach(function (p) { list.appendChild(projectCard(p)); });
+
+    // Completed projects: reference material, tucked into a collapsed section.
+    var past = document.getElementById('past-projects');
+    var pastList = document.getElementById('past-list');
+    pastList.innerHTML = '';
+    if (done.length) {
+      done.forEach(function (p) { pastList.appendChild(projectCard(p)); });
+      past.hidden = false;
+    } else {
+      past.hidden = true;
+    }
     show('projects');
   }
 
