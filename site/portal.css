@@ -136,6 +136,32 @@ button.btn.ghost:disabled {
 .badge.stalled  { color: oklch(55% 0.17 25); background: oklch(55% 0.17 25 / 0.10); }
 .project-card.is-stalled { border-left: 3px solid oklch(55% 0.17 25); }
 
+/* Admin home: "what needs me now" summary line above the project grid. */
+.portal-summary {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin: 8px 0 0;
+}
+/* Secondary admin area (client setup + lookup) — collapsed, below the grid. */
+.admin-secondary { margin-top: 40px; border-top: 1px solid var(--faint); }
+.admin-secondary > summary {
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 16px 0;
+}
+.admin-secondary > summary::-webkit-details-marker { display: none; }
+.admin-secondary > summary::before { content: '+  '; }
+.admin-secondary[open] > summary::before { content: '–  '; }
+.admin-secondary[open] > summary { color: var(--ink-2); }
+
 /* ── stage timeline ── */
 .stage-list { margin-top: 32px; display: grid; gap: 0; }
 .stage {

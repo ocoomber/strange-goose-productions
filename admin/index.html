@@ -51,7 +51,7 @@
       <header class="portal-hd">
         <p class="eyebrow">Admin</p>
         <h1>Projects</h1>
-        <p class="sub">Create client accounts below — new accounts appear in the client dropdown, ready to be assigned a project.</p>
+        <p class="sub">Projects needing your move are listed first. Client accounts and project setup are below.</p>
       </header>
 
       <div class="admin-panel" id="password-panel" hidden>
@@ -71,52 +71,59 @@
         <p class="hint" id="admin-pw-ok" hidden style="color:oklch(45% 0.12 150);">Password updated.</p>
       </div>
 
-      <div class="admin-panel">
-        <h2>New client account</h2>
-        <form id="client-form" class="admin-row">
-          <div class="field">
-            <label for="client-email">Client email</label>
-            <input id="client-email" type="email" required>
-          </div>
-          <div class="field">
-            <label for="client-name">Display name (optional)</label>
-            <input id="client-name" type="text">
-          </div>
-          <button class="btn primary" type="submit">Create account</button>
-        </form>
-        <p class="form-error" id="client-error" hidden></p>
-        <div class="stage-note-box" id="client-result" hidden style="margin-top:16px;">
-          <p class="eyebrow">Account created — send these credentials to the client</p>
-          <p class="stage-note" id="client-creds"></p>
-          <p class="hint" style="margin-top:8px;">They'll be asked to choose their own password on first sign-in. Portal link: https://www.strangegoose.co.uk/client/</p>
-        </div>
-      </div>
-
-      <div class="admin-panel">
-        <h2>Clients</h2>
-        <div id="clients-list"></div>
-        <p class="hint" id="clients-empty" hidden>No client accounts yet.</p>
-        <p class="form-error" id="clients-error" hidden></p>
-      </div>
-
-      <div class="admin-panel">
-        <h2>New project</h2>
-        <form id="create-form" class="admin-row">
-          <div class="field">
-            <label for="new-title">Project title</label>
-            <input id="new-title" type="text" required>
-          </div>
-          <div class="field">
-            <label for="new-client">Client account</label>
-            <select id="new-client" required></select>
-          </div>
-          <button class="btn primary" type="submit">Create project</button>
-        </form>
-        <p class="form-error" id="create-error" hidden></p>
-      </div>
-
-      <div class="portal-grid" id="project-list" style="margin-top:32px;"></div>
+      <!-- Daily focus: what needs Owen right now. -->
+      <p class="portal-summary" id="project-summary" hidden></p>
+      <div class="portal-grid" id="project-list" style="margin-top:18px;"></div>
       <p class="portal-empty" id="projects-empty" hidden>No projects yet.</p>
+
+      <!-- Secondary: account setup and client lookup, not the daily start. -->
+      <details class="admin-secondary" id="setup-panels">
+        <summary>Clients &amp; project setup</summary>
+
+        <div class="admin-panel">
+          <h2>New project</h2>
+          <form id="create-form" class="admin-row">
+            <div class="field">
+              <label for="new-title">Project title</label>
+              <input id="new-title" type="text" required>
+            </div>
+            <div class="field">
+              <label for="new-client">Client account</label>
+              <select id="new-client" required></select>
+            </div>
+            <button class="btn primary" type="submit">Create project</button>
+          </form>
+          <p class="form-error" id="create-error" hidden></p>
+        </div>
+
+        <div class="admin-panel">
+          <h2>New client account</h2>
+          <form id="client-form" class="admin-row">
+            <div class="field">
+              <label for="client-email">Client email</label>
+              <input id="client-email" type="email" required>
+            </div>
+            <div class="field">
+              <label for="client-name">Display name (optional)</label>
+              <input id="client-name" type="text">
+            </div>
+            <button class="btn primary" type="submit">Create account</button>
+          </form>
+          <p class="form-error" id="client-error" hidden></p>
+          <div class="stage-note-box" id="client-result" hidden style="margin-top:16px;">
+            <p class="eyebrow">Account created — send these credentials to the client</p>
+            <p class="stage-note" id="client-creds"></p>
+            <p class="hint" style="margin-top:8px;">They'll be asked to choose their own password on first sign-in. Portal link: https://www.strangegoose.co.uk/client/</p>
+          </div>
+        </div>
+
+        <div class="admin-panel">
+          <h2>Clients</h2>
+          <div id="clients-list"></div>
+          <p class="hint" id="clients-empty" hidden>No client accounts yet.</p>
+          <p class="form-error" id="clients-error" hidden></p>
+        </div>
+      </details>
     </section>
 
     <!-- single project -->
@@ -172,6 +179,16 @@
     var ps = pendingStageOf(p);
     if (!ps) return 'you';
     return overdueDays(p) >= OVERDUE_DAYS ? 'stalled' : 'client';
+  }
+
+  // When the project entered its current waiting state, for "longest waiting
+  // first" sorting. Client's turn → when the stage went pending. Owen's turn →
+  // the most recent approval (when the ball came back to him), else created_at.
+  function waitingSince(p) {
+    var ps = pendingStageOf(p);
+    if (ps && ps.pending_since) return new Date(ps.pending_since).getTime();
+    var times = (p.approvals || []).map(function (a) { return new Date(a.approved_at).getTime(); });
+    return times.length ? Math.max.apply(null, times) : new Date(p.created_at).getTime();
   }
 
   function show(name) {
@@ -249,7 +266,7 @@
     });
 
     var res = await sb.from('projects')
-      .select('id, title, status, created_at, client_id, profiles(email, display_name), stages(state, stage_index, pending_since)')
+      .select('id, title, status, created_at, client_id, profiles(email, display_name), stages(state, stage_index, pending_since), approvals(approved_at)')
       .order('created_at', { ascending: false });
     var list = document.getElementById('project-list');
     list.innerHTML = '';
@@ -269,8 +286,25 @@
     var order = { you: 0, stalled: 1, client: 2, complete: 3 };
     projects.sort(function (a, b) {
       var d = order[statusOf(a)] - order[statusOf(b)];
-      return d !== 0 ? d : (a.created_at < b.created_at ? 1 : -1);
+      if (d !== 0) return d;
+      // Within a status, longest-waiting first (oldest waitingSince first).
+      return waitingSince(a) - waitingSince(b);
     });
+
+    // Summary line: answer "what needs me right now?" before the grid.
+    var tally = { you: 0, stalled: 0, client: 0, complete: 0 };
+    projects.forEach(function (p) { tally[statusOf(p)]++; });
+    var summary = document.getElementById('project-summary');
+    var parts = [];
+    if (tally.you) parts.push(tally.you + ' need your move');
+    if (tally.stalled) parts.push(tally.stalled + ' overdue');
+    if (tally.client) parts.push(tally.client + ' awaiting client');
+    if (parts.length) {
+      summary.textContent = parts.join('  ·  ');
+      summary.hidden = false;
+    } else {
+      summary.hidden = true;
+    }
 
     projects.forEach(function (p) {
       var stages = p.stages || [];
