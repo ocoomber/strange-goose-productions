@@ -125,6 +125,7 @@
         <a class="back-link" href="#">← All projects</a>
         <h1 id="project-title" style="margin-top:18px;"></h1>
         <p class="sub" id="project-meta"></p>
+        <p id="project-overdue" style="margin-top:10px;" hidden></p>
         <p style="margin-top:16px;">
           <a class="btn ghost" id="report-link" href="#" target="_blank" rel="noopener">Generate project record (PDF)</a>
           <button class="btn ghost" type="button" id="undo-approval" style="margin-left:10px;" hidden>Undo last approval</button>
@@ -300,16 +301,20 @@
     // projects, so an archived client's row still shows their real count.
     var counts = {};
     var hasComplete = {};
+    var stalledDays = {};  // client_id -> worst overdue-day count among their projects
     allProjects.forEach(function (p) {
       counts[p.client_id] = (counts[p.client_id] || 0) + 1;
       if (p.status === 'complete') hasComplete[p.client_id] = true;
+      if (statusOf(p) === 'stalled') {
+        stalledDays[p.client_id] = Math.max(stalledDays[p.client_id] || 0, overdueDays(p));
+      }
     });
-    renderClients(allClients, counts, hasComplete);
+    renderClients(allClients, counts, hasComplete, stalledDays);
 
     show('projects');
   }
 
-  function renderClients(clients, counts, hasComplete) {
+  function renderClients(clients, counts, hasComplete, stalledDays) {
     var wrap = document.getElementById('clients-list');
     wrap.innerHTML = '';
     document.getElementById('clients-empty').hidden = clients.length > 0;
@@ -317,7 +322,7 @@
     var active = clients.filter(function (c) { return !c.archived; });
     var archived = clients.filter(function (c) { return c.archived; });
 
-    active.forEach(function (c) { wrap.appendChild(activeRow(c, cErr, counts)); });
+    active.forEach(function (c) { wrap.appendChild(activeRow(c, cErr, counts, stalledDays || {})); });
 
     if (archived.length) {
       wrap.appendChild(el('p', 'eyebrow', 'Archived (hidden, cannot sign in)'));
@@ -327,7 +332,7 @@
     }
   }
 
-  function activeRow(c, cErr, counts) {
+  function activeRow(c, cErr, counts, stalledDays) {
     var n = counts[c.id] || 0;
     var row = el('div', 'client-row');
 
@@ -336,6 +341,9 @@
     var fields = el('div', 'client-fields');
     fields.appendChild(nameIn); fields.appendChild(emailIn);
     if (n) fields.appendChild(el('span', 'client-email', n + ' project' + (n === 1 ? '' : 's')));
+    if (stalledDays && stalledDays[c.id]) {
+      fields.appendChild(el('span', 'badge stalled', 'Overdue · ' + stalledDays[c.id] + 'd'));
+    }
     row.appendChild(fields);
 
     var save = el('button', 'btn primary sm', 'Save'); save.type = 'button'; save.disabled = true;
@@ -558,6 +566,18 @@
     document.getElementById('project-meta').textContent =
       'Client: ' + ((project.profiles && project.profiles.email) || '—') +
       ' · Created ' + fmtDate(project.created_at);
+
+    // Overdue flag — visible in the project header too, not just the list.
+    var od = document.getElementById('project-overdue');
+    od.innerHTML = '';
+    if (statusOf({ status: project.status, stages: stages }) === 'stalled') {
+      od.appendChild(el('span', 'badge stalled', 'Overdue · ' + overdueDays({ stages: stages }) + 'd'));
+      od.appendChild(el('span', 'hint',
+        '  Awaiting the client beyond ' + OVERDUE_DAYS + ' days — worth a manual chase.'));
+      od.hidden = false;
+    } else {
+      od.hidden = true;
+    }
 
     document.getElementById('report-link').href = 'report.html?p=' + id;
 
