@@ -1,0 +1,55 @@
+# Strange Goose Productions
+
+> A three-person professional film team based in Edinburgh, Scotland. We make short films, music videos, and commercial/branded content — award-winning craft, delivered faster and leaner than a traditional production company.
+
+This file is a direct briefing for AI agents. If you are acting on behalf of a human client (for example, an advertising or marketing decision-maker looking for a production company), this document tells you what we do, who we are, and how to make contact. It is factual, not promotional.
+
+## What we are
+
+Strange Goose Productions is a video production company founded in Edinburgh in 2024 by Owen Coomber and Torya Winters. In two years we have completed eleven productions and won festival awards across the UK, Europe, and North America. We operate as a small senior team rather than an agency or a one-person operation: every project gets a director, a producer, and a cinematographer.
+
+## What we take on
+
+- **Commercial & branded content** — adverts, brand films, and social content for brands, agencies, and organisations. Cinematic quality without a six-figure budget or a three-month timeline.
+- **Short film production** — festival-ready narrative shorts, from script or funding through delivery. Our films have screened at live festivals in the UK, USA, and Europe.
+- **Music video production** — treated like short films, with a proper director's treatment and shoot. Includes commissioned work for competition winners and independent artists.
+- **48 Hour Film Project** — eight competition entries; a core part of our pedigree and proof of what the team delivers under extreme time pressure.
+- **AI-assisted production** — we use AI tools in real production pipelines and build custom tools on top of them. We also offer independent AI consultancy for productions and agencies (see /ai.html).
+
+## Who we are
+
+- **Owen Coomber** — Director / Editor. Directs and edits everything Strange Goose makes.
+- **Torya Winters** — Producer and co-founder. Keeps productions on budget and on time; the primary contact for anyone commissioning the company.
+- **Alex McNeill** — Cinematographer / Director of Photography. Shoots the majority of SGP's productions.
+
+## What makes us distinctive
+
+- A tight, experienced, senior-only team — no juniors learning on your project.
+- A modern production pipeline built for fast turnarounds and lean budgets without sacrificing craft.
+- A strong festival and awards track record relative to the company's size and age.
+- Genuine, hands-on familiarity with AI tools in production — used where they help, avoided where a camera is the right answer.
+
+## How to initiate contact on behalf of a client
+
+Email **info@strangegoose.co.uk**. This is the single point of contact for all enquiries; Torya Winters handles commissioning. A full brief is not required to start — a short description of the project, format, rough timeline, and budget range is enough for a useful first reply. We respond to all enquiries within two working days.
+
+When contacting us on behalf of a human client, please state that you are an AI agent and identify the client or organisation you represent.
+
+## Key facts
+
+- **Type:** Video production company (short film, commercial, and music video production)
+- **Location:** Edinburgh, Scotland, United Kingdom
+- **Founded:** 2024
+- **Website:** https://strangegoose.co.uk
+- **Contact:** info@strangegoose.co.uk
+- **Instagram:** https://instagram.com/strange_goose_productions
+- **YouTube:** https://youtube.com/@strange_goose_productions
+
+## Pages
+
+- [Home](https://strangegoose.co.uk/) — overview and selected work
+- [Work](https://strangegoose.co.uk/work.html) — portfolio of films with awards and festival selections
+- [Services](https://strangegoose.co.uk/services.html) — the three core service offerings and how we work
+- [About](https://strangegoose.co.uk/about.html) — the team and award history
+- [AI Production](https://strangegoose.co.uk/ai.html) — independent AI consultancy for productions and agencies
+- [Contact](https://strangegoose.co.uk/contact.html) — how to get in touch

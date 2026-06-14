@@ -10,6 +10,61 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site/styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Organization", "ProfessionalService"],
+      "@id": "https://strangegoose.co.uk/#organization",
+      "name": "Strange Goose Productions",
+      "alternateName": "SGP",
+      "url": "https://strangegoose.co.uk/",
+      "email": "info@strangegoose.co.uk",
+      "description": "A three-person professional film team in Edinburgh making award-winning short films, music videos, and commercial content.",
+      "slogan": "Proper film. Built differently.",
+      "foundingDate": "2024",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Edinburgh",
+        "addressRegion": "Scotland",
+        "addressCountry": "GB"
+      },
+      "areaServed": "Worldwide",
+      "knowsAbout": [
+        "Short film production",
+        "Commercial and branded content",
+        "Spec advertising",
+        "Music video production",
+        "48 Hour Film Project",
+        "AI-assisted production pipeline"
+      ],
+      "founder": [
+        { "@type": "Person", "name": "Owen Coomber", "jobTitle": "Director" },
+        { "@type": "Person", "name": "Torya Winters", "jobTitle": "Producer" }
+      ],
+      "employee": [
+        { "@type": "Person", "name": "Owen Coomber", "jobTitle": "Director / Editor" },
+        { "@type": "Person", "name": "Torya Winters", "jobTitle": "Producer" },
+        { "@type": "Person", "name": "Alex McNeill", "jobTitle": "Director of Photography" }
+      ],
+      "sameAs": [
+        "https://instagram.com/strange_goose_productions",
+        "https://youtube.com/@strange_goose_productions"
+      ]
+    },
+    {
+      "@type": "Service",
+      "name": "Independent AI Production Consultancy",
+      "serviceType": "AI consultancy for film and video production",
+      "description": "Independent AI consultancy for agencies and productions, from working filmmakers who use the tools daily. Covers creative AI (video, image, voice, script), regulatory requirements such as the EU AI Act and C2PA provenance, and bespoke production tools and workflow automation. No software sold, no platform tie-in.",
+      "provider": { "@id": "https://strangegoose.co.uk/#organization" },
+      "areaServed": "Worldwide",
+      "url": "https://strangegoose.co.uk/ai.html"
+    }
+  ]
+}
+</script>
 <style>
   /* ── AI page · page-scoped, all tokens resolve under body.theatre ── */
   .ai-sub { font-size: clamp(17px, 1.7vw, 21px); line-height: 1.6; color: var(--ink-2); max-width: 62ch; }
