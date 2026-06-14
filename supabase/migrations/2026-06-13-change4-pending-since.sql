@@ -35,7 +35,7 @@ declare
     'Brief agreed',
     'Edit v1',
     'Edit v2',
-    'Picture lock — Edit v3',
+    'Picture lock',
     'Colour and sound',
     'Final approval',
     'Deliverables'
