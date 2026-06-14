@@ -347,6 +347,67 @@ button.btn.ghost:disabled {
   border-color: transparent transparent transparent var(--paper);
   margin-left: 4px;
 }
+.portal-yt:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+/* "Click to review" cue chip, bottom-left of the thumbnail */
+.portal-yt-cue {
+  position: absolute;
+  left: 10px; bottom: 10px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: rgba(20,18,15,0.72);
+  padding: 6px 10px;
+  border-radius: 2px;
+  pointer-events: none;
+  transition: background .15s;
+}
+.portal-yt:hover .portal-yt-cue { background: var(--accent); }
+
+/* ── fullsize video lightbox (shared by client + admin) ── */
+.yt-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 4vw, 56px);
+  background: rgba(20,18,15,0.86);
+}
+.yt-lightbox.open { display: flex; }
+.yt-lb-inner {
+  position: relative;
+  width: min(1100px, 100%);
+}
+.yt-lb-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border: 1px solid rgba(245,242,236,0.18);
+}
+.yt-lb-stage iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.yt-lb-close {
+  position: absolute;
+  top: -42px; right: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: none;
+  border: 1px solid rgba(245,242,236,0.4);
+  padding: 8px 14px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.yt-lb-close:hover { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+@media (max-width: 600px) {
+  .yt-lb-close { top: auto; bottom: -42px; right: 50%; transform: translateX(50%); }
+}
 
 /* ── admin tables / panels ── */
 .admin-panel {
