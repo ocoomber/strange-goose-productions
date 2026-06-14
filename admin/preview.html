@@ -43,6 +43,7 @@
 
   /* ---------------- login ---------------- */
   .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg)}
+  .login-wrap[hidden]{display:none}   /* author display:flex above beats the UA [hidden] rule — restore it */
   .login-wrap .auth-card{margin:0}
 
   /* ---------------- header ---------------- */
