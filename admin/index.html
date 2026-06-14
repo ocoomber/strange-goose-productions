@@ -327,14 +327,27 @@
     var groups = { you: [], stalled: [], client: [], complete: [] };
     projects.forEach(function (p) { groups[statusOf(p)].push(p); });
 
-    // Summary line: answer "what needs me right now?" before the grid.
+    // Summary line: answer "what needs me right now?" before the grid. Each
+    // segment is a button that opens and scrolls to its matching section.
     var summary = document.getElementById('project-summary');
-    var parts = [];
-    if (groups.you.length) parts.push(groups.you.length + ' need your move');
-    if (groups.stalled.length) parts.push(groups.stalled.length + ' overdue');
-    if (groups.client.length) parts.push(groups.client.length + ' awaiting client');
-    if (parts.length) {
-      summary.textContent = parts.join('  ·  ');
+    summary.innerHTML = '';
+    var segs = [];
+    if (groups.you.length) segs.push([groups.you.length + ' need your move', 'sec-you']);
+    if (groups.stalled.length) segs.push([groups.stalled.length + ' overdue', 'sec-stalled']);
+    if (groups.client.length) segs.push([groups.client.length + ' awaiting client', 'sec-client']);
+    if (segs.length) {
+      segs.forEach(function (seg, i) {
+        if (i) summary.appendChild(el('span', 'summary-sep', '·'));
+        var btn = el('button', 'summary-link', seg[0]);
+        btn.type = 'button';
+        btn.addEventListener('click', function () {
+          var sec = document.getElementById(seg[1]);
+          if (!sec) return;
+          sec.open = true;
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        summary.appendChild(btn);
+      });
       summary.hidden = false;
     } else {
       summary.hidden = true;
