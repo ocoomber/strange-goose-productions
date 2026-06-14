@@ -115,7 +115,7 @@ create or replace function public.guard_stage_update()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
   if coalesce(current_setting('sgp.resetting', true), '') = '1' then
-    return new;  -- admin reset via reset_project(), see below
+    return new;  -- admin override via revert_last_approval(), see below
   end if;
   if new.project_id <> old.project_id or new.stage_index <> old.stage_index then
     raise exception 'Stage identity cannot change';
@@ -239,25 +239,6 @@ create trigger guard_profile_update
   before update on public.profiles
   for each row execute function public.guard_profile_update();
 
--- Admin-only project reset for testing: wipes approvals, relocks stages
--- (keeping their links/videos), reactivates the project. The ONE way
--- around approval permanence — callable only by the admin account.
-create or replace function public.reset_project(p_project uuid)
-returns void language plpgsql security definer set search_path = public as $$
-begin
-  if auth.uid() is not null and not public.is_admin() then
-    raise exception 'Admin only';
-  end if;
-  delete from public.approvals where project_id = p_project;
-  perform set_config('sgp.resetting', '1', true);
-  update public.stages
-  set state = case when stage_index = 1 then 'pending' else 'locked' end,
-      pending_since = case when stage_index = 1 then now() else null end
-  where project_id = p_project;
-  perform set_config('sgp.resetting', '', true);
-  update public.projects set status = 'active' where id = p_project;
-end $$;
-
 -- Admin-only correction: undo the single most recent approval on a project,
 -- reverting that stage to pending (and re-locking anything after it). For
 -- accidental approvals — the client still can't undo their own; only admin.
@@ -352,13 +333,11 @@ create index if not exists projects_completed_at_idx
 -- Function EXECUTE grants (lock down the SECURITY DEFINER functions).
 -- By default Postgres grants EXECUTE on new functions to PUBLIC, which
 -- exposes them via the REST API to the anon (logged-out) and authenticated
--- roles. That is dangerous here: the admin RPCs below delete approval
--- records, and their internal "admin only" check is skipped when there is
+-- roles. That is dangerous here: the admin RPC below deletes approval
+-- records, and its internal "admin only" check is skipped when there is
 -- no logged-in user (auth.uid() is null) — i.e. exactly the anon case.
 -- So we revoke public/anon execute and re-grant only to authenticated;
 -- the in-function is_admin() check then blocks non-admin signed-in users.
-revoke execute on function public.reset_project(uuid)        from public, anon;
-grant  execute on function public.reset_project(uuid)        to authenticated;
 revoke execute on function public.revert_last_approval(uuid) from public, anon;
 grant  execute on function public.revert_last_approval(uuid) to authenticated;
 

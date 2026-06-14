@@ -142,9 +142,12 @@ attention" sorted list · deliverables release/confirm redesign · Google
 sign-in for clients (see "Client sign-in" above).
 
 **Pending / next:**
-- **Lockdown before first real client:** remove (or feature-flag) the
-  "Reset project (testing)" button + `reset_project()` so approval
-  permanence has no back door. Owen will say when testing's done.
+- ~~Lockdown before first real client: remove the "Reset project (testing)"
+  button + `reset_project()`.~~ **DONE 2026-06-14** — button removed from
+  `admin/index.html` + `preview.html`, `reset_project()` dropped from the live
+  DB (migration `remove_reset_project_testing_backdoor`) and from `schema.sql`.
+  Approval permanence now has no back door. `revert_last_approval()` (the legit
+  single-approval undo) is kept. Seeded `@example.com` test data also deleted.
 - Tier 3: in-portal feedback capture (emails Owen); audit-grade voids
   (mark approvals voided instead of hard delete) when a real dispute makes
   the missing trail matter; project duplication/templates.
@@ -265,9 +268,9 @@ public by design — **RLS is the real boundary**, so the safety of the whole
 portal depends on RLS staying enabled on every `public` table. A `.gitignore`
 guards against accidentally committing a secret file (`.env`, `*.key`, etc).
 Hardening items still open (none urgent, no real client yet): tighten Edge
-Function CORS from `*` to `https://www.strangegoose.co.uk`; remove the
-`reset_project()` back door before the first real client (intentionally kept
-for now while testing). Leaked-password protection (HaveIBeenPwned) is left
+Function CORS from `*` to `https://www.strangegoose.co.uk`. (The
+`reset_project()` back door has now been removed — see Phase 5 below.)
+Leaked-password protection (HaveIBeenPwned) is left
 off — it's Pro-only and we're on free tier; low priority since accounts use
 admin-issued temp passwords.
 
@@ -323,7 +326,49 @@ only shell/board/queue/detail styling changed.
 - Robustness: a startup `bootError()` net shows any thrown error on-page instead
   of a silent blank. Fixed during this work: a CSS-specificity bug where the
   `.login-wrap` overlay stayed visible after login; completed projects showing
-  `7/6` (`approvedOf` now counts only stages 1–6).
+  `7/6` (later reworked in Phase 5 — see below).
+
+## Phase 5 — fixes, video lightbox, client preview, cleanup (LIVE 2026-06-14)
+A round of admin/client fixes plus a pre-launch tidy. All pushed straight to
+`main`.
+
+- **Stage count reworked:** `approvedOf` (admin) now counts *all* approved
+  stages out of `STAGE_COUNT` (7), shown as `X/7` — the earlier "count 1–6 of 6"
+  made an unfinished project read as `6/6` (looks done) and a complete one as
+  `7/6`. The client card matches: "X of 7 stages complete" (was "of 6 approved").
+- **Stage 7 video field removed:** admin no longer shows a YouTube field/embed on
+  the Deliverables stage (it only has the download-link manager). Client also
+  hides any stage-7 video for parity.
+- **Note-reset fix:** saving a video on the live stage no longer wipes an unsaved
+  note — the note text is preserved across the re-render.
+- **Re-send notification button:** on any pending stage in the admin project view,
+  calls the new **`resend-notification`** Edge Function (admin-only; verifies
+  caller JWT + role, refuses if the stage isn't pending). It re-sends the exact
+  "ready for you" / "files ready" email the `notify` webhook sends on
+  locked→pending — no data change. Self-contained, reuses `RESEND_API_KEY`.
+  Source in `supabase/functions/resend-notification/index.ts`; deployed live.
+- **Video lightbox:** `ytEmbed()` (shared in `portal.js`) now opens a fullsize
+  centred modal player on click (thumbnail keeps a "Click to review" cue), instead
+  of swapping to a small inline iframe that forced clients out to YouTube. Closes
+  via ✕ / backdrop / Esc; tears down the iframe to stop playback. CSS in
+  `portal.css` (`.yt-lightbox`). Applies to both admin and client; `work.html`
+  keeps its own GSAP lightbox.
+- **Admin logo:** the topbar mark is now the shared `.goose-glyph` (was a plain
+  circle); client header already used it.
+- **`client/preview.html`** added — a no-login demo of the client portal (same
+  `DEMO_MODE = /preview/` pattern as `admin/preview.html`), so the client view can
+  be tested in a normal browser without the admin/client shared-session clash (no
+  private window). Read-only stub `sb`; fake data in `buildDemo()` covers the
+  three key states: active review (video + approve), deliverables released
+  (download + confirm), and a completed project. **Never activates on
+  `client/index.html`.**
+- **Pre-launch cleanup:** `reset_project()` testing back door removed (DB + button
+  + schema.sql); 30 seeded `client01..30@example.com` accounts + 47 test projects
+  deleted from the live DB (only real data — `toryawinters@gmail.com` + 1 project
+  — remains); stray `Note for claude.txt` and `testing/Admin Dashboard.html`
+  removed. Security advisor re-checked: only the known-benign warnings remain
+  (`is_admin`, `revert_last_approval`, leaked-password), and the `reset_project`
+  warnings are gone.
 
 ### Working with the Supabase MCP connector (for future sessions)
 A connector gives a session **high-privilege** DB access — `execute_sql`

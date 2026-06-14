@@ -489,7 +489,6 @@
           <div class="actions">
             <a class="btn ghost" id="report-link" href="#" target="_blank" rel="noopener">Generate project record (PDF)</a>
             <button class="btn ghost" type="button" id="undo-approval" hidden>Undo last approval</button>
-            <button class="btn ghost" type="button" id="reset-project">Reset project (testing)</button>
           </div>
           <p class="form-error" id="project-error" hidden></p>
         </div>
@@ -1237,14 +1236,6 @@
         'This reverts that stage to awaiting approval — use it to correct an accidental approval. ' +
         'Earlier approvals are kept.')) return;
       var res = await sb.rpc('revert_last_approval', { p_project: id });
-      if (res.error) showError(projErr, res.error); else renderProject(id);
-    };
-
-    var reset = document.getElementById('reset-project');
-    reset.onclick = async function () {
-      if (!window.confirm('Reset "' + project.title + '"?\n\nThis permanently deletes all approval ' +
-        'records for this project and relocks every stage (links and videos are kept). For testing only.')) return;
-      var res = await sb.rpc('reset_project', { p_project: id });
       if (res.error) showError(projErr, res.error); else renderProject(id);
     };
 
