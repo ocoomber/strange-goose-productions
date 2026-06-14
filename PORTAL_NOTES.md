@@ -290,6 +290,41 @@ function), the PUBLIC grant returns — the REVOKE/GRANT block at the end of
 callable by `authenticated`) are expected; the in-function `is_admin()` check
 blocks non-admin signed-in users, which the linter can't see.
 
+## Phase 4 — admin full redesign + Claude Design loop (LIVE 2026-06-14)
+The admin SPA was fully rebuilt (replaces the Phase 2.1 accordion home above):
+**topbar + left sidebar + 3-column board (My move / Client's move / Overdue) +
+per-queue list pages (incl. a Complete queue, reached only for report
+generation) + a redesigned single-project detail page** (colour-coded stage
+spine, masked-icon state badges, calmer editors, tidy YouTube review frame).
+All live Supabase/JS logic and the single-project flow were preserved verbatim;
+only shell/board/queue/detail styling changed.
+
+- **Files:** `admin/index.html` (live) and `admin/preview.html` (design sandbox)
+  are **byte-identical**. Promote a sandbox change by straight-copying
+  `preview.html` → `index.html` and pushing.
+- **Demo mode (sandbox):** `var DEMO_MODE = /preview/.test(location.pathname)`.
+  So `preview.html` auto-renders every screen from baked-in fake data with **no
+  login** (`sb` is swapped for a read-only stub — cannot touch real data);
+  `index.html` never runs demo even with `?demo=1`. `#project/demo` opens the
+  project-detail page. There is **no real client data** anywhere in preview.
+- **Styling source of truth:** the inline `<style>` block in `preview.html`.
+  Some classes are inherited from `site/portal.css` (shared with the client
+  portal — **do not edit it**); override from the inline block instead, scoped
+  e.g. `.page[data-page="project"]`.
+- **Claude Design loop:** Claude Design has **read-only repo access (cannot
+  commit)** and `web_fetch` is text-only. It (1) **views** the rendered design by
+  embedding `https://strangegoose.co.uk/admin/preview.html` in an **iframe** (the
+  page sends no `X-Frame-Options`/CSP, so framing works), and (2) **edits** by
+  pulling `preview.html` from the repo and changing **only the inline `<style>`
+  block** — returning the revised CSS as text. Claude Code applies it and pushes.
+- **Copy changes:** Claude Design must **not** edit HTML/JS to change wording —
+  it lists `old → new` pairs and Claude Code places them (markup vs the shared
+  `portal.js` strings, some of which are client-facing — confirm before changing).
+- Robustness: a startup `bootError()` net shows any thrown error on-page instead
+  of a silent blank. Fixed during this work: a CSS-specificity bug where the
+  `.login-wrap` overlay stayed visible after login; completed projects showing
+  `7/6` (`approvedOf` now counts only stages 1–6).
+
 ### Working with the Supabase MCP connector (for future sessions)
 A connector gives a session **high-privilege** DB access — `execute_sql`
 bypasses RLS and can read/write/drop anything, deploy Edge Functions, etc. Owen
