@@ -152,9 +152,29 @@
   .page[data-page="clients"] .client-fields .badge{margin:0}
   .page[data-page="clients"] .client-actions{flex:0 0 auto}
 
-  /* Setup page: cap panel width so the text inputs aren't enormous. */
-  .page[data-page="setup"] .admin-panel{max-width:620px}
-  .page[data-page="setup"] .admin-row .field{flex:1 1 200px;max-width:300px}
+  /* Setup / export / new-client: cap panel width so the text inputs aren't enormous. */
+  .page[data-page="setup"] .admin-panel,
+  .page[data-page="export"] .admin-panel,
+  .page[data-page="clients"] .new-client-panel{max-width:620px}
+  .page[data-page="setup"] .admin-row .field,
+  .page[data-page="export"] .admin-row .field,
+  .page[data-page="clients"] .new-client-panel .admin-row .field{flex:1 1 200px;max-width:300px}
+  /* date inputs in export shouldn't stretch full width */
+  .page[data-page="export"] .admin-row .field input[type="date"]{max-width:200px}
+
+  /* New-client account: a collapsed panel so the client list leads the page. */
+  .page[data-page="clients"] .new-client-panel{margin-bottom:18px;padding:0}
+  .page[data-page="clients"] .new-client-panel > summary{
+    cursor:pointer;list-style:none;padding:16px 22px;font-weight:700;font-size:16px;
+    display:flex;align-items:center;gap:10px;color:var(--ink);
+  }
+  .page[data-page="clients"] .new-client-panel > summary::-webkit-details-marker{display:none}
+  .page[data-page="clients"] .new-client-panel > summary::before{
+    content:"+";font-family:var(--mono);font-size:18px;color:var(--move);width:14px;text-align:center;
+  }
+  .page[data-page="clients"] .new-client-panel[open] > summary::before{content:"–"}
+  .page[data-page="clients"] .new-client-panel > *:not(summary){margin-left:22px;margin-right:22px}
+  .page[data-page="clients"] .new-client-panel > *:last-child{margin-bottom:22px}
   .client-controls{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
   .client-controls input,.client-controls select{font:inherit;font-size:14px;background:var(--paper);color:var(--ink);border:1px solid rgba(20,18,15,.22);padding:8px 11px}
   .client-controls input{flex:1;min-width:200px;max-width:340px}
@@ -256,11 +276,13 @@
 
   /* ---- badges → filled tint-chips with masked state icons ---- */
   .page[data-page="project"] .badge{
-    display:inline-flex;align-items:center;gap:6px;
+    display:inline-flex;align-items:center;justify-content:flex-start;gap:6px;
     font-family:var(--mono);font-size:10px;font-weight:500;
     letter-spacing:.11em;text-transform:uppercase;
     padding:5px 10px 5px 9px;border:1px solid transparent;border-radius:2px;
     white-space:nowrap;line-height:1;
+    /* uniform width so the status chips line up — longest is "Feedback confirmed" */
+    min-width:160px;
   }
   .page[data-page="project"] .badge::before{
     content:"";width:12px;height:12px;flex:0 0 auto;background:currentColor;
@@ -388,6 +410,29 @@
     .page[data-page="project"] .stage{padding:18px 16px}
     .page[data-page="project"] .stage.pending{padding-left:15px}
   }
+
+  /* ---- TIGHTENING PASS (to-do items 2–8) ----
+     The stage blocks read too loose / "full-page". Trim vertical padding,
+     inner-panel padding, editor gaps and textarea heights so each stage is
+     compact, with the small items (doc link, note) sitting in tidy contained
+     panels. Layout/grid is inherited from portal.css; this only tightens. */
+  .page[data-page="project"] .stage{padding:16px 22px}
+  .page[data-page="project"] .stage.pending{padding-left:21px}
+  .page[data-page="project"] .stage .admin-tools{margin-top:14px;padding-top:14px;gap:13px}
+  /* contained "small item" panels: less air inside */
+  .page[data-page="project"] .stage.pending .admin-tools > div,
+  .page[data-page="project"] .stage.locked .admin-tools > div:has(.note-form),
+  .page[data-page="project"] .stage.locked .admin-tools > div:has(.inline-form),
+  .page[data-page="project"] .stage.locked .admin-tools > div:has(.portal-links),
+  .page[data-page="project"] .stage.approved .admin-tools > div:not(.portal-yt){
+    padding:13px 15px;gap:9px;
+  }
+  /* shorter note boxes */
+  .page[data-page="project"] .stage.pending .admin-tools .note-form textarea,
+  .page[data-page="project"] .stage.locked .admin-tools .note-form textarea{min-height:64px}
+  /* item 8 — deliverables: keep the release/submit button on-spec (compact ghost/primary) */
+  .page[data-page="project"] .stage .admin-tools .btn{font-size:11px;letter-spacing:.1em;padding:8px 14px}
+  .page[data-page="project"] .stage .admin-tools .portal-links .btn.ghost{padding:3px 10px;font-size:10px}
 </style>
 </head>
 <body>
@@ -438,7 +483,6 @@
       <div class="side-sec">Manage</div>
       <a class="nav" data-page="clients"><span class="dot"></span>Clients <span class="scount" data-badge="clients">0</span></a>
       <a class="nav" data-page="setup"><span class="dot"></span>New project</a>
-      <a class="nav" data-page="setup"><span class="dot"></span>New client</a>
       <a class="nav" data-page="export"><span class="dot"></span>Export records</a>
 
       <div class="grow"></div>
@@ -452,7 +496,6 @@
         <div class="phead">
           <p class="eyebrow">Admin</p>
           <h1>Dashboard</h1>
-          <p class="lede">What's on whose plate, at a glance. Projects needing your move come first — open any queue on the left for the full list.</p>
           <div class="statline" id="statline"></div>
         </div>
         <div class="board">
@@ -476,7 +519,6 @@
         <div class="phead">
           <p class="eyebrow">Your move</p>
           <h1>My move</h1>
-          <p class="lede">Your turn — the client has responded and these are waiting on you.</p>
         </div>
         <div class="list-scroll"><div class="submeta"><span data-badge="you">0</span> projects<span>·</span>longest waiting on you first</div><div data-list="you"></div></div>
       </section>
@@ -485,7 +527,6 @@
         <div class="phead">
           <p class="eyebrow">Awaiting client</p>
           <h1>Client's move</h1>
-          <p class="lede">Sent for review — waiting on the client. Nothing for you to do yet.</p>
         </div>
         <div class="list-scroll"><div class="submeta"><span data-badge="client">0</span> projects<span>·</span>longest waiting first</div><div data-list="client"></div></div>
       </section>
@@ -494,7 +535,6 @@
         <div class="phead">
           <p class="eyebrow">Overdue</p>
           <h1>Overdue</h1>
-          <p class="lede">Awaiting the client beyond the chase window — worth a manual nudge.</p>
         </div>
         <div class="list-scroll"><div class="submeta"><span data-badge="stalled">0</span> projects<span>·</span>most overdue first</div><div data-list="stalled"></div></div>
       </section>
@@ -503,7 +543,6 @@
         <div class="phead">
           <p class="eyebrow">Complete</p>
           <h1>Complete</h1>
-          <p class="lede">Finished projects. Open one only to generate its end-of-project record.</p>
         </div>
         <div class="list-scroll"><div class="submeta"><span data-badge="complete">0</span> projects<span>·</span>most recently completed first</div><div data-list="complete"></div></div>
       </section>
@@ -533,9 +572,28 @@
         <div class="phead">
           <p class="eyebrow">Manage</p>
           <h1>Clients</h1>
-          <p class="lede">Edit, archive or restore client accounts. Archived clients can't sign in and drop out of the queues, but all their records are kept.</p>
         </div>
         <div class="list-scroll">
+          <details class="admin-panel new-client-panel">
+            <summary>New client account</summary>
+            <form id="client-form" class="admin-row">
+              <div class="field">
+                <label for="client-email">Client email</label>
+                <input id="client-email" type="email" required>
+              </div>
+              <div class="field">
+                <label for="client-name">Display name (optional)</label>
+                <input id="client-name" type="text">
+              </div>
+              <button class="btn primary" type="submit">Create account</button>
+            </form>
+            <p class="form-error" id="client-error" hidden></p>
+            <div class="stage-note-box" id="client-result" hidden style="margin-top:16px;">
+              <p class="eyebrow">Account created — send these credentials to the client</p>
+              <p class="stage-note" id="client-creds"></p>
+              <p class="hint" style="margin-top:8px;">They'll be asked to choose their own password on first sign-in. Portal link: https://www.strangegoose.co.uk/client/</p>
+            </div>
+          </details>
           <div class="client-controls">
             <input id="client-search" type="search" placeholder="Search name or email">
             <select id="client-filter">
@@ -554,12 +612,10 @@
       <section class="page" data-page="setup">
         <div class="phead">
           <p class="eyebrow">Manage</p>
-          <h1>New project &amp; client</h1>
-          <p class="lede">Create a project for an existing client, or set up a new client account.</p>
+          <h1>New project</h1>
         </div>
         <div class="list-scroll">
           <div class="admin-panel">
-            <h2>New project</h2>
             <form id="create-form" class="admin-row">
               <div class="field">
                 <label for="new-title">Project title</label>
@@ -572,28 +628,8 @@
               </div>
               <button class="btn primary" type="submit">Create project</button>
             </form>
+            <p class="hint" style="margin-top:14px;">New client? Create their account first on the Clients page.</p>
             <p class="form-error" id="create-error" hidden></p>
-          </div>
-
-          <div class="admin-panel">
-            <h2>New client account</h2>
-            <form id="client-form" class="admin-row">
-              <div class="field">
-                <label for="client-email">Client email</label>
-                <input id="client-email" type="email" required>
-              </div>
-              <div class="field">
-                <label for="client-name">Display name (optional)</label>
-                <input id="client-name" type="text">
-              </div>
-              <button class="btn primary" type="submit">Create account</button>
-            </form>
-            <p class="form-error" id="client-error" hidden></p>
-            <div class="stage-note-box" id="client-result" hidden style="margin-top:16px;">
-              <p class="eyebrow">Account created — send these credentials to the client</p>
-              <p class="stage-note" id="client-creds"></p>
-              <p class="hint" style="margin-top:8px;">They'll be asked to choose their own password on first sign-in. Portal link: https://www.strangegoose.co.uk/client/</p>
-            </div>
           </div>
         </div>
       </section>
@@ -608,9 +644,7 @@
         <div class="list-scroll">
           <div class="admin-panel">
             <h2>Completion records (CSV)</h2>
-            <p class="hint">Export every approval from projects completed within a
-              date range — one row per approval — for accounts, annual review, or a
-              legal request spanning multiple jobs. Leave a date blank for open-ended.</p>
+            <p class="hint">One row per approval, from projects completed in the range. Leave a date blank for open-ended.</p>
             <form id="export-form" class="admin-row">
               <div class="field">
                 <label for="export-from">Completed from</label>
@@ -1568,7 +1602,7 @@
       events.push({ t: project.completed_at, sys: true, text: 'Project completed' });
     }
     notes.forEach(function (n) { events.push({ t: n.created_at, sys: false, text: n.body }); });
-    events.sort(function (a, b) { return new Date(b.t) - new Date(a.t); });
+    events.sort(function (a, b) { return new Date(a.t) - new Date(b.t); });
 
     var panel = el('div', 'admin-panel');
     panel.appendChild(el('h2', null, 'Activity log'));
