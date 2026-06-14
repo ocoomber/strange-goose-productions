@@ -68,8 +68,6 @@
   .nav .scount{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.02em;color:var(--muted);min-width:20px;text-align:right}
   .nav.active .scount,.nav .scount.hot{color:var(--move);font-weight:700}
   .nav .scount.over{color:var(--over)}
-  .nav.new{border:1px dashed var(--line-2);border-left:3px solid transparent;justify-content:center;margin-top:6px;color:var(--ink)}
-  .nav.new:hover{border-color:var(--move)}
   .grow{flex:1}
   .acct{display:flex;align-items:center;gap:10px;padding:9px 11px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
   .acct .pic{width:24px;height:24px;border-radius:50%;background:var(--ink);color:#f3efe7;display:flex;align-items:center;justify-content:center;font-size:9px;flex:0 0 24px}
@@ -408,12 +406,11 @@
       <div class="side-sec">Manage</div>
       <a class="nav" data-page="clients"><span class="dot"></span>Clients <span class="scount" data-badge="clients">0</span></a>
       <a class="nav" data-page="setup"><span class="dot"></span>New project</a>
-      <a class="nav new" data-page="setup">+ New client</a>
+      <a class="nav" data-page="setup"><span class="dot"></span>New client</a>
       <a class="nav" data-page="export"><span class="dot"></span>Export records</a>
 
       <div class="grow"></div>
       <a class="nav" data-page="password"><span class="dot"></span>Change password</a>
-      <div class="acct"><span class="pic">SGP</span>Admin</div>
     </aside>
 
     <main class="canvas">
