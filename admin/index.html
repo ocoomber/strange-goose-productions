@@ -73,7 +73,7 @@
 
       <!-- Daily focus: what needs Owen right now. -->
       <p class="portal-summary" id="project-summary" hidden></p>
-      <div class="portal-grid" id="project-list" style="margin-top:18px;"></div>
+      <div id="project-list" style="margin-top:18px;"></div>
       <p class="portal-empty" id="projects-empty" hidden>No projects yet.</p>
 
       <!-- Secondary: account setup and client lookup, not the daily start. -->
@@ -306,7 +306,7 @@
     });
 
     var res = await sb.from('projects')
-      .select('id, title, status, created_at, client_id, profiles(email, display_name), stages(state, stage_index, pending_since), approvals(approved_at)')
+      .select('id, title, status, created_at, completed_at, client_id, profiles(email, display_name), stages(state, stage_index, pending_since), approvals(approved_at)')
       .order('created_at', { ascending: false });
     var list = document.getElementById('project-list');
     list.innerHTML = '';
@@ -323,22 +323,16 @@
     //   client   — client's turn: a stage is pending, within the chase window
     //   stalled  — client's turn, but pending longer than OVERDUE_DAYS
     //   complete — project finished
-    var order = { you: 0, stalled: 1, client: 2, complete: 3 };
-    projects.sort(function (a, b) {
-      var d = order[statusOf(a)] - order[statusOf(b)];
-      if (d !== 0) return d;
-      // Within a status, longest-waiting first (oldest waitingSince first).
-      return waitingSince(a) - waitingSince(b);
-    });
+    // Group by status (no flat sort — each section sorts itself below).
+    var groups = { you: [], stalled: [], client: [], complete: [] };
+    projects.forEach(function (p) { groups[statusOf(p)].push(p); });
 
     // Summary line: answer "what needs me right now?" before the grid.
-    var tally = { you: 0, stalled: 0, client: 0, complete: 0 };
-    projects.forEach(function (p) { tally[statusOf(p)]++; });
     var summary = document.getElementById('project-summary');
     var parts = [];
-    if (tally.you) parts.push(tally.you + ' need your move');
-    if (tally.stalled) parts.push(tally.stalled + ' overdue');
-    if (tally.client) parts.push(tally.client + ' awaiting client');
+    if (groups.you.length) parts.push(groups.you.length + ' need your move');
+    if (groups.stalled.length) parts.push(groups.stalled.length + ' overdue');
+    if (groups.client.length) parts.push(groups.client.length + ' awaiting client');
     if (parts.length) {
       summary.textContent = parts.join('  ·  ');
       summary.hidden = false;
@@ -346,7 +340,8 @@
       summary.hidden = true;
     }
 
-    projects.forEach(function (p) {
+    // Build one project card (used by every section).
+    function makeCard(p) {
       var stages = p.stages || [];
       var approved = stages.filter(function (s) { return s.state === 'approved'; }).length;
       var status = statusOf(p);
@@ -368,7 +363,47 @@
       card.appendChild(meta);
       if (status === 'you') card.classList.add('your-move');
       if (status === 'stalled') card.classList.add('is-stalled');
-      list.appendChild(card);
+      return card;
+    }
+
+    function completedAt(p) {
+      return p.completed_at ? new Date(p.completed_at).getTime() : 0;
+    }
+
+    // Four sections, in priority order. First three open by default, Complete
+    // collapsed. Each sorts its own members and shows a mono caption naming the
+    // order, so the list never looks arbitrarily shuffled.
+    var sections = [
+      { id: 'sec-you', key: 'you', label: 'Your move',
+        caption: 'Longest waiting on you first',
+        sort: function (a, b) { return waitingSince(a) - waitingSince(b); }, open: true },
+      { id: 'sec-stalled', key: 'stalled', label: 'Overdue',
+        caption: 'Most overdue first',
+        sort: function (a, b) { return overdueDays(b) - overdueDays(a); }, open: true },
+      { id: 'sec-client', key: 'client', label: 'Awaiting client',
+        caption: 'Longest waiting first',
+        sort: function (a, b) { return waitingSince(a) - waitingSince(b); }, open: true },
+      { id: 'sec-complete', key: 'complete', label: 'Complete',
+        caption: 'Most recently completed first',
+        sort: function (a, b) { return completedAt(b) - completedAt(a); }, open: false }
+    ];
+
+    sections.forEach(function (s) {
+      var items = groups[s.key];
+      if (!items.length) return;            // omit empty sections
+      items.sort(s.sort);
+      var det = el('details', 'project-section');
+      det.id = s.id;
+      if (s.open) det.open = true;
+      var sum = el('summary');
+      sum.appendChild(el('span', 'section-label', s.label));
+      sum.appendChild(el('span', 'section-count', String(items.length)));
+      det.appendChild(sum);
+      det.appendChild(el('p', 'section-caption', s.caption));
+      var grid = el('div', 'portal-grid');
+      items.forEach(function (p) { grid.appendChild(makeCard(p)); });
+      det.appendChild(grid);
+      list.appendChild(det);
     });
 
     // Project counts (and whether any are complete) per client — over ALL
