@@ -267,10 +267,12 @@ vars. The `SUPABASE_URL` + anon/publishable key in `site/portal.js` are
 public by design — **RLS is the real boundary**, so the safety of the whole
 portal depends on RLS staying enabled on every `public` table. A `.gitignore`
 guards against accidentally committing a secret file (`.env`, `*.key`, etc).
-Hardening items still open (none urgent, no real client yet): tighten Edge
-Function CORS from `*` to `https://www.strangegoose.co.uk`. (The
-`reset_project()` back door has now been removed — see Phase 5 below.)
-Leaked-password protection (HaveIBeenPwned) is left
+Hardening done in Phase 5 (see below): the three browser-called Edge Functions
+(`create-client`, `manage-client`, `resend-notification`) now reflect a
+two-host origin allowlist (apex + www) instead of `*`; the `reset_project()`
+back door has been removed. `notify` keeps `*` on purpose — it's a
+server-to-server webhook target with no browser Origin. Leaked-password
+protection (HaveIBeenPwned) is left
 off — it's Pro-only and we're on free tier; low priority since accounts use
 admin-issued temp passwords.
 
@@ -362,6 +364,17 @@ A round of admin/client fixes plus a pre-launch tidy. All pushed straight to
   three key states: active review (video + approve), deliverables released
   (download + confirm), and a completed project. **Never activates on
   `client/index.html`.**
+- **CORS hardening:** the three browser-called Edge Functions (`create-client`,
+  `manage-client`, `resend-notification`) now reflect an origin from a two-host
+  allowlist (`https://strangegoose.co.uk` + `https://www.strangegoose.co.uk`)
+  with `Vary: Origin`, instead of the old wildcard `*`. Both hosts must serve the
+  portal (the OAuth redirect setup already allowlists both), so a single
+  hardcoded origin would break one — hence the reflect-from-allowlist approach.
+  Pattern: `corsHeadersFor(req)` at module scope + `const corsHeaders =
+  corsHeadersFor(req)` as the first line of the handler, with the `json()` helper
+  moved *inside* the handler so it closes over the per-request headers. `notify`
+  deliberately keeps `*` (webhook target, no browser Origin). All three deployed
+  live via the MCP `deploy_edge_function` (no manual dashboard paste this time).
 - **Pre-launch cleanup:** `reset_project()` testing back door removed (DB + button
   + schema.sql); 30 seeded `client01..30@example.com` accounts + 47 test projects
   deleted from the live DB (only real data — `toryawinters@gmail.com` + 1 project

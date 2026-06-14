@@ -20,14 +20,25 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 const PORTAL_URL = 'https://www.strangegoose.co.uk/client/';
 const FROM = 'Strange Goose Productions <portal@strangegoose.co.uk>';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers':
-    'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+// Browser callers are the SGP portal pages, served from both the apex and www
+// hosts; reflect whichever of the two made the request (else fall back to the
+// apex). Replaces the previous wildcard '*'.
+const ALLOWED_ORIGINS = [
+  'https://strangegoose.co.uk',
+  'https://www.strangegoose.co.uk',
+];
+function corsHeadersFor(req: Request): Record<string, string> {
+  const origin = req.headers.get('Origin') || '';
+  return {
+    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Vary': 'Origin',
+  };
+}
 
 Deno.serve(async (req) => {
+  const corsHeaders = corsHeadersFor(req);
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -101,6 +112,13 @@ Deno.serve(async (req) => {
   } catch (err) {
     console.error(err);
     return json({ error: String(err) }, 500);
+  }
+
+  function json(body: unknown, status = 200): Response {
+    return new Response(JSON.stringify(body), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
 
@@ -180,11 +198,4 @@ function plainEmail(o: EmailContent): string {
   if (o.info) { o.info.forEach((r) => { t += `${r.label}: ${r.value}\n`; }); t += '\n'; }
   if (o.outro) t += `${o.outro}\n\n`;
   return t + 'Strange Goose Productions';
-}
-
-function json(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
 }
