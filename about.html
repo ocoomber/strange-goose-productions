@@ -9,6 +9,73 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site/styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Organization", "ProfessionalService"],
+      "@id": "https://strangegoose.co.uk/#organization",
+      "name": "Strange Goose Productions",
+      "alternateName": "SGP",
+      "url": "https://strangegoose.co.uk/",
+      "email": "info@strangegoose.co.uk",
+      "description": "A three-person professional film team in Edinburgh making award-winning short films, music videos, and commercial content.",
+      "slogan": "Proper film. Built differently.",
+      "foundingDate": "2024",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Edinburgh",
+        "addressRegion": "Scotland",
+        "addressCountry": "GB"
+      },
+      "areaServed": "Worldwide",
+      "knowsAbout": [
+        "Short film production",
+        "Commercial and branded content",
+        "Spec advertising",
+        "Music video production",
+        "48 Hour Film Project",
+        "AI-assisted production pipeline"
+      ],
+      "founder": [
+        { "@type": "Person", "name": "Owen Coomber", "jobTitle": "Director" },
+        { "@type": "Person", "name": "Torya Winters", "jobTitle": "Producer" }
+      ],
+      "employee": [
+        { "@id": "https://strangegoose.co.uk/about.html#owen-coomber" },
+        { "@id": "https://strangegoose.co.uk/about.html#torya-winters" },
+        { "@id": "https://strangegoose.co.uk/about.html#alex-mcneill" }
+      ],
+      "sameAs": [
+        "https://instagram.com/strange_goose_productions",
+        "https://youtube.com/@strange_goose_productions"
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://strangegoose.co.uk/about.html#owen-coomber",
+      "name": "Owen Coomber",
+      "jobTitle": "Director / Editor",
+      "worksFor": { "@id": "https://strangegoose.co.uk/#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://strangegoose.co.uk/about.html#torya-winters",
+      "name": "Torya Winters",
+      "jobTitle": "Producer",
+      "worksFor": { "@id": "https://strangegoose.co.uk/#organization" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://strangegoose.co.uk/about.html#alex-mcneill",
+      "name": "Alex McNeill",
+      "jobTitle": "Director of Photography",
+      "worksFor": { "@id": "https://strangegoose.co.uk/#organization" }
+    }
+  ]
+}
+</script>
 </head>
 <body class="theatre" data-screen-label="04 About">
 
@@ -50,24 +117,24 @@
   <div class="wrap">
     <p class="section-label">The cast</p>
     <div class="team-grid">
-      <div class="member">
+      <article class="member">
         <div class="member-photo"><img src="img/owen.jpg" alt="Owen Coomber" loading="lazy"></div>
         <h3>Owen Coomber</h3>
         <div class="member-role">Director / Editor</div>
         <p>Owen directs and edits everything Strange Goose makes. He's made eleven productions in two years, won awards across the UK, Europe, and North America, and has never missed a deadline.</p>
-      </div>
-      <div class="member">
+      </article>
+      <article class="member">
         <div class="member-photo"><img src="img/torya.avif" alt="Torya Winters" loading="lazy"></div>
         <h3>Torya Winters</h3>
         <div class="member-role">Producer</div>
         <p>Torya produces. That means she keeps everything moving, on budget, and on time, and she's the person you'll deal with if you're commissioning us. She's also co-founder of Strange Goose.</p>
-      </div>
-      <div class="member">
+      </article>
+      <article class="member">
         <div class="member-photo ph"><span class="ph-label">Portrait · Alex McNeill</span></div>
         <h3>Alex McNeill</h3>
         <div class="member-role">Cinematographer</div>
         <p>Alex is Strange Goose's Director of Photography. He's shot the majority of SGP's productions including Family Time (8 wins, Aberdeen 2025) and the commissioned Wild Song music video.</p>
-      </div>
+      </article>
     </div>
   </div>
 </section>
