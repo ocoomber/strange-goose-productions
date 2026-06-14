@@ -161,27 +161,78 @@ function parseYouTubeId(input) {
   return tail ? tail[1] : s;
 }
 
+/* Shared fullscreen lightbox player. Lazily created once, reused for every
+   thumbnail click so the video opens at a proper review size (and the client
+   never has to bounce out to YouTube). Closes via ×, backdrop click, or Esc;
+   closing tears down the iframe so playback stops. */
+var _ytLightbox = null;
+function ytLightbox() {
+  if (_ytLightbox) return _ytLightbox;
+  var lb = el('div', 'yt-lightbox');
+  lb.setAttribute('aria-hidden', 'true');
+  lb.setAttribute('role', 'dialog');
+  lb.setAttribute('aria-modal', 'true');
+  lb.setAttribute('aria-label', 'Video player');
+  var inner = el('div', 'yt-lb-inner');
+  var close = el('button', 'yt-lb-close');
+  close.type = 'button';
+  close.setAttribute('aria-label', 'Close video');
+  close.textContent = 'Close ✕';
+  var stage = el('div', 'yt-lb-stage');
+  inner.appendChild(close);
+  inner.appendChild(stage);
+  lb.appendChild(inner);
+
+  function hide() {
+    lb.classList.remove('open');
+    lb.setAttribute('aria-hidden', 'true');
+    stage.innerHTML = '';          // tear down iframe → stops playback
+    document.removeEventListener('keydown', onKey);
+  }
+  function onKey(e) { if (e.key === 'Escape') hide(); }
+
+  close.addEventListener('click', hide);
+  lb.addEventListener('click', function (e) { if (e.target === lb) hide(); });
+
+  document.body.appendChild(lb);
+  _ytLightbox = { el: lb, stage: stage, hide: hide, onKey: onKey };
+  return _ytLightbox;
+}
+
+function openYtLightbox(videoId) {
+  var lb = ytLightbox();
+  var frame = document.createElement('iframe');
+  frame.src = 'https://www.youtube-nocookie.com/embed/' + videoId +
+    '?autoplay=1&rel=0&modestbranding=1';
+  frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+  frame.allowFullscreen = true;
+  lb.stage.innerHTML = '';
+  lb.stage.appendChild(frame);
+  lb.el.classList.add('open');
+  lb.el.setAttribute('aria-hidden', 'false');
+  document.addEventListener('keydown', lb.onKey);
+}
+
 function ytEmbed(rawId) {
   var videoId = parseYouTubeId(rawId);
   var box = el('div', 'portal-yt');
   box.setAttribute('data-yt', videoId);
+  box.setAttribute('role', 'button');
+  box.setAttribute('tabindex', '0');
+  box.setAttribute('aria-label', 'Play video to review');
   var img = el('img');
   img.src = 'https://i.ytimg.com/vi/' + videoId + '/maxresdefault.jpg';
   img.alt = 'Video preview';
   img.loading = 'lazy';
   var play = el('span', 'portal-yt-play');
+  var cue = el('span', 'portal-yt-cue', 'Click to review');
   box.appendChild(img);
   box.appendChild(play);
-  box.addEventListener('click', function () {
-    var frame = document.createElement('iframe');
-    frame.src = 'https://www.youtube-nocookie.com/embed/' + videoId +
-      '?autoplay=1&rel=0&modestbranding=1';
-    frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-    frame.allowFullscreen = true;
-    box.innerHTML = '';
-    box.appendChild(frame);
-    box.classList.add('playing');
-  }, { once: true });
+  box.appendChild(cue);
+  box.addEventListener('click', function () { openYtLightbox(videoId); });
+  box.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openYtLightbox(videoId); }
+  });
   return box;
 }
 
