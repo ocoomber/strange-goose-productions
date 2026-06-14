@@ -432,25 +432,15 @@
   /* shorter note boxes */
   .page[data-page="project"] .stage.pending .admin-tools .note-form textarea,
   .page[data-page="project"] .stage.locked .admin-tools .note-form textarea{min-height:64px}
-  /* item 8 — deliverables: keep the release/submit button on-spec (compact ghost/primary) */
-  .page[data-page="project"] .stage .admin-tools .btn{font-size:11px;letter-spacing:.1em;padding:8px 14px}
-  .page[data-page="project"] .stage .admin-tools .portal-links .btn.ghost{padding:3px 10px;font-size:10px}
-
-  /* ---- BUTTON SIZING PASS (to-do items 1, 4, 5 + general) ----
-     Standalone action buttons (re-send notification, undo last approval,
-     reopen / release / mark-complete in the bottom panel, the report link)
-     sit inside grid/flex panels. As grid items they inherit the default
-     justify-self:stretch and blow up to the full panel width — "comedy
-     sized". Size every one of them to its own label instead. */
+  /* ---- BUTTON LAYOUT (sizing now comes from the .btn / .btn.sm scale in
+     portal.css — see "canonical portal button scale" there) ----
+     These buttons sit inside grid/flex panels where the grid default
+     justify-self:stretch blew them up to the full panel width. Pin them to
+     their own label; never set size here, so they can't drift off-scale. */
   .page[data-page="project"] .admin-tools .btn,
   .page[data-page="project"] .admin-panel .btn,
   .page[data-page="project"] .phead .actions .btn{
     justify-self:start;width:fit-content;max-width:100%;
-  }
-  /* ...and the two header actions (PDF link, undo) are secondary chrome —
-     keep them compact, not the chunky full-size button. */
-  .page[data-page="project"] .phead .actions .btn{
-    padding:6px 12px;font-size:10px;letter-spacing:.09em;gap:6px;
   }
 
   /* ---- NO-VIDEO PANELS (to-do item 3) ----
@@ -586,8 +576,8 @@
           <p class="sub" id="project-meta"></p>
           <p id="project-overdue" style="margin-top:10px;" hidden></p>
           <div class="actions">
-            <a class="btn ghost" id="report-link" href="#" target="_blank" rel="noopener">Generate project record (PDF)</a>
-            <button class="btn ghost" type="button" id="undo-approval" hidden>Undo last approval</button>
+            <a class="btn ghost sm" id="report-link" href="#" target="_blank" rel="noopener">Generate project record (PDF)</a>
+            <button class="btn ghost sm" type="button" id="undo-approval" hidden>Undo last approval</button>
           </div>
           <p class="form-error" id="project-error" hidden></p>
         </div>
@@ -1272,9 +1262,9 @@
       var a = el('a', null, (l.label || l.url));
       a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
       li.appendChild(a);
-      var rm = el('button', 'btn ghost', 'Remove');
+      var rm = el('button', 'btn ghost sm', 'Remove');
       rm.type = 'button';
-      rm.style.cssText = 'margin-left:12px;padding:3px 10px;font-size:10px;';
+      rm.style.marginLeft = '12px';
       rm.addEventListener('click', function () {
         save(links.filter(function (_, j) { return j !== i; }));
       });
@@ -1286,7 +1276,7 @@
     var form = el('form', 'inline-form');
     var label = el('input'); label.placeholder = 'Label'; label.type = 'text';
     var url = el('input'); url.placeholder = 'https://drive.google.com/…'; url.type = 'url'; url.required = true;
-    var add = el('button', 'btn ghost', 'Add link'); add.type = 'submit';
+    var add = el('button', 'btn ghost sm', 'Add link'); add.type = 'submit';
     form.appendChild(label); form.appendChild(url); form.appendChild(add);
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -1411,7 +1401,7 @@
         var noteArea = el('textarea');
         noteArea.placeholder = 'e.g. As per your feedback, Scene 3 is now longer and Scene 5 uses more close-ups.';
         noteArea.value = s.note || '';
-        var noteSave = el('button', 'btn ghost', s.note ? 'Update note' : 'Save note');
+        var noteSave = el('button', 'btn ghost sm', s.note ? 'Update note' : 'Save note');
         noteSave.type = 'submit';
         var noteErr = el('p', 'form-error'); noteErr.hidden = true;
         noteForm.appendChild(noteArea);
@@ -1434,7 +1424,7 @@
           vidInput.type = 'text';
           vidInput.placeholder = 'https://youtube.com/watch?v=… or video ID (blank to remove)';
           vidInput.value = s.video_id || '';
-          var vidSave = el('button', 'btn ghost', 'Save video'); vidSave.type = 'submit';
+          var vidSave = el('button', 'btn ghost sm', 'Save video'); vidSave.type = 'submit';
           var vidErr = el('p', 'form-error'); vidErr.hidden = true;
           vidForm.appendChild(vidInput); vidForm.appendChild(vidSave);
           vidForm.addEventListener('submit', async function (e) {
@@ -1463,7 +1453,7 @@
         var resendBox = el('div');
         resendBox.appendChild(el('p', 'eyebrow', 'Client notification'));
         resendBox.appendChild(el('p', 'hint', "Re-send this stage's “ready for you” email. Nothing else changes."));
-        var resendBtn = el('button', 'btn ghost', 'Re-send notification email');
+        var resendBtn = el('button', 'btn ghost sm', 'Re-send notification email');
         resendBtn.type = 'button';
         var resendErr = el('p', 'form-error'); resendErr.hidden = true;
         resendBtn.addEventListener('click', async function () {
