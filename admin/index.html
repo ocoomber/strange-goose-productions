@@ -231,6 +231,25 @@
     return times.length ? Math.max.apply(null, times) : new Date(p.created_at).getTime();
   }
 
+  // The action that put the project in its current state, for the card: what
+  // happened and when. Owen's turn → the client's last response (or creation);
+  // client's turn → when Owen last sent it over; complete → when it finished.
+  function lastAction(p, status) {
+    if (status === 'complete') {
+      return p.completed_at ? { label: 'Completed', ts: p.completed_at } : null;
+    }
+    if (status === 'client' || status === 'stalled') {
+      var ps = pendingStageOf(p);
+      return ps && ps.pending_since ? { label: 'Sent to client', ts: ps.pending_since } : null;
+    }
+    // status === 'you'
+    var times = (p.approvals || []).map(function (a) { return new Date(a.approved_at).getTime(); });
+    if (times.length) {
+      return { label: 'Client responded', ts: new Date(Math.max.apply(null, times)).toISOString() };
+    }
+    return p.created_at ? { label: 'Created', ts: p.created_at } : null;
+  }
+
   function show(name) {
     views.forEach(function (v) {
       document.getElementById('view-' + v).hidden = (v !== name);
@@ -375,6 +394,8 @@
       }
       meta.appendChild(el('span', null, 'Client: ' + ((p.profiles && p.profiles.email) || '—')));
       meta.appendChild(el('span', null, approved + '/' + (STAGE_COUNT - 1) + ' approved'));
+      var act = lastAction(p, status);
+      if (act) meta.appendChild(el('span', null, act.label + ': ' + fmtDate(act.ts)));
       card.appendChild(meta);
       if (status === 'you') card.classList.add('your-move');
       if (status === 'stalled') card.classList.add('is-stalled');
