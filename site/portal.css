@@ -453,6 +453,114 @@ button.btn.ghost:disabled {
   .page[data-page="project"] .stage.pending .admin-tools > .portal-yt{grid-column:1;grid-row:auto;align-self:auto;aspect-ratio:16/9;min-height:0;margin-top:-18px}
 }
 
+/* ============================================================
+   APPROVED · LOCKED · DELIVERABLES editors
+   ============================================================ */
+
+/* ---------- APPROVED: settled permanent record ---------- */
+.page[data-page="project"] .stage.approved .stage-foot{display:none}
+
+.page[data-page="project"] .stage.approved .admin-tools{
+  display:grid;grid-template-columns:1fr;gap:13px;align-items:start;
+}
+.page[data-page="project"] .stage.approved .admin-tools:has(.portal-yt){
+  grid-template-columns:minmax(0,1fr) minmax(0,300px);column-gap:18px;
+}
+.page[data-page="project"] .stage.approved .admin-tools:has(.portal-yt) > .hint{grid-column:1/-1;grid-row:1}
+.page[data-page="project"] .stage.approved .admin-tools:has(.portal-yt) > div:not(.portal-yt){grid-column:1}
+.page[data-page="project"] .stage.approved .admin-tools:has(.portal-yt) > .portal-yt{grid-column:2;grid-row:2}
+
+.page[data-page="project"] .stage.approved .admin-tools > .hint{
+  margin:0;font-size:12.5px;line-height:1.45;color:var(--ink-3);
+  display:flex;align-items:flex-start;gap:8px;
+}
+.page[data-page="project"] .stage.approved .admin-tools > .hint::before{
+  content:"";width:13px;height:13px;flex:0 0 auto;margin-top:1px;background:var(--done);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='9.5' rx='1.6'/%3E%3Cpath d='M8 10.5V7.5a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='9.5' rx='1.6'/%3E%3Cpath d='M8 10.5V7.5a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.page[data-page="project"] .stage.approved .admin-tools > div:not(.portal-yt){
+  margin:0;background:var(--paper-2);border:1px solid var(--line-2);
+  border-left:2px solid color-mix(in oklab, var(--done) 36%, transparent);
+  border-radius:3px;padding:14px 16px;display:grid;gap:8px;align-content:start;
+}
+.page[data-page="project"] .stage.approved .admin-tools > div .eyebrow{margin:0}
+.page[data-page="project"] .stage.approved .admin-tools > div .stage-note{margin:0;color:var(--ink-2)}
+.page[data-page="project"] .stage.approved .admin-tools .portal-links{margin:0}
+.page[data-page="project"] .stage.approved .admin-tools .portal-yt{
+  width:100%;max-width:none;aspect-ratio:16/9;min-height:0;margin:0;align-self:start;
+  border:1px solid var(--line-2);border-radius:3px;
+}
+
+/* ---------- LOCKED + DELIVERABLES: two-panel editor ---------- */
+.page[data-page="project"] .stage.locked .admin-tools{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);
+  column-gap:18px;row-gap:14px;align-items:start;
+}
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.note-form),
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.inline-form){
+  margin:0;background:var(--paper-2);border:1px solid var(--line-2);
+  border-radius:3px;padding:16px 18px;display:grid;gap:11px;align-content:start;
+}
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.note-form){grid-column:1;grid-row:1}
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.inline-form):not(:has(.portal-links)){grid-column:2;grid-row:1}
+.page[data-page="project"] .stage.locked .admin-tools .eyebrow{margin:0;color:var(--ink-3)}
+.page[data-page="project"] .stage.locked .admin-tools .note-form{margin:0}
+.page[data-page="project"] .stage.locked .admin-tools .note-form textarea{min-height:78px}
+.page[data-page="project"] .stage.locked .admin-tools .form-error{margin:0}
+.page[data-page="project"] .stage.locked .admin-tools .note-form button,
+.page[data-page="project"] .stage.locked .admin-tools .inline-form button{
+  font-size:11px;letter-spacing:.1em;padding:8px 14px;margin-top:0;justify-self:start;
+}
+
+/* locked submit row → gated footer, not a panel */
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.btn.primary[disabled]){
+  grid-column:1/-1;grid-row:2;margin:0;background:none;border:none;
+  border-top:1px solid var(--line);border-radius:0;padding:13px 0 0;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.btn.primary[disabled]) .btn.primary{
+  order:1;font-size:11px;letter-spacing:.1em;padding:8px 14px;margin:0;opacity:.5;cursor:not-allowed;
+}
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.btn.primary[disabled]) .hint{
+  order:2;margin:0;color:var(--muted);display:flex;align-items:center;gap:8px;
+}
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.btn.primary[disabled]) .hint::before{
+  content:"";width:12px;height:12px;flex:0 0 auto;background:var(--muted);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='9.5' rx='1.6'/%3E%3Cpath d='M8 10.5V7.5a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4.5' y='10.5' width='15' height='9.5' rx='1.6'/%3E%3Cpath d='M8 10.5V7.5a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+/* deliverables link manager → full-width panel */
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.portal-links){
+  grid-column:1/-1;grid-row:2;margin:0;background:var(--paper-2);
+  border:1px solid var(--line-2);border-radius:3px;padding:16px 18px;display:grid;gap:11px;
+}
+.page[data-page="project"] .stage.locked .admin-tools .portal-links{margin:0;padding:0}
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.portal-links) .inline-form{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0;
+}
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.portal-links) .inline-form input[type="text"]{flex:0 0 160px;min-width:0}
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.portal-links) .inline-form input[type="url"]{flex:1;min-width:200px}
+.page[data-page="project"] .stage.locked .admin-tools > div:has(.portal-links) .inline-form button{
+  font-size:11px;letter-spacing:.1em;padding:8px 14px;margin:0;flex:0 0 auto;
+}
+
+/* narrow: stack every two-panel editor into one column */
+@media(max-width:760px){
+  .page[data-page="project"] .stage.locked .admin-tools,
+  .page[data-page="project"] .stage.approved .admin-tools:has(.portal-yt){grid-template-columns:1fr}
+  .page[data-page="project"] .stage.locked .admin-tools > div:has(.note-form),
+  .page[data-page="project"] .stage.locked .admin-tools > div:has(.inline-form),
+  .page[data-page="project"] .stage.approved .admin-tools:has(.portal-yt) > div:not(.portal-yt),
+  .page[data-page="project"] .stage.approved .admin-tools:has(.portal-yt) > .portal-yt{grid-column:1;grid-row:auto}
+}
+
+@media(max-width:640px){
+  .page[data-page="project"] .stage{padding:18px 16px}
+  .page[data-page="project"] .stage.pending{padding-left:15px}
+}
+
 .back-link {
   font-family: var(--mono);
   font-size: 11px;
