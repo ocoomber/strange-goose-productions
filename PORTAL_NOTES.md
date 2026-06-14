@@ -295,6 +295,15 @@ function), the PUBLIC grant returns — the REVOKE/GRANT block at the end of
 callable by `authenticated`) are expected; the in-function `is_admin()` check
 blocks non-admin signed-in users, which the linter can't see.
 
+> **UPDATE 2026-06-14: `admin/preview.html` was deleted.** Owen no longer uses
+> the no-login design preview, so `index.html` is now the single source of
+> truth — there is no sandbox copy to keep byte-identical and nothing to
+> "promote" by copying. The `DEMO_MODE`/`buildDemo()` block still sits inert in
+> `admin/index.html` (it only ever activated on the `/preview/` path); it can be
+> stripped out next time that area is touched. `client/preview.html` still
+> exists. The Phase 4/5 notes below predate this and mention preview.html —
+> read them with that in mind.
+
 ## Phase 4 — admin full redesign + Claude Design loop (LIVE 2026-06-14)
 The admin SPA was fully rebuilt (replaces the Phase 2.1 accordion home above):
 **topbar + left sidebar + 3-column board (My move / Client's move / Overdue) +
