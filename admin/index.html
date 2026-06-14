@@ -207,6 +207,12 @@
     return Math.max(0, Math.floor(ms / 86400000));
   }
 
+  // Spelled-out overdue badge text. The site font renders "d" and "0" almost
+  // identically, so "12d" misreads as "120" — always write the word "day(s)".
+  function overdueLabel(n) {
+    return 'Overdue · ' + n + (n === 1 ? ' day' : ' days');
+  }
+
   // Four-state project status, derived from stage data + the overdue window.
   function statusOf(p) {
     if (p.status === 'complete') return 'complete';
@@ -353,7 +359,7 @@
       } else if (status === 'you') {
         meta.appendChild(el('span', 'badge pending', 'Your move'));
       } else if (status === 'stalled') {
-        meta.appendChild(el('span', 'badge stalled', 'Overdue · ' + overdueDays(p) + 'd'));
+        meta.appendChild(el('span', 'badge stalled', overdueLabel(overdueDays(p))));
       } else {
         meta.appendChild(el('span', 'badge locked', 'Awaiting client'));
       }
@@ -436,7 +442,7 @@
     fields.appendChild(nameIn); fields.appendChild(emailIn);
     if (n) fields.appendChild(el('span', 'client-email', n + ' project' + (n === 1 ? '' : 's')));
     if (stalledDays && stalledDays[c.id]) {
-      fields.appendChild(el('span', 'badge stalled', 'Overdue · ' + stalledDays[c.id] + 'd'));
+      fields.appendChild(el('span', 'badge stalled', overdueLabel(stalledDays[c.id])));
     }
     row.appendChild(fields);
 
@@ -721,7 +727,7 @@
     var od = document.getElementById('project-overdue');
     od.innerHTML = '';
     if (statusOf({ status: project.status, stages: stages }) === 'stalled') {
-      od.appendChild(el('span', 'badge stalled', 'Overdue · ' + overdueDays({ stages: stages }) + 'd'));
+      od.appendChild(el('span', 'badge stalled', overdueLabel(overdueDays({ stages: stages }))));
       od.appendChild(el('span', 'hint',
         '  Awaiting the client beyond ' + OVERDUE_DAYS + ' days — worth a manual chase.'));
       od.hidden = false;
