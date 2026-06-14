@@ -79,8 +79,8 @@
   .canvas{flex:1;position:relative;min-width:0}
   .page{display:none;height:100%;flex-direction:column}
   .page.active{display:flex}
-  .phead{padding:26px 40px 14px;flex:0 0 auto}
-  .phead h1{font-size:clamp(30px,4vw,46px);font-weight:800;letter-spacing:-.025em;margin:12px 0 0;line-height:1}
+  .phead{padding:14px 40px 14px;flex:0 0 auto}
+  .phead h1{font-size:clamp(28px,3.4vw,42px);font-weight:800;letter-spacing:-.025em;margin:3px 0 0;line-height:1}
   .phead .lede{color:var(--ink-2);font-size:15px;max-width:620px;margin-top:12px;line-height:1.5}
   .phead .actions{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .statline{font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;margin-top:20px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
@@ -129,6 +129,24 @@
      .stage, .auth-card) already use --paper-2, so they read as raised surfaces. */
   .page[data-page="project"] .list-scroll{padding-top:4px}
   .page .back-link{display:inline-block;margin-bottom:4px}
+
+  /* filled status pills — restore per-status colour on cards & rows */
+  .tag{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .tag.you{--accent:var(--move)} .tag.client{--accent:var(--wait)}
+  .tag.stalled{--accent:var(--over)} .tag.complete{--accent:var(--done)}
+  .mcard .mc-status{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+
+  /* clients page: fixed columns so every row's inputs line up, and the
+     project-count + overdue badge wrap onto their own line instead of
+     shoving the inputs out of alignment. */
+  .page[data-page="clients"] .client-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:10px 18px}
+  .page[data-page="clients"] .client-fields{display:grid;grid-template-columns:220px 280px;gap:8px 12px;align-items:center;flex:none;min-width:0}
+  .page[data-page="clients"] .client-fields input{flex:none;width:100%;min-width:0}
+  .page[data-page="clients"] .client-fields .client-email,
+  .page[data-page="clients"] .client-fields .badge{grid-column:1/-1;justify-self:start;margin:0}
+  .client-controls{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+  .client-controls input,.client-controls select{font:inherit;font-size:14px;background:var(--paper);color:var(--ink);border:1px solid rgba(20,18,15,.22);padding:8px 11px}
+  .client-controls input{flex:1;min-width:200px;max-width:340px}
 
   ::-webkit-scrollbar{width:11px;height:11px}
   ::-webkit-scrollbar-thumb{background:#cebfa8;border-radius:6px;border:3px solid var(--bg)}
@@ -322,7 +340,8 @@
               </div>
               <div class="field">
                 <label for="new-client">Client account</label>
-                <select id="new-client" required></select>
+                <input id="new-client" list="client-options" placeholder="Type a name or email…" autocomplete="off" required>
+                <datalist id="client-options"></datalist>
               </div>
               <button class="btn primary" type="submit">Create project</button>
             </form>
@@ -418,6 +437,7 @@
 (function () {
   var profile = null;
   var clientData = null;   // cached client/project data for search/filter re-render
+  var clientOptionMap = {};// "Name — email" → client id, for the new-project picker
   var loaded = false;      // projects/clients fetched at least once this session
 
   // ── Overdue / status config (unchanged from the live admin) ──────
@@ -496,12 +516,14 @@
       .select('id, email, display_name, archived').eq('role', 'client').order('email');
     var allClients = clients.data || [];
     var activeClients = allClients.filter(function (c) { return !c.archived; });
-    var sel = document.getElementById('new-client');
-    sel.innerHTML = '';
+    var dl = document.getElementById('client-options');
+    dl.innerHTML = '';
+    clientOptionMap = {};
     activeClients.forEach(function (c) {
-      var opt = el('option', null, (c.display_name || c.email) + ' — ' + c.email);
-      opt.value = c.id;
-      sel.appendChild(opt);
+      var label = (c.display_name || c.email) + ' — ' + c.email;
+      clientOptionMap[label] = c.id;
+      var opt = el('option'); opt.value = label;
+      dl.appendChild(opt);
     });
 
     var res = await sb.from('projects')
@@ -573,9 +595,11 @@
     return bar;
   }
 
-  function makeMini(p) {
+  function makeMini(p, status) {
     var a = el('a', 'mcard');
     a.href = '#project/' + p.id;
+    if (status) a.appendChild(el('div', 'mc-status',
+      status === 'stalled' ? overdueLabel(overdueDays(p)) : TAG[status]));
     a.appendChild(el('div', 'mc-client', clientLabel(p)));
     a.appendChild(el('div', 'mc-project', p.title));
     var stg = el('div', 'mc-stage');
@@ -591,9 +615,9 @@
     a.appendChild(el('div', 'rtitle', p.title));
     var meta = el('div', 'rmeta');
     if (status === 'stalled') {
-      meta.appendChild(el('span', 'tag', overdueLabel(overdueDays(p))));
+      meta.appendChild(el('span', 'tag stalled', overdueLabel(overdueDays(p))));
     } else {
-      meta.appendChild(el('span', 'tag', TAG[status]));
+      meta.appendChild(el('span', 'tag ' + status, TAG[status]));
     }
     var c = el('span', null, 'Client: ');
     c.appendChild(el('span', 'k', clientEmail(p)));
@@ -624,7 +648,7 @@
         body.appendChild(e);
         return;
       }
-      items.forEach(function (p) { body.appendChild(makeMini(p)); });
+      items.forEach(function (p) { body.appendChild(makeMini(p, key)); });
     });
   }
 
@@ -841,12 +865,16 @@
     e.preventDefault();
     var errNode = document.getElementById('create-error');
     errNode.hidden = true;
+    var clientInput = document.getElementById('new-client');
+    var clientId = clientOptionMap[clientInput.value.trim()];
+    if (!clientId) { showError(errNode, { message: 'Pick a client from the list.' }); return; }
     var res = await sb.from('projects').insert({
       title: document.getElementById('new-title').value.trim(),
-      client_id: document.getElementById('new-client').value
+      client_id: clientId
     });
     if (res.error) { showError(errNode, res.error); return; }
     document.getElementById('new-title').value = '';
+    clientInput.value = '';
     renderProjects();
   });
 
