@@ -1517,8 +1517,22 @@
     selectPage(page);
   }
 
+  // Safety net: a thrown startup error must never leave a silent blank page.
+  function bootError(msg) {
+    var d = document.getElementById('boot-error') || document.createElement('pre');
+    d.id = 'boot-error';
+    d.style.cssText = 'position:fixed;inset:0;margin:0;padding:24px;background:#1a1714;' +
+      'color:#ffb4a0;font:13px/1.6 monospace;white-space:pre-wrap;z-index:99999;overflow:auto';
+    d.textContent = 'Admin failed to start:\n\n' + msg +
+      '\n\n(Hard-refresh with Ctrl+F5. If this persists, send Owen this text.)';
+    (document.body || document.documentElement).appendChild(d);
+  }
+  window.addEventListener('error', function (ev) {
+    bootError((ev.message || ev.error || 'unknown') + '  ' + (ev.filename || '') + ':' + (ev.lineno || ''));
+  });
+
   window.addEventListener('hashchange', route);
-  route();
+  route().catch(function (e) { bootError(String((e && e.message) || e)); });
 })();
 </script>
 </body>
