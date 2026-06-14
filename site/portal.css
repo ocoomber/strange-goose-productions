@@ -369,6 +369,90 @@ button.btn.ghost:disabled {
   gap: 12px;
 }
 
+/* ============================================================
+   PENDING-STAGE EDITOR — NOTE panel (left) + VIDEO field & its
+   preview docked as one media card (right). Bottoms aligned.
+   Scoped to the live (pending) stage only.
+   ============================================================ */
+.page[data-page="project"] .stage.pending .admin-tools{
+  grid-template-columns:minmax(0,1fr) minmax(0,300px);
+  grid-template-rows:auto 1fr;
+  column-gap:18px;
+  row-gap:0;
+  align-items:start;
+}
+.page[data-page="project"] .stage.pending .admin-tools > div{
+  margin:0;
+  background:var(--paper-2);
+  border:1px solid var(--line-2);
+  border-radius:3px;
+  padding:16px 18px 18px;
+  display:grid;
+  gap:11px;
+  align-content:start;
+}
+/* NOTE panel — left column, spans both rows */
+.page[data-page="project"] .stage.pending .admin-tools > div:has(.note-form){
+  grid-column:1;
+  grid-row:1 / span 2;
+  align-self:stretch;
+}
+/* VIDEO field panel — right column, top */
+.page[data-page="project"] .stage.pending .admin-tools > div:has(.inline-form):has(+ .portal-yt){
+  grid-column:2;
+  grid-row:1;
+  align-self:stretch;
+  border-bottom:none;
+  border-radius:3px 3px 0 0;
+  padding-bottom:14px;
+}
+/* VIDEO field panel with no preview yet — closed card spanning both rows */
+.page[data-page="project"] .stage.pending .admin-tools > div:has(.inline-form):not(:has(+ .portal-yt)){
+  grid-column:2;
+  grid-row:1 / span 2;
+}
+/* VIDEO preview — right column, bottom; flush under field */
+.page[data-page="project"] .stage.pending .admin-tools > .portal-yt{
+  grid-column:2;
+  grid-row:2;
+  align-self:stretch;
+  aspect-ratio:auto;
+  min-height:150px;
+  margin:0;
+  width:100%;
+  max-width:none;
+  border:1px solid var(--line-2);
+  border-top:none;
+  border-radius:0 0 3px 3px;
+  background:#1a1714;
+}
+/* internal rhythm */
+.page[data-page="project"] .stage.pending .admin-tools .eyebrow{margin:0}
+.page[data-page="project"] .stage.pending .admin-tools .stage-note-box{margin:0}
+.page[data-page="project"] .stage.pending .admin-tools .note-form{margin:0}
+.page[data-page="project"] .stage.pending .admin-tools .form-error{margin:0}
+/* calmer note editor */
+.page[data-page="project"] .stage.pending .admin-tools .note-form textarea{
+  min-height:78px;
+}
+/* compact buttons */
+.page[data-page="project"] .stage.pending .admin-tools .note-form button,
+.page[data-page="project"] .stage.pending .admin-tools .inline-form button{
+  font-size:11px;
+  letter-spacing:.1em;
+  padding:8px 14px;
+  margin-top:0;
+  justify-self:start;
+  align-self:center;
+}
+/* stack into one column on narrow screens */
+@media(max-width:760px){
+  .page[data-page="project"] .stage.pending .admin-tools{grid-template-columns:1fr;grid-template-rows:none;row-gap:18px}
+  .page[data-page="project"] .stage.pending .admin-tools > div:has(.note-form){grid-column:1;grid-row:auto;align-self:auto}
+  .page[data-page="project"] .stage.pending .admin-tools > div:has(.inline-form){grid-column:1;grid-row:auto;align-self:auto}
+  .page[data-page="project"] .stage.pending .admin-tools > .portal-yt{grid-column:1;grid-row:auto;align-self:auto;aspect-ratio:16/9;min-height:0;margin-top:-18px}
+}
+
 .back-link {
   font-family: var(--mono);
   font-size: 11px;
