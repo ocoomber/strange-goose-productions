@@ -2,6 +2,11 @@
 
 Website for Strange Goose Productions. Static HTML/CSS, no build step, no dependencies. Hosted on GitHub Pages at strangegoose.co.uk. Pushing to main makes it live.
 
+> **Start of session:** First, read `Claude To-Do List.txt` in the repo root —
+> Owen edits it before a session as an opening brief of what to work on. It's a
+> local, personal file (not always present in a fresh clone); if it's missing,
+> just carry on.
+
 > **Client Portal:** There is an authenticated client portal in `client/`,
 > `admin/`, `site/portal.*` and `supabase/`, backed by Supabase. If working on
 > it, **read `PORTAL_NOTES.md` first** (architecture, live state, decisions,
