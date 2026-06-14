@@ -1574,9 +1574,11 @@
      the ?demo gate get stripped when promoting to index.html.
      Nothing here can touch real data (sb is swapped for a stub).
      ======================================================== */
-  // Demo is sandbox-only: it never activates on the live admin (index.html),
-  // only on preview.html, so the two files can be byte-identical.
-  var DEMO_MODE = /[?&]demo=1/.test(location.search) && /preview/.test(location.pathname);
+  // Demo activates automatically on preview.html (the design sandbox) and NEVER
+  // on the live admin (index.html), so the two files stay byte-identical. No
+  // query string needed — just open admin/preview.html and it self-populates
+  // with fake data and no login, so any renderer (incl. Claude Design) can see it.
+  var DEMO_MODE = /preview/.test(location.pathname);
 
   function buildDemo() {
     function prof(id, name, email, arch) {
