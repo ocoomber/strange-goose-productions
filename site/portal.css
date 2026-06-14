@@ -466,3 +466,23 @@ button.btn.ghost:disabled {
   .stage { padding: 20px 18px; }
   .auth-card { padding: 28px 22px; }
 }
+
+/* Phone: stack the admin/client rows full-width so nothing gets squeezed. */
+@media (max-width: 640px) {
+  /* Client management rows: info, edit fields and actions each on their own row. */
+  .client-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .client-info { min-width: 0; }
+  .client-fields { min-width: 0; flex-direction: column; align-items: stretch; }
+  .client-fields input { min-width: 0; width: 100%; }
+  .client-fields .client-email { flex: 0 0 auto; }
+  .client-actions { flex-wrap: wrap; }
+  .client-actions .btn { flex: 1 1 auto; }
+  /* New-project form fields stack instead of squeezing side by side. */
+  .admin-row { flex-direction: column; align-items: stretch; }
+  .admin-row .field { min-width: 0; }
+  /* Search/filter controls fill the width. */
+  .client-controls input,
+  .client-controls select { flex: 1 1 100%; }
+  /* Single-column cards (already one column, but be explicit on small screens). */
+  .portal-grid { grid-template-columns: 1fr; }
+}
