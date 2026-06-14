@@ -1362,8 +1362,139 @@
   document.getElementById('client-search').addEventListener('input', renderClients);
   document.getElementById('client-filter').addEventListener('change', renderClients);
 
+  /* ========================================================
+     DEMO MODE — open  admin/preview.html?demo=1  to see every
+     screen rendered with fake data and NO login, for design.
+     Claude Design edits the <style> block only; this block and
+     the ?demo gate get stripped when promoting to index.html.
+     Nothing here can touch real data (sb is swapped for a stub).
+     ======================================================== */
+  var DEMO_MODE = /[?&]demo=1/.test(location.search);
+
+  function buildDemo() {
+    function prof(id, name, email, arch) {
+      return { id: id, email: email, display_name: name, archived: !!arch };
+    }
+    var clients = [
+      prof('c1', 'Jane Doe', 'jane@crossfire.com'),
+      prof('c2', 'Mark Lewis', 'mark@journeyman.tv'),
+      prof('c3', 'Sara Kim', 'sara@dreamhouse.co'),
+      prof('c4', 'Old Client', 'old@client.com', true)
+    ];
+    // helper: build a project for the board/queues
+    function P(id, title, cid, status, stages, completed) {
+      var c = clients.filter(function (x) { return x.id === cid; })[0];
+      return {
+        id: id, title: title, status: status, client_id: cid,
+        created_at: '2026-05-01T10:00:00Z', completed_at: completed || null,
+        profiles: { email: c.email, display_name: c.display_name },
+        stages: stages,
+        approvals: stages.filter(function (s) { return s.state === 'approved'; })
+          .map(function () { return { approved_at: '2026-05-20T09:15:00Z' }; })
+      };
+    }
+    function S(i, state, since) { return { stage_index: i, state: state, pending_since: since || null }; }
+    var projects = [
+      // your move (no pending stage)
+      P('demo', 'Crossfire — Trailer', 'c1', 'active',
+        [S(1, 'approved'), S(2, 'approved'), S(3, 'locked')]),
+      // client's move (recent pending)
+      P('p2', 'Family Time — Short', 'c1', 'active',
+        [S(1, 'approved'), S(2, 'pending', '2026-06-11T16:00:00Z')]),
+      // overdue (old pending)
+      P('p3', 'The Journeyman — Doc', 'c2', 'active',
+        [S(1, 'approved'), S(2, 'pending', '2026-05-18T12:00:00Z')]),
+      P('p4', 'Dream House — Promo', 'c3', 'active',
+        [S(1, 'approved'), S(2, 'locked')]),
+      // complete
+      P('p5', 'Getting Over — Music Video', 'c3', 'complete',
+        [S(1, 'approved'), S(2, 'approved'), S(3, 'approved'), S(4, 'approved'),
+         S(5, 'approved'), S(6, 'approved'), S(7, 'approved')], '2026-04-30T17:00:00Z')
+    ];
+    // rich single-project detail (the page we're designing)
+    var YT = 'dQw4w9WgXcQ';
+    var stages = [
+      { id: 's1', stage_index: 1, name: 'Brief', state: 'approved',
+        doc_links: [{ label: 'Brief v2 (Google Doc)', url: 'https://drive.google.com' }],
+        note: 'Agreed scope: a 90-second trailer, two feedback rounds included.',
+        video_id: null, deliverable_links: [] },
+      { id: 's2', stage_index: 2, name: 'Edit v1', state: 'approved',
+        doc_links: [], note: 'First cut for your review.', video_id: YT, deliverable_links: [] },
+      { id: 's3', stage_index: 3, name: 'Edit v2', state: 'pending',
+        doc_links: [], video_id: YT, deliverable_links: [],
+        note: 'As per your feedback, Scene 3 is now longer and Scene 5 uses more close-ups.' },
+      { id: 's4', stage_index: 4, name: 'Picture lock', state: 'locked', doc_links: [], deliverable_links: [] },
+      { id: 's5', stage_index: 5, name: 'Colour & sound', state: 'locked', doc_links: [], deliverable_links: [] },
+      { id: 's6', stage_index: 6, name: 'Final version', state: 'locked', doc_links: [], deliverable_links: [] },
+      { id: 's7', stage_index: 7, name: 'Deliverables', state: 'locked', doc_links: [], deliverable_links: [] }
+    ];
+    return {
+      adminProfile: { id: 'demo-admin', role: 'admin' },
+      clients: clients,
+      projects: projects,
+      project: { id: 'demo', title: 'Crossfire — Trailer', status: 'active',
+        created_at: '2026-05-01T10:00:00Z', completed_at: null,
+        profiles: { email: 'jane@crossfire.com', display_name: 'Jane Doe' } },
+      stages: stages,
+      approvals: [
+        { stage_id: 's1', approved_at: '2026-05-05T14:30:00Z', stage_name: 'Brief' },
+        { stage_id: 's2', approved_at: '2026-05-20T09:15:00Z', stage_name: 'Edit v1' }
+      ],
+      notes: [{ created_at: '2026-06-12T11:00:00Z',
+        body: 'Emailed client to chase Edit v2 feedback — no reply yet.' }]
+    };
+  }
+
+  var DEMO = DEMO_MODE ? buildDemo() : null;
+
+  function demoSb() {
+    function builder(table) {
+      var b = { _t: table, _single: false, _mut: false };
+      ['select', 'eq', 'neq', 'gte', 'lte', 'order', 'limit'].forEach(function (m) {
+        b[m] = function () { return b; };
+      });
+      ['insert', 'update', 'delete', 'upsert'].forEach(function (m) {
+        b[m] = function () { b._mut = true; return b; };
+      });
+      b.single = function () { b._single = true; return b; };
+      b.then = function (resolve) { resolve(demoResolve(b)); };
+      return b;
+    }
+    function demoResolve(b) {
+      if (b._mut) return { data: {}, error: null };
+      if (b._t === 'profiles') return { data: b._single ? DEMO.adminProfile : DEMO.clients, error: null };
+      if (b._t === 'projects') return { data: b._single ? DEMO.project : DEMO.projects, error: null };
+      if (b._t === 'stages') return { data: b._single ? DEMO.stages[0] : DEMO.stages, error: null };
+      if (b._t === 'approvals') return { data: DEMO.approvals, error: null };
+      if (b._t === 'project_notes') return { data: DEMO.notes, error: null };
+      return { data: [], error: null };
+    }
+    var ok = function () { return Promise.resolve({ data: {}, error: null }); };
+    return {
+      from: function (t) { return builder(t); },
+      rpc: ok,
+      functions: { invoke: ok },
+      auth: {
+        getSession: function () { return Promise.resolve({ data: { session: { user: DEMO.adminProfile } } }); },
+        getUser: function () { return Promise.resolve({ data: { user: DEMO.adminProfile } }); },
+        updateUser: ok, signOut: ok
+      }
+    };
+  }
+  if (DEMO_MODE) sb = demoSb();
+
   /* ── routing ── */
   async function route() {
+    if (DEMO_MODE) {
+      profile = DEMO.adminProfile;
+      showShell();
+      var dpm = location.hash.match(/^#project\/(.+)$/);
+      if (dpm) { if (!loaded) loadData(); renderProject(dpm[1]); return; }
+      var dgm = location.hash.match(/^#page\/(.+)$/);
+      if (!loaded) await loadData();
+      selectPage(dgm ? dgm[1] : 'dash');
+      return;
+    }
     var session = await getSession();
     if (!session) { showLogin(); return; }
     if (!profile) profile = await getProfile();
