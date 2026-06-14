@@ -442,6 +442,13 @@
   .page[data-page="project"] .phead .actions .btn{
     justify-self:start;width:fit-content;max-width:100%;
   }
+  /* form submit buttons (Create project / Export CSV / Create account /
+     Update password) sit in a flex row, bottom-aligned next to the inputs.
+     At the .btn scale they were shorter than the inputs, so they floated low
+     and looked undersized. Match the input box height (≈42px: 11px padding ×2
+     + ~17px text + 1px border ×2) so the button lines up with the field next
+     to it. Height only — the type scale is untouched. */
+  .admin-row > .btn{ min-height:42px; }
 
   /* ---- NO-VIDEO PANELS (to-do item 3) ----
      Where a stage has no video the single content panel spans the full
