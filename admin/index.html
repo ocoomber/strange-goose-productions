@@ -281,8 +281,10 @@
     letter-spacing:.11em;text-transform:uppercase;
     padding:5px 10px 5px 9px;border:1px solid transparent;border-radius:2px;
     white-space:nowrap;line-height:1;
-    /* uniform width so the status chips line up — longest is "Feedback confirmed" */
-    min-width:160px;
+    /* uniform width so the status chips line up — longest is "Feedback confirmed";
+       must clear that label fully or the green chips end up *nearly* but not
+       exactly the same length (to-do item 2) */
+    min-width:184px;
   }
   .page[data-page="project"] .badge::before{
     content:"";width:12px;height:12px;flex:0 0 auto;background:currentColor;
@@ -433,6 +435,30 @@
   /* item 8 — deliverables: keep the release/submit button on-spec (compact ghost/primary) */
   .page[data-page="project"] .stage .admin-tools .btn{font-size:11px;letter-spacing:.1em;padding:8px 14px}
   .page[data-page="project"] .stage .admin-tools .portal-links .btn.ghost{padding:3px 10px;font-size:10px}
+
+  /* ---- BUTTON SIZING PASS (to-do items 1, 4, 5 + general) ----
+     Standalone action buttons (re-send notification, undo last approval,
+     reopen / release / mark-complete in the bottom panel, the report link)
+     sit inside grid/flex panels. As grid items they inherit the default
+     justify-self:stretch and blow up to the full panel width — "comedy
+     sized". Size every one of them to its own label instead. */
+  .page[data-page="project"] .admin-tools .btn,
+  .page[data-page="project"] .admin-panel .btn,
+  .page[data-page="project"] .phead .actions .btn{
+    justify-self:start;width:fit-content;max-width:100%;
+  }
+
+  /* ---- NO-VIDEO PANELS (to-do item 3) ----
+     Where a stage has no video the single content panel spans the full
+     stage width and reads as a giant empty block. Cap it to a sensible
+     reading width so it sits tidily on the left. Stages WITH a video keep
+     their two-column layout; the deliverables link manager (an actual
+     form, :has(.inline-form)) keeps its full width. */
+  .page[data-page="project"] .stage.approved .admin-tools:not(:has(.portal-yt)) > div:not(.portal-yt),
+  .page[data-page="project"] .stage.approved .admin-tools:not(:has(.portal-yt)) > .hint,
+  .page[data-page="project"] .stage.locked .admin-tools:not(:has(.inline-form)) > div:has(.note-form){
+    max-width:640px;
+  }
 </style>
 </head>
 <body>
