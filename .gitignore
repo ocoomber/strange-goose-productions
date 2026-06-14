@@ -22,3 +22,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Owen's personal session brief — lives on his machine only
+Claude To-Do List.txt
