@@ -1537,7 +1537,7 @@
       reportBtn.style.cssText = 'margin-top:10px;display:inline-block;';
       remind.appendChild(reportBtn);
       panel.appendChild(remind);
-      var reopen = el('button', 'btn ghost', 'Reopen project');
+      var reopen = el('button', 'btn ghost sm', 'Reopen project');
       reopen.type = 'button';
       reopen.onclick = async function () {
         var res = await sb.from('projects').update({ status: 'active' }).eq('id', id);
