@@ -333,8 +333,8 @@
     summary.innerHTML = '';
     var segs = [];
     if (groups.you.length) segs.push([groups.you.length + ' need your move', 'sec-you']);
-    if (groups.stalled.length) segs.push([groups.stalled.length + ' overdue', 'sec-stalled']);
     if (groups.client.length) segs.push([groups.client.length + ' awaiting client', 'sec-client']);
+    if (groups.stalled.length) segs.push([groups.stalled.length + ' overdue', 'sec-stalled']);
     if (segs.length) {
       segs.forEach(function (seg, i) {
         if (i) summary.appendChild(el('span', 'summary-sep', '·'));
@@ -378,6 +378,8 @@
       card.appendChild(meta);
       if (status === 'you') card.classList.add('your-move');
       if (status === 'stalled') card.classList.add('is-stalled');
+      if (status === 'client') card.classList.add('is-client');
+      if (status === 'complete') card.classList.add('is-complete');
       return card;
     }
 
@@ -392,12 +394,12 @@
       { id: 'sec-you', key: 'you', label: 'Your move',
         caption: 'Longest waiting on you first',
         sort: function (a, b) { return waitingSince(a) - waitingSince(b); }, open: true },
-      { id: 'sec-stalled', key: 'stalled', label: 'Overdue',
-        caption: 'Most overdue first',
-        sort: function (a, b) { return overdueDays(b) - overdueDays(a); }, open: false },
       { id: 'sec-client', key: 'client', label: 'Awaiting client',
         caption: 'Longest waiting first',
         sort: function (a, b) { return waitingSince(a) - waitingSince(b); }, open: false },
+      { id: 'sec-stalled', key: 'stalled', label: 'Overdue',
+        caption: 'Most overdue first',
+        sort: function (a, b) { return overdueDays(b) - overdueDays(a); }, open: false },
       { id: 'sec-complete', key: 'complete', label: 'Complete',
         caption: 'Most recently completed first',
         sort: function (a, b) { return completedAt(b) - completedAt(a); }, open: false }

@@ -103,8 +103,21 @@ button.btn.ghost:disabled {
   padding: 24px 26px;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
-.project-card:hover { border-color: var(--accent); background: var(--paper-3); }
-.project-card.your-move { border-left: 3px solid var(--accent); }
+.project-card:hover { border-color: var(--accent); }
+/* Subtle per-status block shading — a faint tint + matching left edge, so a
+   "Your move" card reads differently from an "Overdue" one at a glance. */
+.project-card.your-move {
+  border-left: 3px solid var(--accent);
+  background: oklch(58% 0.14 45 / 0.07);
+}
+.project-card.is-client {
+  border-left: 3px solid var(--faint);
+  background: rgba(138,131,118,0.07);
+}
+.project-card.is-complete {
+  border-left: 3px solid oklch(45% 0.12 150 / 0.55);
+  background: oklch(45% 0.12 150 / 0.05);
+}
 .project-card h3 { font-size: 19px; margin-bottom: 8px; }
 .project-card .meta {
   font-family: var(--mono);
@@ -134,7 +147,10 @@ button.btn.ghost:disabled {
 .badge.complete { color: oklch(45% 0.12 150); }
 /* Overdue / stalled — a project waiting on the client past the chase window. */
 .badge.stalled  { color: oklch(55% 0.17 25); background: oklch(55% 0.17 25 / 0.10); }
-.project-card.is-stalled { border-left: 3px solid oklch(55% 0.17 25); }
+.project-card.is-stalled {
+  border-left: 3px solid oklch(55% 0.17 25);
+  background: oklch(55% 0.17 25 / 0.08);
+}
 
 /* Client list search + filter (admin, Change 6). */
 .client-controls {
