@@ -447,6 +447,11 @@
   .page[data-page="project"] .phead .actions .btn{
     justify-self:start;width:fit-content;max-width:100%;
   }
+  /* ...and the two header actions (PDF link, undo) are secondary chrome —
+     keep them compact, not the chunky full-size button. */
+  .page[data-page="project"] .phead .actions .btn{
+    padding:6px 12px;font-size:10px;letter-spacing:.09em;gap:6px;
+  }
 
   /* ---- NO-VIDEO PANELS (to-do item 3) ----
      Where a stage has no video the single content panel spans the full
