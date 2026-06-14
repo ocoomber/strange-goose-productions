@@ -210,8 +210,9 @@
     card.appendChild(el('h3', null, p.title));
     var meta = el('div', 'meta');
     meta.appendChild(el('span', 'badge ' + p.status, p.status === 'complete' ? 'Complete' : 'In progress'));
-    // Stages 1–6 are client approvals; stage 7 is delivery, not approved.
-    meta.appendChild(el('span', null, approved + ' of ' + (STAGE_COUNT - 1) + ' stages approved'));
+    // All 7 stages count toward the bar (stage 7 = deliverables); counting to 6
+    // made an unfinished project read as "6 of 6" / a complete one as "7 of 6".
+    meta.appendChild(el('span', null, approved + ' of ' + STAGE_COUNT + ' stages complete'));
     card.appendChild(meta);
     return card;
   }
@@ -318,7 +319,7 @@
         body.appendChild(noteEl);
       }
       if ((s.doc_links || []).length) body.appendChild(linkList(s.doc_links));
-      if (s.video_id) body.appendChild(ytEmbed(s.video_id));
+      if (s.video_id && !isDeliverables) body.appendChild(ytEmbed(s.video_id));
       if (isDeliverables) {
         if ((released || delivered) && hasFiles) {
           var dl = el('div');
