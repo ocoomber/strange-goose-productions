@@ -183,6 +183,19 @@ button.btn.ghost:disabled {
   color: var(--ink-2);
   margin: 8px 0 0;
 }
+.summary-link {
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+}
+.summary-link:hover { border-bottom-color: var(--accent); }
+.summary-sep { color: var(--muted); margin: 0 8px; }
 /* Admin home: project list split into collapsible status sections. */
 .project-section { border-top: 1px solid var(--faint); }
 .project-section:first-of-type { border-top: none; }
