@@ -397,7 +397,8 @@
       if (s.open) det.open = true;
       var sum = el('summary');
       sum.appendChild(el('span', 'section-label', s.label));
-      sum.appendChild(el('span', 'section-count', String(items.length)));
+      sum.appendChild(el('span', 'section-count',
+        '· ' + items.length + (items.length === 1 ? ' project' : ' projects')));
       det.appendChild(sum);
       det.appendChild(el('p', 'section-caption', s.caption));
       var grid = el('div', 'portal-grid');
