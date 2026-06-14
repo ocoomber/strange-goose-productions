@@ -783,7 +783,12 @@
   }
   function clientEmail(p) { return (p.profiles && p.profiles.email) || '—'; }
   function approvedOf(p) {
-    return (p.stages || []).filter(function (s) { return s.state === 'approved'; }).length;
+    // Count only the six client-approval stages (1–6). Stage 7 (Deliverables)
+    // also flips to 'approved' on completion but isn't an approval — counting
+    // it gave completed projects "7/6".
+    return (p.stages || []).filter(function (s) {
+      return s.state === 'approved' && s.stage_index <= STAGE_COUNT - 1;
+    }).length;
   }
   var TAG = { you: 'Your move', client: 'Awaiting client', stalled: 'Overdue', complete: 'Complete' };
 
