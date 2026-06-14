@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal (preview) · Strange Goose Productions</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../site/styles.css">
+<link rel="stylesheet" href="../site/portal.css">
+</head>
+<body>
+
+<nav class="top">
+  <a href="../index.html" class="brand"><span class="goose-glyph"></span><span class="brand-word">Strange Goose Productions</span></a>
+  <div class="links">
+    <span class="eyebrow" style="margin:0;">Client Portal · preview</span>
+  </div>
+  <a href="#" class="cta" id="nav-signout" hidden><span class="cta-text">Sign out</span></a>
+</nav>
+
+<main class="portal-main">
+  <div class="wrap-tight">
+
+    <!-- login -->
+    <section id="view-login" hidden>
+      <div class="auth-card">
+        <p class="eyebrow">Client Portal</p>
+        <h2 style="margin-top:14px;">Sign in</h2>
+        <p class="hint">Use the credentials Strange Goose Productions sent you.</p>
+        <form id="login-form">
+          <div class="field">
+            <label for="login-email">Email</label>
+            <input id="login-email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="login-password">Password</label>
+            <input id="login-password" type="password" autocomplete="current-password" required>
+          </div>
+          <p class="form-error" id="login-error" hidden></p>
+          <button class="btn primary full" type="submit" style="margin-top:18px;">Sign in</button>
+          <p style="margin-top:14px;text-align:center;">
+            <a href="#" id="forgot-link" class="hint" style="text-decoration:underline;">Forgot password?</a>
+          </p>
+          <p class="hint" id="forgot-sent" hidden style="margin-top:10px;">If that email has an account, a reset link is on its way — check your inbox.</p>
+        </form>
+        <div class="auth-or"><span>or</span></div>
+        <button class="btn ghost full" type="button" id="login-google">Sign in with Google</button>
+        <p class="form-error" id="login-google-error" hidden></p>
+      </div>
+    </section>
+
+    <!-- forced password change -->
+    <section id="view-password" hidden>
+      <div class="auth-card">
+        <p class="eyebrow">First sign-in</p>
+        <h2 style="margin-top:14px;">Choose a new password</h2>
+        <p class="hint">Please replace the temporary password you were sent.</p>
+        <form id="password-form">
+          <div class="field">
+            <label for="pw-new">New password</label>
+            <input id="pw-new" type="password" autocomplete="new-password" minlength="8" required>
+          </div>
+          <div class="field">
+            <label for="pw-confirm">Confirm new password</label>
+            <input id="pw-confirm" type="password" autocomplete="new-password" minlength="8" required>
+          </div>
+          <p class="form-error" id="pw-error" hidden></p>
+          <button class="btn primary full" type="submit" style="margin-top:18px;">Save password</button>
+        </form>
+        <div class="auth-or"><span>or</span></div>
+        <button class="btn ghost full" type="button" id="pw-google">Continue with Google instead</button>
+        <p class="hint" style="margin-top:10px;text-align:center;">Prefer not to remember a password? Use your Google account to sign in from now on.</p>
+        <p class="form-error" id="pw-google-error" hidden></p>
+      </div>
+    </section>
+
+    <!-- project list -->
+    <section id="view-projects" hidden>
+      <header class="portal-hd">
+        <p class="eyebrow">Client Portal</p>
+        <h1>Your projects</h1>
+        <p class="sub" id="projects-greeting"></p>
+      </header>
+      <div class="portal-grid" id="project-list"></div>
+      <p class="portal-empty" id="projects-empty" hidden>No projects yet — we'll add yours shortly.</p>
+      <details class="past-projects" id="past-projects" hidden>
+        <summary>Past projects</summary>
+        <div class="portal-grid" id="past-list" style="margin-top:16px;"></div>
+      </details>
+    </section>
+
+    <!-- single project -->
+    <section id="view-project" hidden>
+      <header class="portal-hd">
+        <a class="back-link" href="#">← All projects</a>
+        <h1 id="project-title" style="margin-top:18px;"></h1>
+        <p class="sub" id="project-status"></p>
+      </header>
+      <div class="stage-list" id="stage-list"></div>
+    </section>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../site/portal.js"></script>
+<script>
+(function () {
+  var views = ['login', 'password', 'projects', 'project'];
+  var profile = null;
+
+  function show(name) {
+    views.forEach(function (v) {
+      document.getElementById('view-' + v).hidden = (v !== name);
+    });
+    document.getElementById('nav-signout').hidden = (name === 'login');
+  }
+
+  document.getElementById('nav-signout').addEventListener('click', function (e) {
+    e.preventDefault();
+    signOut();
+  });
+
+  /* ── password recovery (from emailed reset link) ── */
+  var recoveryMode = false;
+  sb.auth.onAuthStateChange(function (event) {
+    if (event === 'PASSWORD_RECOVERY') {
+      recoveryMode = true;
+      show('password');
+    }
+  });
+
+  document.getElementById('forgot-link').addEventListener('click', async function (e) {
+    e.preventDefault();
+    var errNode = document.getElementById('login-error');
+    errNode.hidden = true;
+    var email = document.getElementById('login-email').value.trim();
+    if (!email) {
+      showError(errNode, { message: 'Enter your email address above first, then click "Forgot password?".' });
+      return;
+    }
+    var res = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    if (res.error) { showError(errNode, res.error); return; }
+    document.getElementById('forgot-sent').hidden = false;
+  });
+
+  /* ── Google sign-in (login screen + first-login screen) ── */
+  document.getElementById('login-google').addEventListener('click', async function () {
+    var errNode = document.getElementById('login-google-error');
+    errNode.hidden = true;
+    try { await signInWithGoogle(); }
+    catch (err) { showError(errNode, err); }
+  });
+  document.getElementById('pw-google').addEventListener('click', async function () {
+    var errNode = document.getElementById('pw-google-error');
+    errNode.hidden = true;
+    try { await signInWithGoogle(); }
+    catch (err) { showError(errNode, err); }
+  });
+
+  /* ── login ── */
+  document.getElementById('login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errNode = document.getElementById('login-error');
+    errNode.hidden = true;
+    try {
+      await signIn(
+        document.getElementById('login-email').value.trim(),
+        document.getElementById('login-password').value
+      );
+      route();
+    } catch (err) { showError(errNode, err); }
+  });
+
+  /* ── password change ── */
+  document.getElementById('password-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var errNode = document.getElementById('pw-error');
+    errNode.hidden = true;
+    var pw = document.getElementById('pw-new').value;
+    if (pw !== document.getElementById('pw-confirm').value) {
+      showError(errNode, { message: 'Passwords do not match.' });
+      return;
+    }
+    try {
+      await changePassword(pw);
+      recoveryMode = false;
+      if (profile) profile.must_change_password = false;
+      route();
+    } catch (err) { showError(errNode, err); }
+  });
+
+  /* ── project list ── */
+  // Most recent activity on a project: latest approval, else creation. Used to
+  // order active projects so the one the client touched last is first.
+  function lastActivity(p) {
+    var times = (p.approvals || []).map(function (a) { return new Date(a.approved_at).getTime(); });
+    return times.length ? Math.max.apply(null, times) : new Date(p.created_at).getTime();
+  }
+
+  function projectCard(p) {
+    var approved = (p.stages || []).filter(function (s) { return s.state === 'approved'; }).length;
+    var card = el('a', 'project-card');
+    card.href = '#project/' + p.id;
+    card.appendChild(el('h3', null, p.title));
+    var meta = el('div', 'meta');
+    meta.appendChild(el('span', 'badge ' + p.status, p.status === 'complete' ? 'Complete' : 'In progress'));
+    // All 7 stages count toward the bar (stage 7 = deliverables); counting to 6
+    // made an unfinished project read as "6 of 6" / a complete one as "7 of 6".
+    meta.appendChild(el('span', null, approved + ' of ' + STAGE_COUNT + ' stages complete'));
+    card.appendChild(meta);
+    return card;
+  }
+
+  async function renderProjects() {
+    document.getElementById('projects-greeting').textContent =
+      'Signed in as ' + profile.email + '. Approvals you make here are timestamped and permanent.';
+    var res = await sb.from('projects')
+      .select('id, title, status, created_at, stages(state), approvals(approved_at)')
+      .order('created_at', { ascending: false });
+    var projects = res.data || [];
+    var active = projects.filter(function (p) { return p.status !== 'complete'; });
+    var done = projects.filter(function (p) { return p.status === 'complete'; });
+    active.sort(function (a, b) { return lastActivity(b) - lastActivity(a); });
+
+    // A client with a single active project lands straight on it — no
+    // intermediate one-item list. Once per session, so "back" still reaches
+    // the dashboard (where past projects live).
+    if (active.length === 1 && !sessionStorage.getItem('sgp_landed')) {
+      sessionStorage.setItem('sgp_landed', '1');
+      location.hash = '#project/' + active[0].id;
+      return;
+    }
+
+    var list = document.getElementById('project-list');
+    list.innerHTML = '';
+    document.getElementById('projects-empty').hidden = projects.length > 0;
+    active.forEach(function (p) { list.appendChild(projectCard(p)); });
+
+    // Completed projects: reference material, tucked into a collapsed section.
+    var past = document.getElementById('past-projects');
+    var pastList = document.getElementById('past-list');
+    pastList.innerHTML = '';
+    if (done.length) {
+      done.forEach(function (p) { pastList.appendChild(projectCard(p)); });
+      past.hidden = false;
+    } else {
+      past.hidden = true;
+    }
+    show('projects');
+  }
+
+  /* ── single project ── */
+  async function renderProject(id) {
+    var pr = await sb.from('projects').select('*').eq('id', id).single();
+    if (pr.error || !pr.data) { location.hash = ''; return; }
+    var project = pr.data;
+    var st = await sb.from('stages').select('*').eq('project_id', id).order('stage_index');
+    var ap = await sb.from('approvals').select('*').eq('project_id', id);
+    var approvals = {};
+    (ap.data || []).forEach(function (a) { approvals[a.stage_id] = a; });
+
+    document.getElementById('project-title').textContent = project.title;
+    document.getElementById('project-status').textContent = project.status === 'complete'
+      ? 'Project complete — your deliverables are available below.'
+      : 'Approved stages are shown with their approval date and time. The current stage is highlighted.';
+
+    var list = document.getElementById('stage-list');
+    list.innerHTML = '';
+    var visible = st.data || [];
+    // Expand only what matters now: the stage awaiting the client, the
+    // released deliverables, or (while waiting on SGP) the latest completed
+    // stage. Everything else collapses to its header.
+    var currentStage = visible.find(function (s) { return s.state === 'pending'; });
+    if (!currentStage && project.status === 'complete') {
+      currentStage = visible.find(function (s) { return s.stage_index === 7; });
+    }
+    if (!currentStage) {
+      currentStage = visible.filter(function (s) { return s.state === 'approved'; }).pop();
+    }
+    visible.forEach(function (s) {
+      var card = el('div', 'stage collapsible ' + s.state);
+      var top = el('div', 'stage-top');
+      top.appendChild(el('span', 'stage-num', '0' + s.stage_index));
+      top.appendChild(el('h3', null, s.name));
+      var a = approvals[s.id];
+      var isDeliverables = (s.stage_index === 7);
+      var act = STAGE_ACTIONS[s.stage_index];
+      // Deliverables are "released" once Owen submits the stage (pending) and
+      // confirmed once approved (or the project is marked complete).
+      var hasFiles = (s.deliverable_links || []).length > 0;
+      var delivered = isDeliverables && (s.state === 'approved' || project.status === 'complete');
+      var released = isDeliverables && s.state === 'pending' && hasFiles;
+      if (s.state === 'approved') {
+        top.appendChild(el('span', 'badge approved',
+          isDeliverables ? 'Files received' : ((act && act.done) || 'Approved')));
+        if (a) top.appendChild(el('span', 'stage-when', fmtDate(a.approved_at)));
+      } else if (isDeliverables) {
+        top.appendChild(el('span', 'badge ' + (delivered ? 'complete' : released ? 'pending' : 'locked'),
+          delivered ? 'Complete' : released ? 'Ready to download' : 'In preparation'));
+      } else {
+        top.appendChild(el('span', 'badge pending', 'Action needed'));
+      }
+      card.appendChild(top);
+
+      var body = el('div', 'stage-body');
+      // The deliverables note belongs with the released files, not the
+      // "in preparation" placeholder.
+      if (isDeliverables && !released && !delivered) s.note = null;
+      if (s.note) {
+        var noteEl = el('div', 'stage-note-box');
+        noteEl.appendChild(el('p', 'eyebrow', 'Note from Strange Goose'));
+        noteEl.appendChild(el('p', 'stage-note', s.note));
+        body.appendChild(noteEl);
+      }
+      if ((s.doc_links || []).length) body.appendChild(linkList(s.doc_links));
+      if (s.video_id && !isDeliverables) body.appendChild(ytEmbed(s.video_id));
+      if (isDeliverables) {
+        if ((released || delivered) && hasFiles) {
+          var dl = el('div');
+          dl.appendChild(el('p', 'eyebrow', 'Your files'));
+          dl.appendChild(linkList(s.deliverable_links));
+          body.appendChild(dl);
+          if (released) {
+            body.appendChild(el('p', 'hint',
+              'Please download and check all your files. When you\'re happy you have everything, let us know below.'));
+            var dErr = el('p', 'form-error'); dErr.hidden = true;
+            var dBtn = el('button', 'btn primary', 'All files downloaded and checked');
+            dBtn.type = 'button';
+            dBtn.addEventListener('click', async function () {
+              if (!window.confirm('Confirm you have downloaded and checked all your files? ' +
+                'This marks your project complete.')) return;
+              dBtn.disabled = true;
+              var res = await sb.from('approvals').insert({ stage_id: s.id });
+              if (res.error) { dBtn.disabled = false; showError(dErr, res.error); }
+              else renderProject(id);
+            });
+            body.appendChild(dBtn);
+            body.appendChild(dErr);
+          }
+        } else {
+          body.appendChild(el('p', 'hint',
+            'Your final files are being prepared — the download links will appear here once ready.'));
+        }
+      }
+
+      if (s.state === 'pending' && !isDeliverables && act) {
+        if (act.note) body.appendChild(el('p', 'hint', act.note));
+        var errNode = el('p', 'form-error');
+        errNode.hidden = true;
+        var btn = el('button', 'btn primary', act.btn);
+        btn.type = 'button';
+        btn.addEventListener('click', async function () {
+          var msg = act.confirm +
+            '\n\nThis is recorded against your account with a timestamp and is permanent — it cannot be undone.';
+          if (!window.confirm(msg)) return;
+          btn.disabled = true;
+          var res = await sb.from('approvals').insert({ stage_id: s.id });
+          if (res.error) {
+            btn.disabled = false;
+            showError(errNode, res.error);
+          } else {
+            renderProject(id);
+          }
+        });
+        body.appendChild(btn);
+        body.appendChild(errNode);
+      }
+
+      card.appendChild(body);
+      if (!currentStage || s.id !== currentStage.id) card.classList.add('collapsed');
+      top.addEventListener('click', function () { card.classList.toggle('collapsed'); });
+      list.appendChild(card);
+    });
+
+    // Nothing currently needs the client's action — tell them what we're doing
+    var nothingPending = !visible.some(function (s) { return s.state === 'pending'; });
+    if (nothingPending && project.status !== 'complete') {
+      var lastApproved = visible.filter(function (s) { return s.state === 'approved'; }).pop();
+      var nextAct = lastApproved && STAGE_ACTIONS[lastApproved.stage_index];
+      if (nextAct && nextAct.next) {
+        var banner = el('div', 'next-up');
+        banner.appendChild(el('p', 'eyebrow', 'What happens next'));
+        banner.appendChild(el('p', null, nextAct.next));
+        list.appendChild(banner);
+      }
+    }
+
+    show('project');
+  }
+
+  /* ========================================================
+     DEMO MODE — open  client/preview.html  to see the client
+     portal rendered with fake data and NO login, for design
+     and review testing. This sidesteps the admin/client shared
+     session (no private window needed). Nothing here can touch
+     real data (sb is swapped for a read-only stub). This block
+     and the demo gate get stripped when promoting to index.html.
+     ======================================================== */
+  var DEMO_MODE = /preview/.test(location.pathname);
+
+  function buildDemo() {
+    var YT = 'dQw4w9WgXcQ';
+    var STAGE_NAMES = ['Brief', 'Edit v1', 'Edit v2', 'Picture lock',
+                       'Colour & sound', 'Final version', 'Deliverables'];
+    // Build a full set of 7 stage rows for a project's detail view.
+    // `states` is a 7-item array; `extras` patches individual stages by index.
+    function buildStages(prefix, states, extras) {
+      return states.map(function (state, i) {
+        var idx = i + 1;
+        var s = {
+          id: prefix + (idx), stage_index: idx, name: STAGE_NAMES[i], state: state,
+          doc_links: [], note: null, video_id: null, deliverable_links: []
+        };
+        if (extras && extras[idx]) Object.assign(s, extras[idx]);
+        return s;
+      });
+    }
+    function approvalsFor(stages) {
+      return stages.filter(function (s) { return s.state === 'approved'; })
+        .map(function (s, i) {
+          return { stage_id: s.id, stage_name: s.name,
+            approved_at: '2026-05-' + String(10 + i * 2).padStart(2, '0') + 'T09:15:00Z' };
+        });
+    }
+
+    // ── Project A: an active review — Edit v2 awaiting the client (video + approve) ──
+    var aStages = buildStages('a', ['approved', 'approved', 'pending', 'locked', 'locked', 'locked', 'locked'], {
+      1: { doc_links: [{ label: 'Brief v2 (Google Doc)', url: 'https://drive.google.com' }],
+           note: 'Agreed scope: a 90-second trailer, two feedback rounds included.' },
+      2: { video_id: YT, note: 'First cut for your review.' },
+      3: { video_id: YT, note: 'As per your feedback, Scene 3 is now longer and Scene 5 uses more close-ups.' }
+    });
+
+    // ── Project B: deliverables released — files ready to download + confirm ──
+    var bStages = buildStages('b', ['approved', 'approved', 'approved', 'approved', 'approved', 'approved', 'pending'], {
+      7: { deliverable_links: [
+             { label: 'Final film — ProRes master (Google Drive)', url: 'https://drive.google.com' },
+             { label: 'H.264 web version (MP4)', url: 'https://drive.google.com' }
+           ],
+           note: 'All your final files are here. Download everything and confirm once you have it all.' }
+    });
+
+    // ── Project C: complete — files received ──
+    var cStages = buildStages('c', ['approved', 'approved', 'approved', 'approved', 'approved', 'approved', 'approved'], {
+      7: { deliverable_links: [
+             { label: 'Final film — ProRes master (Google Drive)', url: 'https://drive.google.com' }
+           ],
+           note: 'All your final files. Thanks for a great project!' }
+    });
+
+    var detail = {
+      'demo': {
+        project: { id: 'demo', title: 'Crossfire — Trailer', status: 'active',
+          created_at: '2026-05-01T10:00:00Z', completed_at: null },
+        stages: aStages, approvals: approvalsFor(aStages)
+      },
+      'p-deliver': {
+        project: { id: 'p-deliver', title: 'Dream House — Promo', status: 'active',
+          created_at: '2026-04-10T10:00:00Z', completed_at: null },
+        stages: bStages, approvals: approvalsFor(bStages)
+      },
+      'p-done': {
+        project: { id: 'p-done', title: 'Getting Over — Music Video', status: 'complete',
+          created_at: '2026-03-01T10:00:00Z', completed_at: '2026-04-30T17:00:00Z' },
+        stages: cStages, approvals: approvalsFor(cStages)
+      }
+    };
+
+    // Project-list rows (lighter shape: just states + approval times).
+    function listRow(id) {
+      var d = detail[id];
+      return {
+        id: id, title: d.project.title, status: d.project.status,
+        created_at: d.project.created_at,
+        stages: d.stages.map(function (s) { return { state: s.state }; }),
+        approvals: d.approvals.map(function (a) { return { approved_at: a.approved_at }; })
+      };
+    }
+
+    return {
+      profile: { id: 'demo-client', role: 'client', email: 'jane@crossfire.com',
+        display_name: 'Jane Doe', must_change_password: false },
+      list: ['demo', 'p-deliver', 'p-done'].map(listRow),
+      detail: detail
+    };
+  }
+
+  var DEMO = DEMO_MODE ? buildDemo() : null;
+
+  function demoSb() {
+    function builder(table) {
+      var b = { _t: table, _single: false, _mut: false, _filters: {} };
+      ['select', 'neq', 'gte', 'lte', 'order', 'limit'].forEach(function (m) {
+        b[m] = function () { return b; };
+      });
+      b.eq = function (col, val) { b._filters[col] = val; return b; };
+      ['insert', 'update', 'delete', 'upsert'].forEach(function (m) {
+        b[m] = function () { b._mut = true; return b; };
+      });
+      b.single = function () { b._single = true; return b; };
+      b.then = function (resolve) { resolve(demoResolve(b)); };
+      return b;
+    }
+    function demoResolve(b) {
+      if (b._mut) return { data: {}, error: null };
+      var id = b._filters.id || b._filters.project_id;
+      var d = id && DEMO.detail[id];
+      if (b._t === 'profiles') return { data: DEMO.profile, error: null };
+      if (b._t === 'projects') return { data: b._single ? (d ? d.project : null) : DEMO.list, error: null };
+      if (b._t === 'stages') return { data: d ? d.stages : [], error: null };
+      if (b._t === 'approvals') return { data: d ? d.approvals : [], error: null };
+      return { data: [], error: null };
+    }
+    var ok = function () { return Promise.resolve({ data: {}, error: null }); };
+    return {
+      from: function (t) { return builder(t); },
+      rpc: ok,
+      functions: { invoke: ok },
+      auth: {
+        getSession: function () { return Promise.resolve({ data: { session: { user: DEMO.profile } } }); },
+        getUser: function () { return Promise.resolve({ data: { user: DEMO.profile } }); },
+        onAuthStateChange: function () { return { data: { subscription: { unsubscribe: function () {} } } }; },
+        updateUser: ok, signOut: ok, resetPasswordForEmail: ok
+      }
+    };
+  }
+  if (DEMO_MODE) sb = demoSb();
+
+  /* ── routing ── */
+  async function route() {
+    if (DEMO_MODE) {
+      profile = DEMO.profile;
+      var dm = location.hash.match(/^#project\/(.+)$/);
+      if (dm) { renderProject(dm[1]); return; }
+      renderProjects();
+      return;
+    }
+    if (recoveryMode) { show('password'); return; }
+    var session = await getSession();
+    if (!session) { show('login'); return; }
+    if (!profile || profile.id !== session.user.id) profile = await getProfile();
+    if (!profile) { show('login'); return; }
+    if (profile.role === 'admin') { window.location.href = '../admin/'; return; }
+    /* Google sign-ins have no password to change — clear the first-login flag
+       so they skip the "choose a password" screen entirely. */
+    if (profile.must_change_password && signedInWithGoogle(session)) {
+      await clearMustChangePassword();
+      profile.must_change_password = false;
+    }
+    if (profile.must_change_password) { show('password'); return; }
+    var m = location.hash.match(/^#project\/(.+)$/);
+    if (m) renderProject(m[1]); else renderProjects();
+  }
+
+  // Safety net: a thrown startup error must never leave a silent blank page.
+  function bootError(msg) {
+    var d = document.getElementById('boot-error') || document.createElement('pre');
+    d.id = 'boot-error';
+    d.style.cssText = 'position:fixed;inset:0;margin:0;padding:24px;background:#1a1714;' +
+      'color:#ffb4a0;font:13px/1.6 monospace;white-space:pre-wrap;z-index:99999;overflow:auto';
+    d.textContent = 'Client portal failed to start:\n\n' + msg +
+      '\n\n(Hard-refresh with Ctrl+F5. If this persists, send Owen this text.)';
+    (document.body || document.documentElement).appendChild(d);
+  }
+  window.addEventListener('error', function (ev) {
+    bootError((ev.message || ev.error || 'unknown') + '  ' + (ev.filename || '') + ':' + (ev.lineno || ''));
+  });
+
+  window.addEventListener('hashchange', route);
+  route().catch(function (e) { bootError(String((e && e.message) || e)); });
+})();
+</script>
+</body>
+</html>
