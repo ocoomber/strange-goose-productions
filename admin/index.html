@@ -343,7 +343,9 @@
         btn.addEventListener('click', function () {
           var sec = document.getElementById(seg[1]);
           if (!sec) return;
-          sec.open = true;
+          // Accordion: collapse every section, then open just this one.
+          var all = list.querySelectorAll('.project-section');
+          for (var j = 0; j < all.length; j++) all[j].open = (all[j] === sec);
           sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
         summary.appendChild(btn);
@@ -383,19 +385,19 @@
       return p.completed_at ? new Date(p.completed_at).getTime() : 0;
     }
 
-    // Four sections, in priority order. First three open by default, Complete
-    // collapsed. Each sorts its own members and shows a mono caption naming the
-    // order, so the list never looks arbitrarily shuffled.
+    // Four sections, in priority order. Only "Your move" opens on load; the
+    // rest stay collapsed so the page leads with what needs Owen. Each sorts
+    // its own members and shows a mono caption naming the order.
     var sections = [
       { id: 'sec-you', key: 'you', label: 'Your move',
         caption: 'Longest waiting on you first',
         sort: function (a, b) { return waitingSince(a) - waitingSince(b); }, open: true },
       { id: 'sec-stalled', key: 'stalled', label: 'Overdue',
         caption: 'Most overdue first',
-        sort: function (a, b) { return overdueDays(b) - overdueDays(a); }, open: true },
+        sort: function (a, b) { return overdueDays(b) - overdueDays(a); }, open: false },
       { id: 'sec-client', key: 'client', label: 'Awaiting client',
         caption: 'Longest waiting first',
-        sort: function (a, b) { return waitingSince(a) - waitingSince(b); }, open: true },
+        sort: function (a, b) { return waitingSince(a) - waitingSince(b); }, open: false },
       { id: 'sec-complete', key: 'complete', label: 'Complete',
         caption: 'Most recently completed first',
         sort: function (a, b) { return completedAt(b) - completedAt(a); }, open: false }
