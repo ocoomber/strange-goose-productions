@@ -76,6 +76,18 @@ button.btn.ghost:disabled {
 }
 .btn.full { width: 100%; justify-content: center; display: inline-flex; }
 
+/* ── canonical portal button scale ───────────────────────────────────
+   The whole portal (admin + client) uses EXACTLY TWO button sizes so the
+   UI reads as one consistent set. The marketing pages keep the larger
+   styles.css .btn; this overrides it for every page that loads portal.css.
+   Per-screen rules elsewhere in this file / the admin inline styles set
+   button LAYOUT only (justify-self, order, flex, margins) — never size —
+   so no button can drift out of this scale again.
+     .btn      → default            (forms, primary actions, bottom panels)
+     .btn.sm   → compact secondary  (stage editors, header actions, rows) */
+.btn    { padding: 9px 16px; font-size: 11px; letter-spacing: .1em; }
+.btn.sm { padding: 6px 12px; font-size: 10px; }
+
 /* "or" divider between the password form and the Google button */
 .auth-or {
   display: flex;
@@ -496,12 +508,9 @@ button.btn.ghost:disabled {
 .page[data-page="project"] .stage.pending .admin-tools .note-form textarea{
   min-height:78px;
 }
-/* compact buttons */
+/* layout only — size comes from .btn.sm (set on these buttons in markup) */
 .page[data-page="project"] .stage.pending .admin-tools .note-form button,
 .page[data-page="project"] .stage.pending .admin-tools .inline-form button{
-  font-size:11px;
-  letter-spacing:.1em;
-  padding:8px 14px;
   margin-top:0;
   justify-self:start;
   align-self:center;
@@ -571,7 +580,7 @@ button.btn.ghost:disabled {
 .page[data-page="project"] .stage.locked .admin-tools .form-error{margin:0}
 .page[data-page="project"] .stage.locked .admin-tools .note-form button,
 .page[data-page="project"] .stage.locked .admin-tools .inline-form button{
-  font-size:11px;letter-spacing:.1em;padding:8px 14px;margin-top:0;justify-self:start;
+  margin-top:0;justify-self:start;
 }
 
 /* locked submit row → gated footer, not a panel */
@@ -581,7 +590,7 @@ button.btn.ghost:disabled {
   display:flex;align-items:center;gap:14px;flex-wrap:wrap;
 }
 .page[data-page="project"] .stage.locked .admin-tools > div:has(.btn.primary[disabled]) .btn.primary{
-  order:1;font-size:11px;letter-spacing:.1em;padding:8px 14px;margin:0;opacity:.5;cursor:not-allowed;
+  order:1;margin:0;opacity:.5;cursor:not-allowed;
 }
 .page[data-page="project"] .stage.locked .admin-tools > div:has(.btn.primary[disabled]) .hint{
   order:2;margin:0;color:var(--muted);display:flex;align-items:center;gap:8px;
@@ -604,7 +613,7 @@ button.btn.ghost:disabled {
 .page[data-page="project"] .stage.locked .admin-tools > div:has(.portal-links) .inline-form input[type="text"]{flex:0 0 160px;min-width:0}
 .page[data-page="project"] .stage.locked .admin-tools > div:has(.portal-links) .inline-form input[type="url"]{flex:1;min-width:200px}
 .page[data-page="project"] .stage.locked .admin-tools > div:has(.portal-links) .inline-form button{
-  font-size:11px;letter-spacing:.1em;padding:8px 14px;margin:0;flex:0 0 auto;
+  margin:0;flex:0 0 auto;
 }
 
 /* narrow: stack every two-panel editor into one column */
@@ -647,7 +656,6 @@ button.btn.ghost:disabled {
 .client-name { font-weight: 600; font-size: 15px; }
 .client-email { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
 .client-actions { display: flex; gap: 8px; align-items: center; }
-.btn.sm { padding: 5px 12px; font-size: 11px; }
 .client-fields {
   flex: 1; min-width: 220px;
   display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
