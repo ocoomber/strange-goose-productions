@@ -49,8 +49,7 @@
   /* ---------------- header ---------------- */
   .topbar{height:60px;background:var(--bg-head);border-bottom:1px solid var(--line-2);display:flex;align-items:center;padding:0 26px;gap:20px}
   .logo{display:flex;align-items:center;gap:11px;font-weight:700;font-size:17px;letter-spacing:-.01em;color:var(--ink);text-decoration:none}
-  .logo .mark{width:22px;height:22px;border-radius:50%;background:var(--ink);position:relative;flex:0 0 22px}
-  .logo .mark::after{content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:var(--bg-head);top:5px;left:8px}
+  .logo .goose-glyph{color:var(--ink);flex:0 0 auto}
   .top-sp{flex:1}
   .signout{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;background:var(--ink);color:#f3efe7;border:none;padding:9px 16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
   .signout:hover{background:#000}
@@ -391,7 +390,7 @@
 <div id="app-shell" hidden>
 
   <header class="topbar">
-    <a href="../index.html" class="logo"><span class="mark"></span>Strange Goose Productions</a>
+    <a href="../index.html" class="logo"><span class="goose-glyph"></span>Strange Goose Productions</a>
     <span class="top-sp"></span>
     <a href="#" class="signout" id="nav-signout">Sign out</a>
   </header>
@@ -783,19 +782,14 @@
   }
   function clientEmail(p) { return (p.profiles && p.profiles.email) || '—'; }
   function approvedOf(p) {
-    // Count only the six client-approval stages (1–6). Stage 7 (Deliverables)
-    // also flips to 'approved' on completion but isn't an approval — counting
-    // it gave completed projects "7/6".
-    return (p.stages || []).filter(function (s) {
-      return s.state === 'approved' && s.stage_index <= STAGE_COUNT - 1;
-    }).length;
+    return (p.stages || []).filter(function (s) { return s.state === 'approved'; }).length;
   }
   var TAG = { you: 'Your move', client: 'Awaiting client', stalled: 'Overdue', complete: 'Complete' };
 
   function progressBar(p) {
     var bar = el('span', 'bar');
     var i = el('i');
-    i.style.width = Math.round(approvedOf(p) / (STAGE_COUNT - 1) * 100) + '%';
+    i.style.width = Math.round(approvedOf(p) / (STAGE_COUNT) * 100) + '%';
     bar.appendChild(i);
     return bar;
   }
@@ -809,7 +803,7 @@
     a.appendChild(el('div', 'mc-project', p.title));
     var stg = el('div', 'mc-stage');
     stg.appendChild(progressBar(p));
-    stg.appendChild(el('span', null, approvedOf(p) + '/' + (STAGE_COUNT - 1)));
+    stg.appendChild(el('span', null, approvedOf(p) + '/' + (STAGE_COUNT)));
     a.appendChild(stg);
     return a;
   }
@@ -828,7 +822,7 @@
     c.appendChild(el('span', 'k', clientEmail(p)));
     meta.appendChild(c);
     var ap = el('span', null);
-    ap.appendChild(el('span', 'k', approvedOf(p) + '/' + (STAGE_COUNT - 1)));
+    ap.appendChild(el('span', 'k', approvedOf(p) + '/' + (STAGE_COUNT)));
     ap.appendChild(document.createTextNode(' approved'));
     meta.appendChild(ap);
     var act = lastAction(p, status);
@@ -1340,31 +1334,63 @@
         noteBox.appendChild(noteForm);
         tools.appendChild(noteBox);
 
-        var vidBox = el('div');
-        vidBox.appendChild(el('p', 'eyebrow', 'Video (paste YouTube link or ID)'));
-        var vidForm = el('form', 'inline-form');
-        var vidInput = el('input');
-        vidInput.type = 'text';
-        vidInput.placeholder = 'https://youtube.com/watch?v=… or video ID (blank to remove)';
-        vidInput.value = s.video_id || '';
-        var vidSave = el('button', 'btn ghost', 'Save video'); vidSave.type = 'submit';
-        var vidErr = el('p', 'form-error'); vidErr.hidden = true;
-        vidForm.appendChild(vidInput); vidForm.appendChild(vidSave);
-        vidForm.addEventListener('submit', async function (e) {
-          e.preventDefault();
-          var res = await sb.from('stages')
-            .update({ video_id: parseYouTubeId(vidInput.value) || null }).eq('id', s.id);
-          if (res.error) showError(vidErr, res.error); else renderProject(id);
-        });
-        vidBox.appendChild(vidForm);
-        vidBox.appendChild(vidErr);
-        tools.appendChild(vidBox);
+        if (s.stage_index !== 7) {
+          var vidBox = el('div');
+          vidBox.appendChild(el('p', 'eyebrow', 'Video (paste YouTube link or ID)'));
+          var vidForm = el('form', 'inline-form');
+          var vidInput = el('input');
+          vidInput.type = 'text';
+          vidInput.placeholder = 'https://youtube.com/watch?v=… or video ID (blank to remove)';
+          vidInput.value = s.video_id || '';
+          var vidSave = el('button', 'btn ghost', 'Save video'); vidSave.type = 'submit';
+          var vidErr = el('p', 'form-error'); vidErr.hidden = true;
+          vidForm.appendChild(vidInput); vidForm.appendChild(vidSave);
+          vidForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var savedNote = noteArea.value;
+            var res = await sb.from('stages')
+              .update({ video_id: parseYouTubeId(vidInput.value) || null }).eq('id', s.id);
+            if (res.error) { showError(vidErr, res.error); return; }
+            await renderProject(id);
+            var freshNote = document.querySelector('.stage.pending .note-form textarea');
+            if (freshNote && !freshNote.value && savedNote) freshNote.value = savedNote;
+          });
+          vidBox.appendChild(vidForm);
+          vidBox.appendChild(vidErr);
+          tools.appendChild(vidBox);
+        }
       }
-      if (s.video_id) tools.appendChild(ytEmbed(s.video_id));
+      if (s.video_id && s.stage_index !== 7) tools.appendChild(ytEmbed(s.video_id));
 
       if (s.stage_index === 7 && s.state !== 'approved' && project.status !== 'complete') {
         tools.appendChild(linkEditor(s, 'deliverable_links', id,
           'Deliverable download links (released to the client from the panel at the bottom)'));
+      }
+
+      if (s.state === 'pending') {
+        var resendBox = el('div');
+        var resendBtn = el('button', 'btn ghost', 'Re-send client notification email');
+        resendBtn.type = 'button';
+        var resendErr = el('p', 'form-error'); resendErr.hidden = true;
+        resendBtn.addEventListener('click', async function () {
+          resendBtn.disabled = true;
+          resendBtn.textContent = 'Sending…';
+          resendErr.hidden = true;
+          var res = await sb.functions.invoke('resend-notification', { body: { stage_id: s.id } });
+          resendBtn.disabled = false;
+          var err = res.error || (res.data && res.data.error);
+          if (err) {
+            resendErr.textContent = (err && err.message) || String(err);
+            resendErr.hidden = false;
+            resendBtn.textContent = 'Re-send client notification email';
+          } else {
+            resendBtn.textContent = 'Sent ✓';
+            setTimeout(function () { resendBtn.textContent = 'Re-send client notification email'; }, 3000);
+          }
+        });
+        resendBox.appendChild(resendBtn);
+        resendBox.appendChild(resendErr);
+        tools.appendChild(resendBox);
       }
 
       var firstLocked = stages.find(function (x) { return x.state === 'locked'; });
