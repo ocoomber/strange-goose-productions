@@ -187,7 +187,7 @@ files are in `supabase/migrations/` and reflected in `schema.sql`. **Phase 2 is
 merged and live on `main`.** Verify pattern used: `node --check` of the
 inline `<script>` in each page.
 
-## Phase 2.1 / 3 — admin dashboard follow-ups (PLANNED, not started)
+## Phase 2.1 / 3 — admin dashboard follow-ups (Steps 1–4 DONE & live 2026-06-14)
 Owen tested the live admin home with seeded data (30 `@example.com` clients / 47
 projects — **test data, see cleanup SQL below**) and asked for clarity,
 sectioning, responsiveness, and raised scale. Full plan:
@@ -195,31 +195,58 @@ sectioning, responsiveness, and raised scale. Full plan:
 **Execution rule (Owen): do ONE step, then STOP and ask before the next — never
 the whole thing at once.** All work is `admin/index.html` + `site/portal.css`;
 reuse helpers `statusOf`/`overdueDays`/`waitingSince`/`pendingStageOf` and
-`OVERDUE_DAYS=7`. Branch → push → Owen merges to `main`.
+`OVERDUE_DAYS=7`. Pushed straight to `main` this session (see git note below).
 
-- **Step 1 (do first, quick):** Overdue badge spells out "days". Bug cause: in
-  the site font **"d" and "0" look identical**, so "12d" read as "120". Use one
-  `overdueLabel(p)` → `'Overdue · ' + n + (n===1?' day':' days')` in all 3 places
-  (card, `#project-overdue` header, `activeRow`). Then **ask** re: Step 2.
-- **Step 2:** split the project list into four collapsible `<details>` sections
-  by `statusOf` (Your move / Overdue / Awaiting client / Complete; first three
-  open, Complete collapsed), each with a count + a mono sort caption. Per-section
-  sort: you=longest-waiting (waitingSince asc), overdue=most-overdue (overdueDays
-  desc), client=pending_since asc, complete=completed_at desc. Stable ids
-  `sec-you/sec-stalled/sec-client/sec-complete`. Then **ask** re: Step 3.
-- **Step 3:** make `#project-summary` segments clickable → open + scroll to the
-  matching section (depends on Step 2). Then **ask** re: Step 4.
-- **Step 4:** responsiveness — `@media (max-width:640px)` for `.client-row`,
-  `.admin-row`, `.client-controls`, `.portal-grid` (auto-fill), `nav.top`. Then
-  **ask** re: Step 5.
-- **Step 5 (BIG, likely DEFER):** scale. Answer to "10k×10k — loads them all?":
-  **No** — `renderProjects()` is one unbounded query + browser-side everything;
-  **PostgREST caps at 1000 rows**, so beyond ~1000 projects the dashboard
-  silently truncates and shows **wrong counts** (correctness bug). Fix =
-  `security_invoker` view computing status server-side + per-section pagination
-  (`.range`, `count:'exact'`) + server-side `.ilike` search. Build when nearing
-  ~500–1000 real projects; cheap interim guard: explicit `.limit(1000)` + a
-  "showing first 1000" banner.
+**Steps 1–4 complete and live (commits `a59f484`→`e73accf`), plus extras Owen
+asked for mid-session:**
+- **Step 1 ✅** Overdue badge spells "days" — `overdueLabel(n)` →
+  `'Overdue · ' + n + (n===1?' day':' days')`, used in all 3 places.
+- **Step 2 ✅** Project list split into four collapsible `<details
+  class="project-section">` by `statusOf`, each `summary` = label + "· N
+  projects" count (one line), a mono `.section-caption`, its own `.portal-grid`.
+  Stable ids `sec-you/sec-client/sec-stalled/sec-complete`; empty sections
+  omitted. `completed_at` added to the list query. Per-section sort: you/client =
+  `waitingSince` asc, stalled = `overdueDays` desc, complete = `completed_at` desc.
+- **Step 3 ✅** `#project-summary` segments are now `<button class="summary-link">`
+  that **accordion**: click collapses every section and opens just the target,
+  then smooth-scrolls to it.
+- **Step 4 ✅** `@media (max-width:640px)` in `portal.css` stacks `.client-row`,
+  `.client-fields`, `.client-actions`, `.admin-row`, fills `.client-controls`,
+  one-columns `.portal-grid`. `nav.top` was already responsive in `styles.css`.
+- **Extra — accordion default:** only **Your move** opens on load; the rest start
+  collapsed (`open` flags in the `sections` array).
+- **Extra — section/summary order is Your move → Awaiting client → Overdue →
+  Complete** (Owen: most projects won't be overdue, so it sits lower).
+- **Extra — per-status card shading** (`site/portal.css`): subtle tint + left
+  edge — `.your-move` warm amber, `.is-client` neutral grey, `.is-stalled` red,
+  `.is-complete` green. `makeCard()` adds the matching class. Card hover no longer
+  overrides the tint background.
+- **Extra — last-action timestamp on each card:** `lastAction(p, status)` +
+  `fmtDate` → "Client responded: …" (you, last approval/feedback, or "Created"),
+  "Sent to client: …" (client/stalled, pending_since), "Completed: …" (complete).
+
+`renderProjects()` was refactored: status grouping into `groups{you,stalled,
+client,complete}`, a `makeCard(p)` helper, and a `sections` config array driving
+the four `<details>`. CSS classes added: `.project-section`, `.section-label`,
+`.section-count`, `.section-caption`, `.summary-link`, `.summary-sep`,
+`.project-card.is-client`, `.project-card.is-complete`.
+
+- **Step 5 (BIG, NOT STARTED — likely DEFER):** scale. Answer to "10k×10k —
+  loads them all?": **No** — `renderProjects()` is one unbounded query +
+  browser-side everything; **PostgREST caps at 1000 rows**, so beyond ~1000
+  projects the dashboard silently truncates and shows **wrong counts**
+  (correctness bug). Fix = `security_invoker` view computing status server-side +
+  per-section pagination (`.range`, `count:'exact'`) + server-side `.ilike`
+  search. Build when nearing ~500–1000 real projects; cheap interim guard:
+  explicit `.limit(1000)` + a "showing first 1000" banner.
+
+**Git workflow note (this session):** `git`/`node` are NOT on PATH in Owen's
+PowerShell, but **GitHub Desktop bundles a working git** with stored credentials
+at `%LOCALAPPDATA%\GitHubDesktop\app-*\resources\app\git\cmd\git.exe` — Claude
+can commit/push directly with it (resolve newest via the `app-*` glob). No Node
+means the plan's `node --check` verify step can't run; verify JS by inspection +
+a brace/paren balance count instead. Details saved in the session memory file
+`git-via-github-desktop.md`.
 
 **Test-data cleanup** (DB-only fake clients; run when done, needs write window):
 ```sql
