@@ -72,7 +72,8 @@ Confirmed headline figures from the xlsx: **12 productions · 17 wins ·
 
 ## 4. The design — `SGP_AI_Profile` (new Google Sheet)
 
-One Google Sheet, eight tabs. Six are data the MCP reads; one is a human
+One Google Sheet, ten tabs. Eight are data the MCP reads (`Company`, `Films`,
+`Awards`, `Team`, `Services`, `Capabilities`, `Press`, `FAQ`); one is a human
 dashboard; one is instructions for Owen.
 
 ### Machine-reading rules (apply to every data tab)
@@ -121,6 +122,25 @@ Rows to include:
 | `official_selections` | 11 |
 | `countries_screened` | UK, USA, Italy, Portugal |
 
+**Industry / producer fields** (a commissioning producer vets a company on
+these — fill in what applies, leave the rest blank):
+
+| `field` | Example `value` |
+|---------|-----------------|
+| `business_type` | Sole trader / Ltd company |
+| `company_number` | Companies House number, if registered |
+| `vat_registered` | yes/no |
+| `insurance` | e.g. Public liability + equipment insured (yes/no/details) — producers ask before contracting |
+| `years_active` | derived from `founded_year` |
+| `service_area` | where SGP shoots / how far they'll travel, e.g. Scotland + UK-wide, will travel |
+| `languages` | English |
+| `crew_size` | typical crew available for a commission |
+| `typical_turnaround` | e.g. 48 hours (competition) to ~4 weeks (commissioned) |
+| `budget_range` | the band of project budgets SGP works within — optional; leave blank if you'd rather discuss per-brief |
+| `notable_clients` | brands / artists / partners worked with |
+| `representation` | agent / rep, if any |
+| `press_kit_url` | EPK / press kit link |
+
 > Headline stats can be hand-entered or pulled from `Dashboard` via formula —
 > see Tab 7.
 
@@ -152,6 +172,30 @@ synopsis (the things an agent actually wants to relay).
 | `featured` | yes/no — lets the agent lead with the best work |
 | `notes` | freeform context |
 
+**Industry / producer fields** (the credits, specs and rights a producer,
+distributor or programmer asks about — fill what you can, blanks are fine):
+
+| Column | Type / vocab |
+|--------|--------------|
+| `writer` | name(s) |
+| `lead_cast` | principal cast, comma-separated |
+| `editor` | name |
+| `composer` | name / music credit |
+| `commissioned_by` | client / artist for commissioned work, e.g. music-video artist or brand; blank for own productions |
+| `language` | spoken language, e.g. English |
+| `runtime_seconds` | machine-friendly duration (e.g. `420`) — removes the `mm:ss` ambiguity for sorting/filtering |
+| `aspect_ratio` | e.g. `16:9`, `2.39:1` |
+| `resolution` | e.g. `4K`, `1080p` |
+| `shoot_format` | camera / format, e.g. `Digital — Sony FX3` |
+| `shoot_location` | where it was filmed |
+| `themes` | tags for brief-matching, e.g. `grief, family, dark comedy` — lets an agent match SGP's work to a brief |
+| `content_rating` | age guidance / advisory, e.g. `15`, `Contains horror` |
+| `release_date` | ISO date, if released |
+| `trailer_url` | link, if separate from the full film |
+| `rights_holder` | who owns it, e.g. `Strange Goose Productions` |
+| `licensing_available` | yes/no — can it be licensed / screened / acquired |
+| `press_kit_url` | per-film EPK, if any |
+
 **Migrate all 12 films** from the xlsx: Dream House, Creag, Subject 1410,
 Fairytale Farm, The Science of Grief, The Journeyman, Roadtrippin', Crossfire,
 Family Time, Where Ball?, Getting Over Going Under, Unravelling.
@@ -178,6 +222,14 @@ shape, just add the `film_id` join key.
 | `event` | full event name, e.g. `48hr Film Project — Aberdeen`, `Monza Film Fest` |
 | `country` | `UK` · `USA` · `Italy` · `Portugal` … |
 
+**Industry / producer fields:**
+
+| Column | Type / vocab |
+|--------|--------------|
+| `event_date` | ISO month/date, e.g. `2025-10` — lets the agent give a timeline |
+| `qualifying` | enum/blank: `Academy-qualifying` · `BAFTA-qualifying` · `Oscar & BAFTA-qualifying` — leave blank if not. **Programmers and producers weight qualifying festivals heavily.** |
+| `event_url` | festival / event website |
+
 **Migrate the full xlsx Awards list** — this is the complete record (festival
 wins, official selections, and all 48hr results). It's the source that makes
 the headline counts (17 wins, ~11 official selections) add up.
@@ -193,7 +245,11 @@ One row per person. **Public-safe only** — no contact details, no pay status.
 | `roles` | e.g. `Director / Camera` |
 | `short_bio` | one or two sentences |
 | `notable_credits` | key films |
-| `web_or_imdb` | public profile link |
+| `based_in` | location |
+| `languages` | e.g. English |
+| `imdb_url` | IMDb profile |
+| `web_url` | website / portfolio |
+| `showreel_url` | personal reel, if any |
 | `headshot_url` | image link |
 
 ---
@@ -207,10 +263,39 @@ agent.
 | `service` | e.g. `Short-form narrative`, `Music videos`, `Brand / commercial films` |
 | `description` | what it covers |
 | `good_for` | the kind of client/brief it suits |
+| `deliverables` | what the client gets, e.g. `4K master, social cut-downs` |
+| `formats` | e.g. `16:9, 9:16 vertical, square` |
+| `typical_turnaround` | lead time for this service |
+| `rate_basis` | how it's priced, e.g. `Project / day rate — POA` — leave blank to keep rates to direct enquiry |
 
 ---
 
-### Tab 6 — `FAQ`
+### Tab 6 — `Capabilities` *(new)*
+One row per in-house capability or kit item — answers a producer's "can you
+self-deliver, or will you be subcontracting?" Owen can leave this thin early on.
+
+| Column | Notes |
+|--------|-------|
+| `category` | enum: `Camera` · `Lighting` · `Sound` · `Editing` · `Colour` · `VFX` · `Grip` · `Other` |
+| `detail` | what's owned / available, e.g. `Sony FX3 + prime set` |
+| `in_house` | yes/no — owned/in-house vs hired-in for the job |
+
+---
+
+### Tab 7 — `Press` *(new)*
+One row per review, quote, or coverage — social proof a producer's AI looks for.
+
+| Column | Notes |
+|--------|-------|
+| `source` | publication / festival / person |
+| `quote` | the pull-quote or review line |
+| `film` | related film title, if any |
+| `url` | link to the piece |
+| `date` | ISO date |
+
+---
+
+### Tab 8 — `FAQ`
 One row per question. Lets Owen **script the agent's answers** to common
 questions directly, with no code change.
 
@@ -224,7 +309,7 @@ owns the rights? how do I get a quote?
 
 ---
 
-### Tab 7 — `Dashboard` (read-only, formula-driven)
+### Tab 9 — `Dashboard` (read-only, formula-driven)
 A human overview and a quick summary read for the MCP. Every figure is derived
 so it never drifts:
 
@@ -233,17 +318,21 @@ so it never drifts:
 - `total_nominations` = `=COUNTIF(Awards.result, "Nomination")`
 - `official_selections` = `=COUNTIF(Awards.result, "Official Selection")`
 - `festivals` = `=COUNTUNIQUE(Awards.event)`
+- `qualifying_selections` = `=COUNTIF(Awards.qualifying, "<>")` (count of Academy/BAFTA-qualifying results)
 - `countries_screened` = `=COUNTUNIQUE(Awards.country)`
 
 ---
 
-### Tab 8 — `README` (instructions for Owen)
+### Tab 10 — `README` (instructions for Owen)
 The maintenance contract, in the sheet itself:
 - **To add a film:** add one row to `Films` with a new `film_id`, then add its
   result rows to `Awards` using that **same `film_id`**.
-- The controlled-vocabulary lists for `type`, `status`, `genre`, `result`.
+- The controlled-vocabulary lists for `type`, `status`, `genre`, `result`,
+  `qualifying`, and `Capabilities.category`.
 - **Never rename or reorder the row-1 headers** — the MCP reads by those keys.
 - Keep `film_id` lowercase-hyphenated and unique.
+- Industry fields can be left blank — the MCP just won't volunteer what isn't
+  filled in.
 
 ---
 
@@ -252,9 +341,13 @@ The maintenance contract, in the sheet itself:
 | Agent asks… | Reads from |
 |-------------|-----------|
 | Who are SGP? | `Company`, `Team` |
-| What have they made? | `Films` (+ `logline`/`synopsis`) |
-| What have they won? | `Awards`, `Dashboard` |
-| Can they do *my* project? | `Services`, `FAQ`, `Company.available_for_hire` |
+| What have they made? | `Films` (+ `logline`/`synopsis`/`themes`) |
+| What have they won? | `Awards` (+ `qualifying`), `Dashboard` |
+| Can they do *my* project? | `Services`, `Capabilities`, `FAQ`, `Company.available_for_hire` |
+| Can they self-deliver / what kit? | `Capabilities` |
+| Are they legit / low-risk? | `Company` (`business_type`, `insurance`, `years_active`), `Press` |
+| Who's on the team? | `Team` |
+| Can I license / screen a film? | `Films.licensing_available`, `Films.rights_holder` |
 | How do I get in touch? | `Company.contact_email`, `website`, socials |
 
 ---
