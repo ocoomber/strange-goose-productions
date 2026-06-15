@@ -83,6 +83,7 @@
         <p class="eyebrow">Client Portal</p>
         <h1>Your projects</h1>
         <p class="sub" id="projects-greeting"></p>
+        <p class="sub"><a href="#mcp" style="text-decoration:underline;">Connect your AI assistant (MCP access) →</a></p>
       </header>
       <div class="portal-grid" id="project-list"></div>
       <p class="portal-empty" id="projects-empty" hidden>No projects yet — we'll add yours shortly.</p>
@@ -102,6 +103,40 @@
       <div class="stage-list" id="stage-list"></div>
     </section>
 
+    <!-- MCP access -->
+    <section id="view-mcp" hidden>
+      <style>
+        .mcp-key{white-space:pre-wrap;word-break:break-all;background:var(--paper-2);padding:12px 14px;border-radius:10px;font-family:var(--mono);font-size:13px;margin:8px 0;}
+        .mcp-key-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--faint);}
+        .mcp-key-row:first-child{border-top:none;}
+      </style>
+      <header class="portal-hd">
+        <a class="back-link" href="#">← All projects</a>
+        <h1 style="margin-top:18px;">MCP access</h1>
+        <p class="sub">Connect your AI assistant (Claude, ChatGPT and others) to your Strange Goose projects. Generate a key below and add it to your AI tool — it can then check project status, review deliverables and tell you what needs your approval, without you logging in here. Approvals are still made by you, in this portal.</p>
+      </header>
+      <div class="auth-card" style="max-width:none;">
+        <button class="btn primary" type="button" id="mcp-generate">Generate a new MCP key</button>
+        <p class="form-error" id="mcp-error" hidden></p>
+
+        <div id="mcp-new" hidden style="margin-top:18px;">
+          <p class="eyebrow">Your new key — copy it now, you won't be shown it again</p>
+          <pre class="mcp-key" id="mcp-new-key"></pre>
+          <button class="btn ghost" type="button" id="mcp-copy">Copy key</button>
+          <p class="eyebrow" style="margin-top:20px;">How to connect</p>
+          <p class="hint">Add this MCP server in your AI tool, using your key as the Bearer token:</p>
+          <pre class="mcp-key">https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-portal-mcp</pre>
+          <p class="hint">In Claude Code, for example:</p>
+          <pre class="mcp-key">claude mcp add --transport http sgp-portal \
+  https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-portal-mcp \
+  --header "Authorization: Bearer YOUR_KEY"</pre>
+        </div>
+
+        <h3 style="margin-top:26px;">Your keys</h3>
+        <div id="mcp-list"></div>
+      </div>
+    </section>
+
   </div>
 </main>
 
@@ -109,7 +144,7 @@
 <script src="../site/portal.js"></script>
 <script>
 (function () {
-  var views = ['login', 'password', 'projects', 'project'];
+  var views = ['login', 'password', 'projects', 'project', 'mcp'];
   var profile = null;
 
   function show(name) {
@@ -394,6 +429,70 @@
     show('project');
   }
 
+  /* ── MCP access ── */
+  async function loadKeys() {
+    var listEl = document.getElementById('mcp-list');
+    listEl.innerHTML = '';
+    var res = await sb.from('mcp_tokens')
+      .select('id, label, created_at, last_used_at, revoked_at')
+      .order('created_at', { ascending: false });
+    var rows = res.data || [];
+    if (!rows.length) { listEl.appendChild(el('p', 'hint', 'No keys yet.')); return; }
+    rows.forEach(function (t) {
+      var row = el('div', 'mcp-key-row');
+      var meta = el('div');
+      meta.appendChild(el('strong', null, t.label || 'MCP key'));
+      var sub = 'Created ' + fmtDate(t.created_at) +
+        (t.last_used_at ? ' · last used ' + fmtDate(t.last_used_at) : ' · never used') +
+        (t.revoked_at ? ' · revoked' : '');
+      meta.appendChild(el('div', 'hint', sub));
+      row.appendChild(meta);
+      if (!t.revoked_at) {
+        var rev = el('button', 'btn ghost', 'Revoke');
+        rev.type = 'button';
+        rev.addEventListener('click', async function () {
+          if (!window.confirm('Revoke this key? Any AI tool using it loses access immediately.')) return;
+          rev.disabled = true;
+          var r = await sb.rpc('revoke_mcp_token', { p_token_id: t.id });
+          if (r.error) { rev.disabled = false; window.alert(r.error.message); } else loadKeys();
+        });
+        row.appendChild(rev);
+      }
+      listEl.appendChild(row);
+    });
+  }
+
+  async function renderMcp() {
+    document.getElementById('mcp-new').hidden = true;
+    document.getElementById('mcp-error').hidden = true;
+    show('mcp');
+    await loadKeys();
+  }
+
+  document.getElementById('mcp-generate').addEventListener('click', async function () {
+    var errNode = document.getElementById('mcp-error');
+    errNode.hidden = true;
+    var label = window.prompt('Name this key so you can recognise it later (e.g. "Claude", "ChatGPT"):', '');
+    if (label === null) return; // cancelled
+    var btn = this;
+    btn.disabled = true;
+    try {
+      var r = await sb.rpc('create_mcp_token', { p_label: label || null });
+      if (r.error) throw r.error;
+      document.getElementById('mcp-new-key').textContent = r.data;
+      document.getElementById('mcp-new').hidden = false;
+      document.getElementById('mcp-copy').textContent = 'Copy key';
+      await loadKeys();
+    } catch (err) { showError(errNode, err); }
+    finally { btn.disabled = false; }
+  });
+
+  document.getElementById('mcp-copy').addEventListener('click', function () {
+    var key = document.getElementById('mcp-new-key').textContent;
+    if (navigator.clipboard) navigator.clipboard.writeText(key);
+    this.textContent = 'Copied ✓';
+  });
+
   /* ── routing ── */
   async function route() {
     if (recoveryMode) { show('password'); return; }
@@ -409,6 +508,7 @@
       profile.must_change_password = false;
     }
     if (profile.must_change_password) { show('password'); return; }
+    if (location.hash === '#mcp') { renderMcp(); return; }
     var m = location.hash.match(/^#project\/(.+)$/);
     if (m) renderProject(m[1]); else renderProjects();
   }
