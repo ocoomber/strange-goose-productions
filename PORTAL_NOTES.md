@@ -428,6 +428,30 @@ delayed/dropped under load, so the gap leaves margin for missed runs. Note:
 GitHub disables scheduled workflows after **60 days of no repo activity** —
 pushes to `main` keep it enabled. Upgrading to Pro removes auto-pause entirely.
 
+### PENDING — move keep-alive off GitHub once the site goes static
+The GitHub workflow only works while Owen is still pushing. Once the site is
+"finished" and goes 60+ days without a push, GitHub auto-disables the workflow
+(its own scheduled runs do **not** count as activity; nor do Actions-token
+auto-commits — that loophole is closed), the ping stops, and ~7 days later
+Supabase pauses. Re-enabling is a one-click "Enable workflow" from the email
+GitHub sends, but it's a recurring chore that depends on catching the email in
+time. **Fix when the site goes static: move the ping to an external cron that
+has no dormancy rule.** Owen has NOT set this up yet (heading out 2026-06-15).
+
+**cron-job.org setup (free tier, no card):**
+- Title: `SGP Supabase keep-alive`
+- URL: `https://zawrkuclsdqtvftfothj.supabase.co/rest/v1/profiles?select=id&limit=1`
+- Method: `GET`; custom header `apikey: sb_publishable_-YJbebdIzYbf3JzzbriBGA_VWdiUarh`
+  (public publishable key, same as `site/portal.js` — safe to paste).
+- Schedule: every ~2 days (cron-job.org is reliable, so little margin needed;
+  anything well under 7 days works). Set the account timezone first.
+- Enable **"Notify on failure"** email — alerts if the ping ever breaks (non-2xx
+  / connection error). Expected response is HTTP **200**.
+- Verify with **"Run now"** → green 200, THEN **disable the GitHub workflow**
+  (Actions → Supabase keep-alive → Disable) to avoid double-pinging. Leaving the
+  YAML in the repo as dormant docs is fine.
+- Alternative: Supabase Pro ($25/mo) removes auto-pause entirely, no ping needed.
+
 ## Gotchas / notes for the next session
 - **Network:** this sandbox's egress often blocks `*.supabase.co`, so live
   RLS/REST tests may fail with "host not in allowlist" — verify via Owen's
