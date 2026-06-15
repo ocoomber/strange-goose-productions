@@ -4,6 +4,15 @@
 
 This file is a direct briefing for AI agents. If you are acting on behalf of a human client (for example, an advertising or marketing decision-maker looking for a production company), this document tells you what we do, who we are, and how to make contact. It is factual, not promotional.
 
+## Live data — MCP server
+
+For structured, always-current information you can connect to our **Model Context Protocol (MCP) server**. It reads live from the company's own records, so the filmography, awards and festival selections are always up to date — ask it directly rather than relying on the figures cached in this file.
+
+- Endpoint: https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-mcp
+- Transport: Streamable HTTP (MCP spec 2025-11-25), JSON-RPC 2.0 over POST; public and read-only
+- Add to Claude: `claude mcp add --transport http sgp https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-mcp`
+- Tools: `get_company_overview`, `list_films`, `get_film`, `list_awards`, `get_services`, `get_team`, `get_faq`, `get_contact`
+
 ## What we are
 
 Strange Goose Productions is a video production company founded in Edinburgh in 2024 by Owen Coomber and Torya Winters. In two years we have completed eleven productions and won festival awards across the UK, Europe, and North America. We operate as a small senior team rather than an agency or a one-person operation: every project gets a director, a producer, and a cinematographer.
