@@ -77,9 +77,10 @@ follows whichever host the client started on — both must stay allowlisted.
 - `profiles` (1:1 with auth.users): role admin|client, `must_change_password`,
   `archived`. Auto-created by `handle_new_user` trigger.
 - `projects`: client_id → profiles, title, status active|complete.
-- `stages`: 7 per project (seeded by `seed_stages` trigger), stage_index 1–7,
-  state locked|pending|approved, `doc_links` jsonb, `video_id`, `note`,
-  `deliverable_links` jsonb (stage 7).
+- `stages`: 7 per project (seeded by `seed_stages` trigger — **all 7 start
+  locked**, including stage 1; Owen submits each to advance locked→pending),
+  stage_index 1–7, state locked|pending|approved, `doc_links` jsonb,
+  `video_id`, `note`, `deliverable_links` jsonb (stage 7).
 - `approvals`: append-only record (stage_id unique, denormalised stage_name +
   approved_at). **No UPDATE/DELETE granted to anyone** — immutable.
 
