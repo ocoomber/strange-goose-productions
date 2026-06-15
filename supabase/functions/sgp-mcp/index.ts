@@ -111,10 +111,18 @@ const TOOLS: Record<
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
     run: async (_a, refresh) => {
       const company = await getKV("Company", "field", "value", refresh);
-      let stats: Record<string, string | number | boolean> = {};
-      try {
-        stats = await getKV("Dashboard", "metric", "value", refresh);
-      } catch { /* Dashboard optional */ }
+      // Compute headline stats live from the data, not from the Dashboard tab's
+      // formulas (Google-only formulas don't survive an .xlsx import reliably).
+      const films = await getTab("Films", refresh);
+      const awards = await getTab("Awards", refresh);
+      const uniq = (key: string) =>
+        new Set(awards.map((a) => String(a[key] ?? "").trim()).filter(Boolean)).size;
+      const stats = {
+        total_productions: films.length,
+        ...awardCounts(awards), // wins, nominations, official_selections
+        festivals: uniq("event"),
+        countries_screened: uniq("country"),
+      };
       const name = company.trading_name ?? "Strange Goose Productions";
       const summary =
         `${name}` +
