@@ -81,7 +81,9 @@ create trigger on_auth_user_created
 
 -- ── Stage machine ───────────────────────────────────────────
 
--- Seed the 7 fixed stages when a project is created (stage 1 starts pending)
+-- Seed the 7 fixed stages when a project is created. Every stage (including
+-- stage 1) starts locked ("Not yet submitted"); Owen attaches the brief and
+-- clicks Submit to client to advance it to pending ("Awaiting client").
 create or replace function public.seed_stages()
 returns trigger language plpgsql security definer set search_path = public as $$
 declare
@@ -98,9 +100,7 @@ declare
 begin
   for i in 1..7 loop
     insert into public.stages (project_id, stage_index, name, state, pending_since)
-    values (new.id, i, names[i],
-            case when i = 1 then 'pending' else 'locked' end,
-            case when i = 1 then now() else null end);
+    values (new.id, i, names[i], 'locked', null);
   end loop;
   return new;
 end $$;
