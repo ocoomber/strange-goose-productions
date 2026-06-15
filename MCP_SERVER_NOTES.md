@@ -1,8 +1,24 @@
 # MCP Server — Architecture & Operations Notes
 
-The SGP MCP server lets visiting AI agents converse about Strange Goose
-Productions, answered live from the `SGP_AI_Profile` Google Sheet. This is the
-build that follows `MCP_SPREADSHEET_DESIGN.md` (the data design).
+SGP runs **two** MCP servers, both Supabase Edge Functions (Deno), both stateless
+Streamable HTTP (spec `2025-11-25`):
+
+| Server | Function | Audience | Auth | Data |
+|--------|----------|----------|------|------|
+| **Public profile** | `sgp-mcp` | Any visiting AI agent | none (public) | `SGP_AI_Profile` Google Sheet (gviz) |
+| **Client portal** | `sgp-portal-mcp` | An existing client's AI assistant | the client's own **MCP key** | the client's portal data (via RLS) |
+
+> **Note on cold discovery:** the public `sgp-mcp` was built first for agents to
+> *discover* SGP. In practice MCP needs deliberate per-user configuration, so the
+> live, valuable case is `sgp-portal-mcp` — a known client connecting their AI to
+> their own projects. See `supabase/functions/sgp-portal-mcp/README.md`.
+
+---
+
+## sgp-mcp (public profile)
+
+Lets visiting AI agents converse about Strange Goose Productions, answered live
+from the `SGP_AI_Profile` Google Sheet. Follows `MCP_SPREADSHEET_DESIGN.md`.
 
 ## What it is
 - A single **Supabase Edge Function** (Deno): `supabase/functions/sgp-mcp/`.
