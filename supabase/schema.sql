@@ -21,6 +21,7 @@ create table public.projects (
   client_id uuid not null references public.profiles(id),
   title text not null,
   status text not null default 'active' check (status in ('active','complete')),
+  archived boolean not null default false,   -- per-project archive: hidden from client + admin queues, fully reversible
   created_at timestamptz not null default now(),
   completed_at timestamptz   -- set when status first becomes 'complete' (Change 7/8: date-range export/search)
 );
@@ -269,6 +270,22 @@ begin
   update public.projects set status = 'active' where id = p_project;
 end $$;
 
+-- Admin-only hard delete of a whole project. Refused if the project carries any
+-- client approval (an immutable record — archive it instead). Stages and the
+-- chase-log notes cascade away with the project row; approvals would block the
+-- delete via their no-cascade FK, but we check and raise a friendly error first.
+create or replace function public.delete_project(p_project uuid)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is not null and not public.is_admin() then
+    raise exception 'Admin only';
+  end if;
+  if exists (select 1 from public.approvals where project_id = p_project) then
+    raise exception 'Project has client approvals and cannot be deleted — archive it instead';
+  end if;
+  delete from public.projects where id = p_project;  -- cascades to stages + project_notes
+end $$;
+
 -- ── Row Level Security ──────────────────────────────────────
 
 alter table public.profiles      enable row level security;
@@ -285,19 +302,22 @@ create policy "update own profile or admin" on public.profiles
 
 -- projects
 create policy "clients read own projects, admin all" on public.projects
-  for select using (client_id = auth.uid() or public.is_admin());
+  for select using (
+    public.is_admin() or (client_id = auth.uid() and not archived)
+  );
 create policy "admin inserts projects" on public.projects
   for insert with check (public.is_admin());
 create policy "admin updates projects" on public.projects
   for update using (public.is_admin());
 
--- stages: clients never see locked stages; only admin writes
+-- stages: clients never see locked stages or stages of an archived project;
+-- only admin writes
 create policy "clients read visible stages, admin all" on public.stages
   for select using (
     public.is_admin() or (
       state <> 'locked' and exists (
         select 1 from public.projects p
-        where p.id = project_id and p.client_id = auth.uid()
+        where p.id = project_id and p.client_id = auth.uid() and not p.archived
       )
     )
   );
@@ -340,6 +360,8 @@ create index if not exists projects_completed_at_idx
 -- the in-function is_admin() check then blocks non-admin signed-in users.
 revoke execute on function public.revert_last_approval(uuid) from public, anon;
 grant  execute on function public.revert_last_approval(uuid) to authenticated;
+revoke execute on function public.delete_project(uuid) from public, anon;
+grant  execute on function public.delete_project(uuid) to authenticated;
 
 -- Trigger functions are only ever meant to fire as triggers, never to be
 -- called directly through the API. Revoking EXECUTE does NOT stop triggers

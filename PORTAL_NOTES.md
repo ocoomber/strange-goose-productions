@@ -101,9 +101,17 @@ follows whichever host the client started on — both must stay allowlisted.
   flips stage to approved.
 - `complete_on_deliverables`: stage-7 approval → project status complete.
 - `guard_profile_update`: non-admins can't change own role/email/id.
-- Admin-only RPCs: `reset_project` (testing), `revert_last_approval`
-  (undo one accidental approval). Both bypass guards via a GUC flag.
-- RLS: clients see only their own projects and **non-locked** stages; admin
+- Admin-only RPCs: `revert_last_approval` (undo one accidental approval,
+  bypasses guards via a GUC flag); `delete_project` (hard-delete a whole
+  project — refused if it has any approval, since that's an immutable record;
+  cascades stages + project_notes). `reset_project` was removed pre-launch.
+- Per-project archive: `projects.archived` flag (admin toggles it directly via
+  the "admin updates projects" policy). Archived projects are hidden from the
+  client (RLS) and from the admin dashboard queues; they show in a collapsed
+  "Archived projects" list under their client in the Clients panel, with
+  Restore + (if no approvals) Delete. Reversible; loses nothing.
+- RLS: clients see only their own **non-archived** projects and **non-locked**
+  stages (of non-archived projects); admin
   sees all via `is_admin()`.
 
 ## Completion / deliverables flow (current, post-redesign)
@@ -152,8 +160,12 @@ sign-in for clients (see "Client sign-in" above).
 - Tier 3: in-portal feedback capture (emails Owen); audit-grade voids
   (mark approvals voided instead of hard delete) when a real dispute makes
   the missing trail matter; project duplication/templates.
-- Per-project archiving for *completed projects of still-active clients*
-  (currently only whole-client archive hides projects).
+- ~~Per-project archiving for *completed projects of still-active clients*
+  (currently only whole-client archive hides projects).~~ **DONE 2026-06-15**
+  — `projects.archived` flag + `delete_project()` RPC (migration
+  `per_project_archive_and_delete`). Admin can Archive/Restore any project and
+  hard-delete approval-free ones from the project page; archived projects list
+  per client in the Clients panel. See "Key DB rules" above.
 
 ## Phase 2 (merged to `main` / live 2026-06-13)
 Eight changes, each its own commit, built on `claude/amazing-ride-l1swcn`.

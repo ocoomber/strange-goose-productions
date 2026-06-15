@@ -152,6 +152,16 @@
   .page[data-page="clients"] .client-fields .badge{margin:0}
   .page[data-page="clients"] .client-actions{flex:0 0 auto}
 
+  /* Collapsed per-client archived-projects list. */
+  .archived-projects{margin:-4px 0 8px 14px;border-left:2px solid var(--paper-3);padding-left:14px}
+  .archived-projects>summary{cursor:pointer;color:var(--muted);font:500 13px/1.6 var(--sans);padding:4px 0;list-style:none}
+  .archived-projects>summary::-webkit-details-marker{display:none}
+  .archived-projects>summary::before{content:"▸ ";color:var(--faint)}
+  .archived-projects[open]>summary::before{content:"▾ "}
+  .archived-projects .client-row{padding:6px 0}
+  .archived-projects .client-name{color:var(--ink-2);text-decoration:none}
+  .archived-projects .client-name:hover{text-decoration:underline}
+
   /* Setup / export / new-client: cap panel width so the text inputs aren't enormous. */
   .page[data-page="setup"] .admin-panel,
   .page[data-page="export"] .admin-panel,
@@ -585,6 +595,8 @@
           <div class="actions">
             <a class="btn ghost sm" id="report-link" href="#" target="_blank" rel="noopener">Generate project record (PDF)</a>
             <button class="btn ghost sm" type="button" id="undo-approval" hidden>Undo last approval</button>
+            <button class="btn ghost sm" type="button" id="archive-project" hidden>Archive project</button>
+            <button class="btn ghost sm" type="button" id="delete-project" hidden>Delete permanently</button>
           </div>
           <p class="form-error" id="project-error" hidden></p>
         </div>
@@ -816,12 +828,15 @@
     });
 
     var res = await sb.from('projects')
-      .select('id, title, status, created_at, completed_at, client_id, profiles(email, display_name), stages(state, stage_index, pending_since), approvals(approved_at)')
+      .select('id, title, status, archived, created_at, completed_at, client_id, profiles(email, display_name), stages(state, stage_index, pending_since), approvals(approved_at)')
       .order('created_at', { ascending: false });
     var allProjects = res.data || [];
     var archivedIds = {};
     allClients.forEach(function (c) { if (c.archived) archivedIds[c.id] = true; });
-    var projects = allProjects.filter(function (p) { return !archivedIds[p.client_id]; });
+    // Live projects = client not archived AND project not archived.
+    var projects = allProjects.filter(function (p) {
+      return !archivedIds[p.client_id] && !p.archived;
+    });
 
     var groups = { you: [], stalled: [], client: [], complete: [] };
     projects.forEach(function (p) { groups[statusOf(p)].push(p); });
@@ -830,9 +845,14 @@
     groups.stalled.sort(function (a, b) { return overdueDays(b) - overdueDays(a); });
     groups.complete.sort(function (a, b) { return completedAt(b) - completedAt(a); });
 
-    // per-client counts (over ALL projects so archived rows show real totals)
-    var counts = {}, hasComplete = {}, hasActive = {}, stalledDays = {};
+    // per-client counts over LIVE (non-archived) projects; archived projects are
+    // tracked separately so each client can show its own archived list.
+    var counts = {}, hasComplete = {}, hasActive = {}, stalledDays = {}, archivedByClient = {};
     allProjects.forEach(function (p) {
+      if (p.archived) {
+        (archivedByClient[p.client_id] = archivedByClient[p.client_id] || []).push(p);
+        return;
+      }
       counts[p.client_id] = (counts[p.client_id] || 0) + 1;
       if (p.status === 'complete') hasComplete[p.client_id] = true;
       else hasActive[p.client_id] = true;
@@ -841,9 +861,10 @@
       }
     });
     clientData = { clients: allClients, counts: counts, hasComplete: hasComplete,
-                   stalledDays: stalledDays, hasActive: hasActive };
+                   stalledDays: stalledDays, hasActive: hasActive,
+                   archivedByClient: archivedByClient };
 
-    renderCounts(groups, activeClients.length, allProjects.length);
+    renderCounts(groups, activeClients.length, projects.length);
     renderBoard(groups);
     renderQueues(groups);
     renderClients();
@@ -967,7 +988,8 @@
     if (!clientData) return;
     var clients = clientData.clients, counts = clientData.counts,
         hasComplete = clientData.hasComplete, stalledDays = clientData.stalledDays || {},
-        hasActive = clientData.hasActive || {};
+        hasActive = clientData.hasActive || {},
+        archivedByClient = clientData.archivedByClient || {};
     var wrap = document.getElementById('clients-list');
     wrap.innerHTML = '';
     document.getElementById('clients-empty').hidden = clients.length > 0;
@@ -983,15 +1005,69 @@
       return c.archived && clientMatches(c, term);
     });
 
-    active.forEach(function (c) { wrap.appendChild(activeRow(c, cErr, counts, stalledDays)); });
+    active.forEach(function (c) {
+      wrap.appendChild(activeRow(c, cErr, counts, stalledDays));
+      var ab = archivedProjectsBlock(archivedByClient[c.id], cErr);
+      if (ab) wrap.appendChild(ab);
+    });
     if (archived.length) {
       wrap.appendChild(el('p', 'eyebrow', 'Archived (hidden, cannot sign in)'));
       archived.forEach(function (c) {
         wrap.appendChild(archivedRow(c, cErr, counts, hasComplete));
+        var ab = archivedProjectsBlock(archivedByClient[c.id], cErr);
+        if (ab) wrap.appendChild(ab);
       });
     }
     document.getElementById('clients-none').hidden =
       !(clients.length > 0 && active.length === 0 && archived.length === 0);
+  }
+
+  // Collapsed list of a client's archived projects, with Restore / Delete.
+  // Returns null when the client has none. Delete is offered only for projects
+  // with no client approvals (matches the delete_project RPC's own rule).
+  function archivedProjectsBlock(list, cErr) {
+    if (!list || !list.length) return null;
+    var det = el('details', 'archived-projects');
+    det.appendChild(el('summary', null, 'Archived projects (' + list.length + ')'));
+    list.forEach(function (p) {
+      var row = el('div', 'client-row archived');
+      var info = el('div', 'client-info');
+      var name = el('a', 'client-name', p.title);
+      name.href = '#project/' + p.id;
+      info.appendChild(name);
+      info.appendChild(el('span', 'client-email',
+        (p.status === 'complete' ? 'Complete' : 'In progress') + '  ·  archived'));
+      row.appendChild(info);
+
+      var actions = el('div', 'client-actions');
+      var restore = el('button', 'btn ghost sm', 'Restore'); restore.type = 'button';
+      restore.addEventListener('click', async function () {
+        cErr.hidden = true; restore.disabled = true;
+        var res = await sb.from('projects').update({ archived: false }).eq('id', p.id);
+        restore.disabled = false;
+        if (res.error) { showError(cErr, res.error); return; }
+        renderProjects();
+      });
+      actions.appendChild(restore);
+
+      if (!(p.approvals || []).length) {
+        var del = el('button', 'btn ghost sm', 'Delete'); del.type = 'button';
+        del.addEventListener('click', async function () {
+          cErr.hidden = true;
+          if (!window.confirm('Permanently delete "' + p.title + '"?\n\n' +
+            'This destroys the project and its stages for good and cannot be undone.')) return;
+          del.disabled = true;
+          var res = await sb.rpc('delete_project', { p_project: p.id });
+          del.disabled = false;
+          if (res.error) { showError(cErr, res.error); return; }
+          renderProjects();
+        });
+        actions.appendChild(del);
+      }
+      row.appendChild(actions);
+      det.appendChild(row);
+    });
+    return det;
   }
 
   function activeRow(c, cErr, counts, stalledDays) {
@@ -1310,7 +1386,8 @@
     document.getElementById('project-title').textContent = project.title;
     document.getElementById('project-meta').textContent =
       'Client: ' + ((project.profiles && project.profiles.email) || '—') +
-      ' · Created ' + fmtDate(project.created_at);
+      ' · Created ' + fmtDate(project.created_at) +
+      (project.archived ? ' · Archived (hidden from the client)' : '');
 
     var od = document.getElementById('project-overdue');
     od.innerHTML = '';
@@ -1335,6 +1412,41 @@
         'Earlier approvals are kept.')) return;
       var res = await sb.rpc('revert_last_approval', { p_project: id });
       if (res.error) showError(projErr, res.error); else renderProject(id);
+    };
+
+    // Archive / restore — reversible hide, works on any project.
+    var archiveBtn = document.getElementById('archive-project');
+    archiveBtn.hidden = false;
+    archiveBtn.textContent = project.archived ? 'Restore project' : 'Archive project';
+    archiveBtn.onclick = async function () {
+      if (!project.archived && !window.confirm('Archive "' + project.title + '"?\n\n' +
+        'It will be hidden from the client and from your dashboard queues, but every ' +
+        'record is kept. You can restore it any time.')) return;
+      archiveBtn.disabled = true;
+      var res = await sb.from('projects').update({ archived: !project.archived }).eq('id', id);
+      archiveBtn.disabled = false;
+      if (res.error) showError(projErr, res.error); else renderProject(id);
+    };
+
+    // Delete permanently — only when nothing has been approved (no audit record).
+    var del = document.getElementById('delete-project');
+    del.hidden = hasApproved;
+    del.textContent = 'Delete permanently';
+    del.onclick = async function () {
+      if (!window.confirm('Permanently delete "' + project.title + '"?\n\n' +
+        'This destroys the project and its stages for good — use it only for test ' +
+        'projects or ones that never started. This cannot be undone.')) return;
+      var typed = window.prompt('Type the project title to confirm deletion:');
+      if (typed == null) return;
+      if (typed.trim() !== project.title) {
+        showError(projErr, { message: 'Title did not match — nothing was deleted.' });
+        return;
+      }
+      del.disabled = true;
+      var res = await sb.rpc('delete_project', { p_project: id });
+      del.disabled = false;
+      if (res.error) { showError(projErr, res.error); return; }
+      location.hash = 'page/dash';
     };
 
     var list = document.getElementById('stage-list');
