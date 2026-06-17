@@ -3,10 +3,11 @@
 _Last updated: 2026-06-15. For a new session picking this up._
 
 ## TL;DR
-Built across three stages. **Two MCP servers are deployed and live; the client
-portal MCP (`sgp-portal-mcp`) is the main deliverable.** Everything is merged to
-`main`. The only things left are Owen-side testing/content and two deferred
-features (direct AI approval, client messaging).
+Built across three stages. **`sgp-portal-mcp` (the client portal MCP) is live
+and is the main deliverable. `sgp-mcp` (the public profile MCP) was
+decommissioned 2026-06-17** — see "Decommission: sgp-mcp" below. The only
+things left are Owen-side testing/content and two deferred features (direct AI
+approval, client messaging).
 
 ---
 
@@ -47,6 +48,24 @@ features (direct AI approval, client messaging).
   `client/index.html` → **Client Portal → "MCP access"** (generate/list/revoke keys).
 - Both MCP servers are also documented in `MCP_SERVER_NOTES.md`; the portal one in
   `supabase/functions/sgp-portal-mcp/README.md`.
+
+---
+
+## Decommission: sgp-mcp (2026-06-17)
+
+There is no public/cold-discovery MCP server running for SGP right now.
+`sgp-mcp` was redeployed with a stub that returns `410 Gone` for every request
+(no MCP tool exists to delete an Edge Function outright, so this is the kill
+switch). Site pointers were removed: `llms.txt` no longer has the "Live data —
+MCP server" section, and `index.html` no longer has the `<link
+rel="mcp-server">` / `<meta name="mcp-server">` tags. The original code stays
+in `supabase/functions/sgp-mcp/` for reference, marked decommissioned in its
+README.
+
+**Future plan (not yet built):** Owen intends to recreate a similar
+public-profile system later using a Google Sheet **published to the web**
+(File → Share → Publish to web), rather than the "Anyone with the link" +
+gviz read approach this version used.
 
 ---
 
