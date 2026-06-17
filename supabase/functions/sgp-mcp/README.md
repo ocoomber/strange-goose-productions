@@ -1,4 +1,15 @@
-# sgp-mcp — MCP server Edge Function
+# sgp-mcp — MCP server Edge Function (DECOMMISSIONED)
+
+**Status: decommissioned 2026-06-17.** The deployed function now returns
+`410 Gone` for every request — see the live `index.ts` in the Supabase
+dashboard, not the version below, which is kept here as a reference for the
+design. There is no public MCP server running for SGP right now. Rationale:
+"cold discovery" by unknown agents wasn't a real use case (see
+`MCP_HANDOVER.md`); the client portal MCP (`sgp-portal-mcp`) is the one that
+stayed live. A future replacement may read from a Google Sheet **published to
+the web** (rather than gviz on a "Anyone with the link" share) — not yet built.
+
+---
 
 A public, stateless **Model Context Protocol** server that represents Strange
 Goose Productions to visiting AI agents. It reads live from the `SGP_AI_Profile`

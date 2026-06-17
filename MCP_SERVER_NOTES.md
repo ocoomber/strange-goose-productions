@@ -1,24 +1,30 @@
 # MCP Server — Architecture & Operations Notes
 
-SGP runs **two** MCP servers, both Supabase Edge Functions (Deno), both stateless
-Streamable HTTP (spec `2025-11-25`):
+SGP runs **one live** MCP server today, a Supabase Edge Function (Deno),
+stateless Streamable HTTP (spec `2025-11-25`):
 
 | Server | Function | Audience | Auth | Data |
 |--------|----------|----------|------|------|
-| **Public profile** | `sgp-mcp` | Any visiting AI agent | none (public) | `SGP_AI_Profile` Google Sheet (gviz) |
 | **Client portal** | `sgp-portal-mcp` | An existing client's AI assistant | the client's own **MCP key** | the client's portal data (via RLS) |
+| ~~Public profile~~ | ~~`sgp-mcp`~~ | — | — | **decommissioned 2026-06-17** |
 
 > **Note on cold discovery:** the public `sgp-mcp` was built first for agents to
-> *discover* SGP. In practice MCP needs deliberate per-user configuration, so the
-> live, valuable case is `sgp-portal-mcp` — a known client connecting their AI to
-> their own projects. See `supabase/functions/sgp-portal-mcp/README.md`.
+> *discover* SGP, but in practice MCP needs deliberate per-user configuration —
+> that use case never materialized. It's been decommissioned (the deployed
+> function now returns `410 Gone`; site pointers in `index.html` and `llms.txt`
+> removed). There is no public MCP server right now. A future replacement may
+> read from a Google Sheet **published to the web**, instead of the
+> "Anyone with the link" + gviz approach used before — not yet built.
+> `sgp-portal-mcp` is the one that stayed live — a known client connecting
+> their AI to their own projects. See `supabase/functions/sgp-portal-mcp/README.md`.
 
 ---
 
-## sgp-mcp (public profile)
+## sgp-mcp (public profile) — DECOMMISSIONED
 
 Lets visiting AI agents converse about Strange Goose Productions, answered live
-from the `SGP_AI_Profile` Google Sheet. Follows `MCP_SPREADSHEET_DESIGN.md`.
+from the `SGP_AI_Profile` Google Sheet. Followed `MCP_SPREADSHEET_DESIGN.md`.
+Kept below for reference only — see the status note above.
 
 ## What it is
 - A single **Supabase Edge Function** (Deno): `supabase/functions/sgp-mcp/`.
@@ -44,26 +50,18 @@ AI agent ──JSON-RPC──▶ sgp-mcp Edge Function ──gviz JSON──▶ 
 `get_services`, `get_team`, `get_faq`, `get_contact`. Each returns a short
 human summary plus the structured records as JSON. See the function README.
 
-## Discoverability
-- `llms.txt` (site root) has a "Live data — MCP server" section with the
-  endpoint and tools.
-- `index.html` `<head>` carries `<link rel="mcp-server">` + `<meta
-  name="mcp-server">` pointers. These go live when `main` is deployed (GitHub
-  Pages).
+## Discoverability (removed)
+- `llms.txt` (site root) no longer has a "Live data — MCP server" section.
+- `index.html` `<head>` no longer carries the `<link rel="mcp-server">` /
+  `<meta name="mcp-server">` pointers.
 
-## Operations
-- **Logs:** Supabase dashboard → Edge Functions → `sgp-mcp` → Logs (the function
-  `console.error`s any sheet-read failure).
-- **Free-tier pause:** the Supabase project pauses after ~7 days of no activity.
-  Agent traffic to this function counts as activity; the existing
-  `supabase-keepalive.yml` REST ping is the backstop (see `PORTAL_NOTES.md` for
-  the cron-job.org migration once the repo stops getting pushes).
-- **Changing the sheet:** if the Sheet id ever changes, set the `SGP_SHEET_ID`
-  function secret (overrides the baked-in constant). The tab names and
-  `snake_case` headers must stay as designed — the tools read by those keys.
-
-## Status / next
-- Function deployed (`verify_jwt = false`), parser unit-tested.
-- **Pending:** share the sheet *Anyone with the link → Viewer* (required before
-  any `tools/call` can read data), then run the smoke tests in the README and a
-  real Claude conversation. Merge to `main` to take the site pointers live.
+## Decommission status (2026-06-17)
+- The deployed `sgp-mcp` Edge Function was redeployed with a stub that returns
+  `410 Gone` for every request — there was no MCP-tool path to delete the
+  function outright, so this is the kill switch. The original tool logic
+  (`index.ts`, `sheet.ts`) stays in the repo under
+  `supabase/functions/sgp-mcp/` for reference.
+- Site pointers (`llms.txt`, `index.html`) removed.
+- **Future:** a similar public-profile MCP may be rebuilt later reading from a
+  Google Sheet **published to the web** (File → Share → Publish to web),
+  rather than the "Anyone with the link" + gviz approach this version used.
