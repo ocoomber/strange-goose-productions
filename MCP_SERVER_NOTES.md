@@ -21,6 +21,18 @@ stateless Streamable HTTP (spec `2025-11-25`):
 > `supabase/functions/sgp-portal-mcp/README.md` and
 > `supabase/functions/sgp-admin-mcp/README.md`.
 
+## Auth transport: header or `?key=` query param
+
+Both servers accept the MCP key either as `Authorization: Bearer <key>` (what
+Claude Code / most MCP clients send) **or** as a `?key=<key>` query param on
+the endpoint URL itself. The latter exists because Claude.ai's and ChatGPT's
+web/app "custom connector" settings only have a URL field, no header field —
+so the key has to be baked into the URL. Both portal UIs generate this
+URL-with-key form (alongside the plain header instructions) ready to copy.
+Tradeoff: a key embedded in a URL can end up in browser history/settings
+screens, slightly weaker than a header — acceptable here since revoking a key
+is one click in either portal.
+
 ## sgp-admin-mcp (admin panel)
 
 Gives Owen an AI-conversational alternative to the admin web panel, in

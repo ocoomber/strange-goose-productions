@@ -55,10 +55,15 @@ type Client = { clientId: string; email: string };
 const sessionCache = new Map<string, { accessToken: string; exp: number }>();
 const inflight = new Map<string, Promise<string>>();
 
-function bearer(req: Request): string | null {
+// Most clients send the key as a Bearer header. Claude.ai's web "custom
+// connector" UI only takes a URL (no header field), so we also accept the
+// key as a ?key= query param on the endpoint URL itself.
+function extractToken(req: Request): string | null {
   const h = req.headers.get("authorization") || "";
   const m = h.match(/^Bearer\s+(.+)$/i);
-  return m ? m[1].trim() : null;
+  if (m) return m[1].trim();
+  const q = new URL(req.url).searchParams.get("key");
+  return q ? q.trim() : null;
 }
 
 // Look up the (non-revoked) key by hash → the owning client. Service role is used
@@ -340,11 +345,11 @@ const json = (body: unknown, status = 200) =>
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method === "GET") {
-    return json({ server: SERVER_INFO, protocolVersion: PROTOCOL_VERSION, transport: "streamable-http", tools: Object.keys(TOOLS), note: "POST JSON-RPC 2.0 here (MCP). Authenticate with your SGP MCP key as a Bearer token." });
+    return json({ server: SERVER_INFO, protocolVersion: PROTOCOL_VERSION, transport: "streamable-http", tools: Object.keys(TOOLS), note: "POST JSON-RPC 2.0 here (MCP). Authenticate with your SGP MCP key as a Bearer token, or append ?key=YOUR_KEY to this URL (for clients like Claude.ai's web connector that can't send custom headers)." });
   }
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
-  const token = bearer(req);
+  const token = extractToken(req);
   let body: unknown;
   try { body = await req.json(); } catch { return json(rpcError(null, -32700, "Parse error")); }
 

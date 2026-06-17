@@ -52,8 +52,8 @@ deferred features (direct AI approval, client messaging).
   full endpoint URLs in `MCP_SERVER_NOTES.md` and the function READMEs).
 - **Edge Functions** (all public, `verify_jwt = false`):
   - `sgp-mcp` (v2) → `…/functions/v1/sgp-mcp` (decommissioned, returns 410)
-  - `sgp-portal-mcp` (v5) → `…/functions/v1/sgp-portal-mcp`
-  - `sgp-admin-mcp` (v1) → `…/functions/v1/sgp-admin-mcp`
+  - `sgp-portal-mcp` (v6) → `…/functions/v1/sgp-portal-mcp`
+  - `sgp-admin-mcp` (v2) → `…/functions/v1/sgp-admin-mcp`
 - **DB:** migration `supabase/migrations/2026-06-15-mcp-tokens.sql` is **applied**
   — `mcp_tokens` table + `create_mcp_token(label)` / `revoke_mcp_token(id)`
   SECURITY DEFINER RPCs. `supabase/migrations/2026-06-17-admin-mcp-tokens.sql`
@@ -96,6 +96,14 @@ gviz read approach this version used.
   cached ~50 min, with in-flight dedup + backoff retry). All reads run through
   that session, so the **portal's existing RLS is the security boundary**.
   Service role is used only to look up the key and mint the session.
+- **Auth transport (2026-06-17):** the key can arrive either as an
+  `Authorization: Bearer <key>` header (CLI clients) or as a `?key=<key>`
+  query param on the endpoint URL itself — added because Claude.ai's and
+  ChatGPT's web/app "custom connector" settings only expose a URL field, no
+  header field. We're building primarily for that web/app-connector user, with
+  CLI as the secondary path. Both portal UIs generate the ready-to-copy
+  URL-with-key form. See `extractToken()` in `index.ts` and the tradeoff note
+  in `MCP_SERVER_NOTES.md`.
 - **Tools (7, read-only):** `get_account`, `list_projects`, `get_project`,
   `get_pending_actions`, `list_deliverables`, `get_approval_history`,
   `get_portal_link`.
@@ -168,12 +176,16 @@ up** — production is clean.
 ## Next steps / pending
 
 1. **Owen to test the portal MCP as a client** (needs a `client`-role account):
-   Portal → MCP access → generate key → `claude mcp add --transport http
-   sgp-portal <url> --header "Authorization: Bearer <key>"` → ask "what needs my
-   approval?". (Offer to spin up a throwaway client + project to demo.)
+   Portal → MCP access → generate key → either paste the generated
+   `…/sgp-portal-mcp?key=<key>` URL into Claude.ai/ChatGPT's connector
+   settings, or `claude mcp add --transport http sgp-portal <url> --header
+   "Authorization: Bearer <key>"` → ask "what needs my approval?". (Offer to
+   spin up a throwaway client + project to demo.)
 2. **Owen to test the admin MCP**: Admin Panel → MCP access → generate key →
-   `claude mcp add --transport http sgp-admin <url> --header "Authorization:
-   Bearer <key>"` → ask "what needs my attention?" or "show me Jane's projects."
+   either paste the generated `…/sgp-admin-mcp?key=<key>` URL into
+   Claude.ai/ChatGPT's connector settings, or `claude mcp add --transport http
+   sgp-admin <url> --header "Authorization: Bearer <key>"` → ask "what needs my
+   attention?" or "show me Jane's projects."
 3. **Owen still filling the `SGP_AI_Profile` blanks** (for the public `sgp-mcp`).
 4. **Deferred — direct AI approval:** flip the seam (see above).
 5. **Deferred — client→SGP messaging:** needs a new client-insertable table +

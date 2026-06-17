@@ -10,7 +10,9 @@ project's state for a client.
 
 - **Endpoint:** `https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-admin-mcp`
 - **Transport:** Streamable HTTP, MCP spec `2025-11-25`, JSON-RPC 2.0 over POST
-- **Auth:** Owen's own **MCP key** (see below) as a Bearer token
+- **Auth:** Owen's own **MCP key** (see below) as a Bearer token — or, for
+  clients with no custom-header field (Claude.ai's web "custom connector" UI
+  only takes a URL), appended to the endpoint as `?key=<key>`
 
 ## Scope — read + safe writes only
 This server can **never**: advance a stage, release deliverables, mark a
@@ -62,12 +64,19 @@ supabase functions deploy sgp-admin-mcp --project-ref zawrkuclsdqtvftfothj --no-
 ```
 
 ## Connect (admin side)
+Claude Code / other tools that support custom headers:
 ```bash
 claude mcp add --transport http sgp-admin \
   https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-admin-mcp \
   --header "Authorization: Bearer <your-mcp-key>"
 ```
-Then ask, e.g., "what needs my attention?" or "show me Jane's projects."
+Claude.ai / ChatGPT web or app custom connectors (URL only, no header field) —
+paste the key into the URL itself:
+```
+https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-admin-mcp?key=<your-mcp-key>
+```
+The admin panel's "MCP access" page generates both forms ready to copy. Then
+ask, e.g., "what needs my attention?" or "show me Jane's projects."
 
 ## Test (from a host with egress, or via Postgres `pg_net`)
 ```bash
