@@ -175,6 +175,23 @@ up** — production is clean.
 
 ## Next steps / pending
 
+0. **Next session: code review of the `?key=` query-param auth change**
+   (commit `6e39799`, pushed to `main` 2026-06-17). Scope: `extractToken()` in
+   both `sgp-admin-mcp/index.ts` and `sgp-portal-mcp/index.ts` (header-or-
+   query-param key extraction), the matching UI changes in `admin/index.html`
+   and `client/index.html` (URL-with-key generation + copy button), and the
+   doc updates (both function READMEs, `MCP_SERVER_NOTES.md`,
+   `admin/SETUP.md`). Verified so far: `node --check` / `--experimental-
+   strip-types --check` on every changed file, both unit-test suites still
+   green (17 + 22 assertions, unaffected since the change is isolated to
+   `index.ts`, not `lib.ts`), both functions redeployed and ACTIVE
+   (`sgp-admin-mcp` v2, `sgp-portal-mcp` v6). **Not yet done:** a live pg_net
+   smoke test that actually calls either deployed endpoint with the key as a
+   URL `?key=` param and *no* Authorization header, to confirm the query-param
+   path works end-to-end in production rather than just passing static syntax
+   checks — do this first in the review. Known accepted tradeoff to revisit:
+   a key embedded in a URL can leak via browser history/connector-settings
+   screens; logged in `MCP_SERVER_NOTES.md`.
 1. **Owen to test the portal MCP as a client** (needs a `client`-role account):
    Portal → MCP access → generate key → either paste the generated
    `…/sgp-portal-mcp?key=<key>` URL into Claude.ai/ChatGPT's connector
