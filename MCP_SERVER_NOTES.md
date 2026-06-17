@@ -1,12 +1,13 @@
 # MCP Server — Architecture & Operations Notes
 
-SGP runs **one live** MCP server today, a Supabase Edge Function (Deno),
+SGP runs **two live** MCP servers today, both Supabase Edge Functions (Deno),
 stateless Streamable HTTP (spec `2025-11-25`):
 
-| Server | Function | Audience | Auth | Data |
-|--------|----------|----------|------|------|
-| **Client portal** | `sgp-portal-mcp` | An existing client's AI assistant | the client's own **MCP key** | the client's portal data (via RLS) |
-| ~~Public profile~~ | ~~`sgp-mcp`~~ | — | — | **decommissioned 2026-06-17** |
+| Server | Function | Audience | Auth | Data | Scope |
+|--------|----------|----------|------|------|-------|
+| **Client portal** | `sgp-portal-mcp` | An existing client's AI assistant | the client's own **MCP key** | the client's portal data (via RLS) | read-only |
+| **Admin panel** | `sgp-admin-mcp` | Owen's AI assistant | his own **MCP key** | all clients/projects (via `is_admin()` RLS) | read + safe writes |
+| ~~Public profile~~ | ~~`sgp-mcp`~~ | — | — | — | **decommissioned 2026-06-17** |
 
 > **Note on cold discovery:** the public `sgp-mcp` was built first for agents to
 > *discover* SGP, but in practice MCP needs deliberate per-user configuration —
@@ -15,8 +16,28 @@ stateless Streamable HTTP (spec `2025-11-25`):
 > removed). There is no public MCP server right now. A future replacement may
 > read from a Google Sheet **published to the web**, instead of the
 > "Anyone with the link" + gviz approach used before — not yet built.
-> `sgp-portal-mcp` is the one that stayed live — a known client connecting
-> their AI to their own projects. See `supabase/functions/sgp-portal-mcp/README.md`.
+> `sgp-portal-mcp` and `sgp-admin-mcp` are the two that stayed/went live — a
+> known client (or Owen) connecting their AI to their own portal data. See
+> `supabase/functions/sgp-portal-mcp/README.md` and
+> `supabase/functions/sgp-admin-mcp/README.md`.
+
+## sgp-admin-mcp (admin panel)
+
+Gives Owen an AI-conversational alternative to the admin web panel, in
+addition to it (not a replacement). Same `mcp_tokens` table and auth pattern
+as the client portal MCP — Owen generates his own key in the admin panel
+("MCP access"), the server hashes it, finds the owning profile, and mints a
+real admin session via the GoTrue admin API. The owning profile's `role`
+column is checked (`admin` here, `client` on the portal server) so a key
+minted on one side can't be used on the other.
+
+**Deliberately out of scope** (kept admin-panel-only): advancing a stage,
+releasing deliverables, marking a project complete, reverting an approval,
+deleting a project, or any client account lifecycle change (create/archive/
+delete). The only writes available are adding a chase-log note and editing a
+stage's doc links / video id / note (refuses on an already-approved/frozen
+stage, never touches `state`). See
+`supabase/functions/sgp-admin-mcp/README.md` for the full tool list.
 
 ---
 

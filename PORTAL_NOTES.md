@@ -405,6 +405,34 @@ A round of admin/client fixes plus a pre-launch tidy. All pushed straight to
   (`is_admin`, `revert_last_approval`, leaked-password), and the `reset_project`
   warnings are gone.
 
+## Phase 6 — MCP access, client + admin (LIVE 2026-06-17)
+
+Two stateless Streamable HTTP MCP servers (Supabase Edge Functions) let an
+AI assistant work conversationally with the portal instead of (or alongside)
+the web UI. Full design/ops detail lives in `MCP_SERVER_NOTES.md` and
+`MCP_HANDOVER.md` — summary here for portal context:
+
+- **Client side** (`sgp-portal-mcp`, read-only): an existing client generates
+  an "MCP key" at **Client Portal → MCP access**, adds it to their AI tool.
+  Tools cover status/deliverables/approval history; approvals stay
+  human-in-portal (the tools hand back a deep link).
+- **Admin side** (`sgp-admin-mcp`, read + safe writes): Owen generates his own
+  key at **Admin Panel → MCP access**, giving his AI assistant the same kind
+  of access across every client/project — search, status, attention-needed,
+  plus adding a chase-log note or editing a stage's doc links/video/note. It
+  deliberately cannot advance a stage, release deliverables, mark complete,
+  or touch a client account — those stay admin-panel-only.
+- Both share the **`mcp_tokens`** table and `create_mcp_token`/
+  `revoke_mcp_token` RPCs (migrations `2026-06-15-mcp-tokens.sql` +
+  `2026-06-17-admin-mcp-tokens.sql`, folded into `schema.sql`); the owning
+  profile's `role` is what keeps a client's key from working on the admin
+  server and vice versa.
+- Auth pattern for both: hash the presented key → look up the owning profile
+  → mint a **real session** for them via the GoTrue admin API → run all
+  reads/writes through that session, so the portal's existing RLS
+  (`is_admin()` for admin) is the actual security boundary, not hand-rolled
+  scoping in the Edge Function.
+
 ### Working with the Supabase MCP connector (for future sessions)
 A connector gives a session **high-privilege** DB access — `execute_sql`
 bypasses RLS and can read/write/drop anything, deploy Edge Functions, etc. Owen

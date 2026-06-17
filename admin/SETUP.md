@@ -205,3 +205,26 @@ In the admin panel's **Clients** panel:
 - At stage 7, paste the deliverable Drive links and click
   **Mark project complete** — that's what reveals the download links to
   the client.
+
+### MCP access
+
+- The **MCP access** nav page lets you generate your own MCP key, so you can
+  connect an AI assistant (Claude, ChatGPT, etc.) to the admin panel as a
+  conversational alternative to this web interface — not a replacement for
+  it.
+- Click **Generate a new MCP key**, copy the plaintext shown (you won't see
+  it again — only its hash is stored), and add it to your AI tool, e.g. in
+  Claude Code:
+  ```
+  claude mcp add --transport http sgp-admin \
+    https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-admin-mcp \
+    --header "Authorization: Bearer YOUR_KEY"
+  ```
+  Then ask things like "what needs my attention?" or "show me Jane's
+  projects."
+- It can search/read everything (clients, projects, chase log) and make
+  small safe edits (add a chase-log note, update a stage's doc/video links)
+  — but it can never advance a stage, release deliverables, mark a project
+  complete, or touch a client account. Those stay here, in the admin panel,
+  on purpose.
+- Revoke a key any time from the same page if you think it's leaked.

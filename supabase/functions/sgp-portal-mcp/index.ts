@@ -67,17 +67,18 @@ async function resolveClient(token: string): Promise<Client | null> {
   const hash = await sha256Hex(token);
   const { data } = await admin
     .from("mcp_tokens")
-    .select("id, client_id, revoked_at, profiles!inner(email)")
+    .select("id, client_id, revoked_at, profiles!inner(email, role)")
     .eq("token_hash", hash)
     .is("revoked_at", null)
     .maybeSingle();
   if (!data) return null;
+  const profile = (data as { profiles?: { email?: string; role?: string } }).profiles;
+  // This server is for clients only — an admin's key belongs on sgp-admin-mcp.
+  if (!profile?.email || profile.role !== "client") return null;
   // best-effort last_used stamp
   admin.from("mcp_tokens").update({ last_used_at: new Date().toISOString() }).eq("id", data.id)
     .then(() => {}, () => {});
-  const email = (data as { profiles?: { email?: string } }).profiles?.email;
-  if (!email) return null;
-  return { clientId: data.client_id as string, email };
+  return { clientId: data.client_id as string, email: profile.email };
 }
 
 // Mint a real client session via the Admin API (works regardless of the

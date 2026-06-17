@@ -350,6 +350,73 @@ create index if not exists projects_completed_at_idx
   on public.projects (completed_at desc);
 
 -- ------------------------------------------------------------
+-- MCP access keys (mcp_tokens). Either a client or the admin can generate
+-- their own "MCP key" (Client Portal / Admin Panel → MCP access) to connect
+-- an AI assistant via the sgp-portal-mcp / sgp-admin-mcp Edge Functions. Those
+-- servers hash the presented key, look it up here, and act AS the owning
+-- profile so existing RLS stays the security boundary. The plaintext is
+-- never stored, and each server additionally checks the owning profile's
+-- role (client vs admin) so a key can't be used on the wrong server.
+create table public.mcp_tokens (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid not null references public.profiles(id) on delete cascade,
+  token_hash text not null unique,   -- SHA-256 hex of the plaintext key (plaintext never stored)
+  label text,                        -- chosen name, e.g. "Claude", "ChatGPT"
+  created_at timestamptz not null default now(),
+  last_used_at timestamptz,
+  revoked_at timestamptz
+);
+
+create index if not exists mcp_tokens_client_idx
+  on public.mcp_tokens (client_id, created_at desc);
+
+alter table public.mcp_tokens enable row level security;
+
+-- A profile sees only their own keys (metadata only — never the secret); admin sees all.
+create policy "clients read own mcp tokens, admin all" on public.mcp_tokens
+  for select using (client_id = auth.uid() or public.is_admin());
+
+-- All writes go through the SECURITY DEFINER RPCs below; block direct writes.
+revoke insert, update, delete on public.mcp_tokens from anon, authenticated;
+
+-- Generate a new MCP key for the calling client OR admin. Returns the
+-- plaintext ONCE; only its SHA-256 hash is stored.
+create or replace function public.create_mcp_token(p_label text default null)
+returns text language plpgsql security definer set search_path = public, extensions as $$
+declare
+  uid uuid := auth.uid();
+  tok text;
+begin
+  if uid is null then
+    raise exception 'Not signed in';
+  end if;
+  if not exists (select 1 from public.profiles where id = uid and role in ('client', 'admin')) then
+    raise exception 'Only client or admin accounts can create MCP keys';
+  end if;
+  tok := 'sgp_' || encode(extensions.gen_random_bytes(32), 'hex');
+  insert into public.mcp_tokens (client_id, token_hash, label)
+  values (uid, encode(extensions.digest(tok, 'sha256'), 'hex'), nullif(btrim(p_label), ''));
+  return tok;
+end $$;
+
+-- Revoke one of the caller's own keys.
+create or replace function public.revoke_mcp_token(p_token_id uuid)
+returns void language plpgsql security definer set search_path = public as $$
+declare uid uuid := auth.uid();
+begin
+  if uid is null then raise exception 'Not signed in'; end if;
+  update public.mcp_tokens set revoked_at = now()
+  where id = p_token_id and client_id = uid and revoked_at is null;
+  if not found then raise exception 'Key not found'; end if;
+end $$;
+
+-- User-facing RPCs: authenticated only (not anon).
+revoke execute on function public.create_mcp_token(text) from public, anon;
+grant  execute on function public.create_mcp_token(text) to authenticated;
+revoke execute on function public.revoke_mcp_token(uuid) from public, anon;
+grant  execute on function public.revoke_mcp_token(uuid) to authenticated;
+
+-- ------------------------------------------------------------
 -- Function EXECUTE grants (lock down the SECURITY DEFINER functions).
 -- By default Postgres grants EXECUTE on new functions to PUBLIC, which
 -- exposes them via the REST API to the anon (logged-out) and authenticated
