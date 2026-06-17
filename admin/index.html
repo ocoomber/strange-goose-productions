@@ -725,10 +725,14 @@
               <p class="eyebrow">Your new key — copy it now, you won't be shown it again</p>
               <pre class="mcp-key" id="admin-mcp-new-key"></pre>
               <button class="btn ghost" type="button" id="admin-mcp-copy">Copy key</button>
-              <p class="eyebrow" style="margin-top:20px;">How to connect</p>
-              <p class="hint">Add this MCP server in your AI tool, using your key as the Bearer token:</p>
-              <pre class="mcp-key">https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-admin-mcp</pre>
-              <p class="hint">In Claude Code, for example:</p>
+
+              <p class="eyebrow" style="margin-top:20px;">Claude.ai, ChatGPT (web or app)</p>
+              <p class="hint">These only let you paste a URL, not a separate key field — so your key is baked into this one. Paste it into Settings → Connectors (Claude.ai) or similarly named settings:</p>
+              <pre class="mcp-key" id="admin-mcp-new-url"></pre>
+              <button class="btn ghost" type="button" id="admin-mcp-copy-url">Copy URL</button>
+
+              <p class="eyebrow" style="margin-top:20px;">Claude Code (CLI)</p>
+              <p class="hint">Sends the key as a header instead — nothing to bake into the URL:</p>
               <pre class="mcp-key">claude mcp add --transport http sgp-admin \
   https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-admin-mcp \
   --header "Authorization: Bearer YOUR_KEY"</pre>
@@ -1340,8 +1344,11 @@
       var r = await sb.rpc('create_mcp_token', { p_label: label || null });
       if (r.error) throw r.error;
       document.getElementById('admin-mcp-new-key').textContent = r.data;
+      document.getElementById('admin-mcp-new-url').textContent =
+        'https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-admin-mcp?key=' + encodeURIComponent(r.data);
       document.getElementById('admin-mcp-new').hidden = false;
       document.getElementById('admin-mcp-copy').textContent = 'Copy key';
+      document.getElementById('admin-mcp-copy-url').textContent = 'Copy URL';
       await loadMcpKeys();
     } catch (err) { showError(errNode, err); }
     finally { btn.disabled = false; }
@@ -1350,6 +1357,12 @@
   document.getElementById('admin-mcp-copy').addEventListener('click', function () {
     var key = document.getElementById('admin-mcp-new-key').textContent;
     if (navigator.clipboard) navigator.clipboard.writeText(key);
+    this.textContent = 'Copied ✓';
+  });
+
+  document.getElementById('admin-mcp-copy-url').addEventListener('click', function () {
+    var url = document.getElementById('admin-mcp-new-url').textContent;
+    if (navigator.clipboard) navigator.clipboard.writeText(url);
     this.textContent = 'Copied ✓';
   });
 

@@ -212,14 +212,19 @@ In the admin panel's **Clients** panel:
   connect an AI assistant (Claude, ChatGPT, etc.) to the admin panel as a
   conversational alternative to this web interface — not a replacement for
   it.
-- Click **Generate a new MCP key**, copy the plaintext shown (you won't see
-  it again — only its hash is stored), and add it to your AI tool, e.g. in
-  Claude Code:
-  ```
-  claude mcp add --transport http sgp-admin \
-    https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-admin-mcp \
-    --header "Authorization: Bearer YOUR_KEY"
-  ```
+- Click **Generate a new MCP key** — you won't see the plaintext again (only
+  its hash is stored), so copy whichever connection form you need straight
+  from the page:
+  - **Claude.ai / ChatGPT (web or app):** their custom-connector settings
+    only take a URL, no header field, so the page gives you a ready-made URL
+    with the key baked in (`…/sgp-admin-mcp?key=YOUR_KEY`) — paste that
+    straight into Settings → Connectors.
+  - **Claude Code (CLI):** sends the key as a header instead:
+    ```
+    claude mcp add --transport http sgp-admin \
+      https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-admin-mcp \
+      --header "Authorization: Bearer YOUR_KEY"
+    ```
   Then ask things like "what needs my attention?" or "show me Jane's
   projects."
 - It can search/read everything (clients, projects, chase log) and make

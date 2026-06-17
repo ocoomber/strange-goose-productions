@@ -8,7 +8,9 @@ portal's data model or rules.
 
 - **Endpoint:** `https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-portal-mcp`
 - **Transport:** Streamable HTTP, MCP spec `2025-11-25`, JSON-RPC 2.0 over POST
-- **Auth:** the client's own **MCP key** (see below) as a Bearer token
+- **Auth:** the client's own **MCP key** (see below) as a Bearer token — or, for
+  clients with no custom-header field (Claude.ai's web "custom connector" UI
+  only takes a URL), appended to the endpoint as `?key=<key>`
 
 ## How auth works (and why it's safe)
 1. The client generates an **MCP key** in the portal (Client Portal → *MCP
@@ -56,12 +58,19 @@ supabase functions deploy sgp-portal-mcp --project-ref zawrkuclsdqtvftfothj --no
 ```
 
 ## Connect (client side)
+Claude Code / other tools that support custom headers:
 ```bash
 claude mcp add --transport http sgp-portal \
   https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-portal-mcp \
   --header "Authorization: Bearer <your-mcp-key>"
 ```
-Then ask, e.g., "what's the status of my projects?" or "what needs my approval?"
+Claude.ai / ChatGPT web or app custom connectors (URL only, no header field) —
+paste the key into the URL itself:
+```
+https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-portal-mcp?key=<your-mcp-key>
+```
+The portal's "MCP access" page generates both forms ready to copy. Then ask,
+e.g., "what's the status of my projects?" or "what needs my approval?"
 
 ## Test (from a host with egress, or via Postgres `pg_net`)
 ```bash
