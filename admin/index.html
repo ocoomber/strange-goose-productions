@@ -524,6 +524,7 @@
       <a class="nav" data-page="export"><span class="dot"></span>Export records</a>
 
       <div class="grow"></div>
+      <a class="nav" data-page="mcp"><span class="dot"></span>MCP access</a>
       <a class="nav" data-page="password"><span class="dot"></span>Change password</a>
     </aside>
 
@@ -702,6 +703,43 @@
         </div>
       </section>
 
+      <!-- ===== MCP ACCESS ===== -->
+      <section class="page" data-page="mcp">
+        <style>
+          .mcp-key{white-space:pre-wrap;word-break:break-all;background:var(--paper-2);padding:12px 14px;border-radius:10px;font-family:var(--mono);font-size:13px;margin:8px 0;}
+          .mcp-key-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--faint);}
+          .mcp-key-row:first-child{border-top:none;}
+        </style>
+        <div class="phead">
+          <p class="eyebrow">Account</p>
+          <h1>MCP access</h1>
+        </div>
+        <div class="list-scroll">
+          <div class="admin-panel">
+            <h2>Connect your AI assistant</h2>
+            <p class="hint">Generate a key and add it to your AI tool (Claude, ChatGPT and others) — it can then search clients, check project status, see what needs your attention, read/add chase-log notes, and paste doc/video links into a stage. It cannot advance a stage, release deliverables, mark a project complete, or change a client account — do those here in the admin panel.</p>
+            <button class="btn primary" type="button" id="admin-mcp-generate">Generate a new MCP key</button>
+            <p class="form-error" id="admin-mcp-error" hidden></p>
+
+            <div id="admin-mcp-new" hidden style="margin-top:18px;">
+              <p class="eyebrow">Your new key — copy it now, you won't be shown it again</p>
+              <pre class="mcp-key" id="admin-mcp-new-key"></pre>
+              <button class="btn ghost" type="button" id="admin-mcp-copy">Copy key</button>
+              <p class="eyebrow" style="margin-top:20px;">How to connect</p>
+              <p class="hint">Add this MCP server in your AI tool, using your key as the Bearer token:</p>
+              <pre class="mcp-key">https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-admin-mcp</pre>
+              <p class="hint">In Claude Code, for example:</p>
+              <pre class="mcp-key">claude mcp add --transport http sgp-admin \
+  https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-admin-mcp \
+  --header "Authorization: Bearer YOUR_KEY"</pre>
+            </div>
+
+            <h2 style="margin-top:26px;">Your keys</h2>
+            <div id="admin-mcp-list"></div>
+          </div>
+        </div>
+      </section>
+
       <!-- ===== CHANGE PASSWORD ===== -->
       <section class="page" data-page="password">
         <div class="phead">
@@ -785,7 +823,7 @@
   function completedAt(p) { return p.completed_at ? new Date(p.completed_at).getTime() : 0; }
 
   // ── shell: page switching + login gate ──────────────────────────
-  var PAGES = ['dash','q-you','q-client','q-over','q-done','project','clients','setup','export','password'];
+  var PAGES = ['dash','q-you','q-client','q-over','q-done','project','clients','setup','export','mcp','password'];
 
   function showLogin() {
     document.body.classList.remove('app');
@@ -1248,6 +1286,71 @@
     document.getElementById('new-title').value = '';
     clientInput.value = '';
     renderProjects();
+  });
+
+  /* ── MCP access ── */
+  async function loadMcpKeys() {
+    var listEl = document.getElementById('admin-mcp-list');
+    listEl.innerHTML = '';
+    var res = await sb.from('mcp_tokens')
+      .select('id, label, created_at, last_used_at, revoked_at')
+      .eq('client_id', profile.id)
+      .order('created_at', { ascending: false });
+    var rows = res.data || [];
+    if (!rows.length) { listEl.appendChild(el('p', 'hint', 'No keys yet.')); return; }
+    rows.forEach(function (t) {
+      var row = el('div', 'mcp-key-row');
+      var meta = el('div');
+      meta.appendChild(el('strong', null, t.label || 'MCP key'));
+      var sub = 'Created ' + fmtDate(t.created_at) +
+        (t.last_used_at ? ' · last used ' + fmtDate(t.last_used_at) : ' · never used') +
+        (t.revoked_at ? ' · revoked' : '');
+      meta.appendChild(el('div', 'hint', sub));
+      row.appendChild(meta);
+      if (!t.revoked_at) {
+        var rev = el('button', 'btn ghost sm', 'Revoke');
+        rev.type = 'button';
+        rev.addEventListener('click', async function () {
+          if (!window.confirm('Revoke this key? Any AI tool using it loses access immediately.')) return;
+          rev.disabled = true;
+          var r = await sb.rpc('revoke_mcp_token', { p_token_id: t.id });
+          if (r.error) { rev.disabled = false; window.alert(r.error.message); } else loadMcpKeys();
+        });
+        row.appendChild(rev);
+      }
+      listEl.appendChild(row);
+    });
+  }
+
+  async function renderMcp() {
+    selectPage('mcp');
+    document.getElementById('admin-mcp-new').hidden = true;
+    document.getElementById('admin-mcp-error').hidden = true;
+    await loadMcpKeys();
+  }
+
+  document.getElementById('admin-mcp-generate').addEventListener('click', async function () {
+    var errNode = document.getElementById('admin-mcp-error');
+    errNode.hidden = true;
+    var label = window.prompt('Name this key so you can recognise it later (e.g. "Claude", "ChatGPT"):', '');
+    if (label === null) return; // cancelled
+    var btn = this;
+    btn.disabled = true;
+    try {
+      var r = await sb.rpc('create_mcp_token', { p_label: label || null });
+      if (r.error) throw r.error;
+      document.getElementById('admin-mcp-new-key').textContent = r.data;
+      document.getElementById('admin-mcp-new').hidden = false;
+      document.getElementById('admin-mcp-copy').textContent = 'Copy key';
+      await loadMcpKeys();
+    } catch (err) { showError(errNode, err); }
+    finally { btn.disabled = false; }
+  });
+
+  document.getElementById('admin-mcp-copy').addEventListener('click', function () {
+    var key = document.getElementById('admin-mcp-new-key').textContent;
+    if (navigator.clipboard) navigator.clipboard.writeText(key);
+    this.textContent = 'Copied ✓';
   });
 
   document.getElementById('admin-password-form').addEventListener('submit', async function (e) {
@@ -1974,7 +2077,8 @@
       if (dpm) { if (!loaded) loadData(); renderProject(dpm[1]); return; }
       var dgm = location.hash.match(/^#page\/(.+)$/);
       if (!loaded) await loadData();
-      selectPage(dgm ? dgm[1] : 'dash');
+      var dpage = dgm ? dgm[1] : 'dash';
+      if (dpage === 'mcp') renderMcp(); else selectPage(dpage);
       return;
     }
     var session = await getSession();
@@ -1996,7 +2100,7 @@
     var gm = location.hash.match(/^#page\/(.+)$/);
     var page = gm ? gm[1] : 'dash';
     if (!loaded) await loadData();
-    selectPage(page);
+    if (page === 'mcp') renderMcp(); else selectPage(page);
   }
 
   // Safety net: a thrown startup error must never leave a silent blank page.

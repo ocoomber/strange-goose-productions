@@ -1,13 +1,13 @@
 # MCP Project — Handover Notes
 
-_Last updated: 2026-06-15. For a new session picking this up._
+_Last updated: 2026-06-17. For a new session picking this up._
 
 ## TL;DR
-Built across three stages. **`sgp-portal-mcp` (the client portal MCP) is live
-and is the main deliverable. `sgp-mcp` (the public profile MCP) was
-decommissioned 2026-06-17** — see "Decommission: sgp-mcp" below. The only
-things left are Owen-side testing/content and two deferred features (direct AI
-approval, client messaging).
+Built across four stages. **`sgp-portal-mcp` (client portal, read-only) and
+`sgp-admin-mcp` (admin panel, read + safe writes) are both live.** `sgp-mcp`
+(the public profile MCP) was decommissioned 2026-06-17 — see "Decommission:
+sgp-mcp" below. The only things left are Owen-side testing/content and a few
+deferred features (direct AI approval, client messaging).
 
 ---
 
@@ -32,22 +32,40 @@ approval, client messaging).
    the live, correct use case. **A new interface onto the existing portal — the
    portal itself was not changed** (only an additive "MCP access" UI section).
 
+4. **Admin panel MCP** — `supabase/functions/sgp-admin-mcp/`. Owen connects
+   his AI assistant to the *whole* admin panel — every client, every project —
+   as an additional, conversational interface alongside the existing admin web
+   panel (not a replacement for it). Same key→session→RLS auth pattern as #3,
+   reusing the same `mcp_tokens` table, with `create_mcp_token` broadened to
+   permit `role = 'admin'` and each server checking the owning profile's role
+   so client and admin keys aren't interchangeable. Scope is **read + safe
+   writes**: it can search/read everything plus add a chase-log note or edit a
+   stage's doc links/video/note, but it cannot advance a stage, release
+   deliverables, mark a project complete, or touch a client account — those
+   stay admin-panel-only.
+
 ---
 
 ## Deployed / live infrastructure
 
 - **Supabase project:** `sgp-portal` (project ref + region in `PORTAL_NOTES.md`;
-  full endpoint URLs in `MCP_SERVER_NOTES.md` and the two function READMEs).
-- **Edge Functions** (both public, `verify_jwt = false`):
-  - `sgp-mcp` (v2) → `…/functions/v1/sgp-mcp`
-  - `sgp-portal-mcp` (v4) → `…/functions/v1/sgp-portal-mcp`
+  full endpoint URLs in `MCP_SERVER_NOTES.md` and the function READMEs).
+- **Edge Functions** (all public, `verify_jwt = false`):
+  - `sgp-mcp` (v2) → `…/functions/v1/sgp-mcp` (decommissioned, returns 410)
+  - `sgp-portal-mcp` (v5) → `…/functions/v1/sgp-portal-mcp`
+  - `sgp-admin-mcp` (v1) → `…/functions/v1/sgp-admin-mcp`
 - **DB:** migration `supabase/migrations/2026-06-15-mcp-tokens.sql` is **applied**
   — `mcp_tokens` table + `create_mcp_token(label)` / `revoke_mcp_token(id)`
-  SECURITY DEFINER RPCs.
+  SECURITY DEFINER RPCs. `supabase/migrations/2026-06-17-admin-mcp-tokens.sql`
+  is also **applied** — broadens `create_mcp_token` to permit `role = 'admin'`.
+  Both folded into `supabase/schema.sql`.
 - **Site (GitHub Pages from `main`):** `llms.txt`, `index.html` meta pointer,
-  `client/index.html` → **Client Portal → "MCP access"** (generate/list/revoke keys).
-- Both MCP servers are also documented in `MCP_SERVER_NOTES.md`; the portal one in
-  `supabase/functions/sgp-portal-mcp/README.md`.
+  `client/index.html` → **Client Portal → "MCP access"** (generate/list/revoke keys),
+  `admin/index.html` → **MCP access** nav page (same pattern, admin's own keys).
+- All three MCP servers are also documented in `MCP_SERVER_NOTES.md`; each
+  function has its own README
+  (`supabase/functions/sgp-portal-mcp/README.md`,
+  `supabase/functions/sgp-admin-mcp/README.md`).
 
 ---
 
@@ -89,7 +107,31 @@ gviz read approach this version used.
   (e.g. `mcp:chatgpt`), and surface it in the `notify` email. Because the MCP
   acts *as the client*, the existing `handle_approval()` trigger + notify
   webhook already work for AI-made approvals.
-- `create_mcp_token` is restricted to `role = 'client'` (admins can't mint keys).
+- `create_mcp_token` now permits `role in ('client', 'admin')` (broadened
+  2026-06-17 so Owen can mint his own admin key too).
+
+---
+
+## Admin MCP — how it works (key facts)
+
+- **Auth:** same pattern as the portal MCP, but the owning profile must have
+  `role = 'admin'` (checked in `resolveAdmin()`); a client-owned key is
+  rejected here, and an admin-owned key is rejected by `sgp-portal-mcp`'s
+  `resolveClient()` (also added 2026-06-17) — keys aren't interchangeable
+  between the two servers even though they share one table.
+- **Tools (8):** read-only `get_account`, `list_clients`, `get_client`,
+  `list_projects`, `get_project`, `get_attention_needed`; safe writes
+  `add_chase_note`, `update_stage_links`.
+- **Status model ported server-side:** `statusOf` / `overdueDays` /
+  `waitingSince` in `supabase/functions/sgp-admin-mcp/lib.ts` mirror
+  `admin/index.html`'s derived your_move/client/stalled/complete logic — keep
+  both in sync if the rules ever change.
+- **Why the scope stops where it does:** advancing a stage, releasing
+  deliverables, marking complete, or any client account lifecycle change all
+  email or unblock a real client — explicitly kept out of MCP reach per
+  Owen's choice ("Read + safe writes"). `update_stage_links` is structurally
+  safe: it never includes `state` in its patch and refuses outright on an
+  already-approved stage.
 
 ---
 
@@ -116,8 +158,10 @@ Portal MCP: tenant isolation (Client A's key cannot read Client B's project —
 RLS-blocked), bad/revoked keys rejected, self-service key gen + revoke RPCs,
 concurrent cold-cache bursts all succeed, all 7 tools correctly client-scoped.
 Public MCP: 12 films / 17 wins / 11 selections returned live from the sheet.
-Unit tests green (`sgp-mcp`: 14, `sgp-portal-mcp`: 17, incl. token-hash parity
-with Postgres). Test data was created and **cleaned up** — production is clean.
+Admin MCP: `tools/list` returns all 8 tools live (via pg_net smoke test).
+Unit tests green (`sgp-mcp`: 14, `sgp-portal-mcp`: 17, `sgp-admin-mcp`: 22,
+incl. token-hash parity with Postgres). Test data was created and **cleaned
+up** — production is clean.
 
 ---
 
@@ -127,12 +171,13 @@ with Postgres). Test data was created and **cleaned up** — production is clean
    Portal → MCP access → generate key → `claude mcp add --transport http
    sgp-portal <url> --header "Authorization: Bearer <key>"` → ask "what needs my
    approval?". (Offer to spin up a throwaway client + project to demo.)
-2. **Owen still filling the `SGP_AI_Profile` blanks** (for the public `sgp-mcp`).
-3. **Deferred — direct AI approval:** flip the seam (see above).
-4. **Deferred — client→SGP messaging:** needs a new client-insertable table +
+2. **Owen to test the admin MCP**: Admin Panel → MCP access → generate key →
+   `claude mcp add --transport http sgp-admin <url> --header "Authorization:
+   Bearer <key>"` → ask "what needs my attention?" or "show me Jane's projects."
+3. **Owen still filling the `SGP_AI_Profile` blanks** (for the public `sgp-mcp`).
+4. **Deferred — direct AI approval:** flip the seam (see above).
+5. **Deferred — client→SGP messaging:** needs a new client-insertable table +
    reuse the `notify` Edge Function to email Owen. (Was explicitly deferred.)
-5. **Optional — admin token oversight UI** (admin already has RLS read on
-   `mcp_tokens`).
 6. **Free-tier keep-alive:** the Supabase project pauses after ~7 days of no
    activity. Agent traffic counts; otherwise see the cron-job.org migration note
    in `PORTAL_NOTES.md` once the repo stops getting pushes.
@@ -166,6 +211,9 @@ with Postgres). Test data was created and **cleaned up** — production is clean
 - `MCP_SPREADSHEET_DESIGN.md`, `MCP_SERVER_NOTES.md`, this file.
 - `supabase/functions/sgp-mcp/{index.ts,sheet.ts,sheet.test.ts,README.md}`
 - `supabase/functions/sgp-portal-mcp/{index.ts,lib.ts,lib.test.ts,README.md}`
-- `supabase/migrations/2026-06-15-mcp-tokens.sql`
-- `client/index.html` (MCP access section), `llms.txt`, `index.html` (meta pointer)
+- `supabase/functions/sgp-admin-mcp/{index.ts,lib.ts,lib.test.ts,README.md}`
+- `supabase/migrations/2026-06-15-mcp-tokens.sql`,
+  `supabase/migrations/2026-06-17-admin-mcp-tokens.sql`
+- `client/index.html` (MCP access section), `admin/index.html` (MCP access
+  page), `llms.txt`, `index.html` (meta pointer)
 - Portal reference: `PORTAL_NOTES.md`, `supabase/schema.sql`, `admin/SETUP.md`
