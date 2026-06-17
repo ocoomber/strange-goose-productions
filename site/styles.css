@@ -1029,7 +1029,7 @@ body.theatre .reel-controls {
   align-items: center;
   justify-content: center;
   gap: clamp(16px, 3vw, 44px);
-  padding: clamp(18px, 2.6vh, 30px) 24px clamp(8px, 1.4vh, 16px);
+  padding: clamp(8px, 1.4vh, 16px) 24px clamp(18px, 2.6vh, 30px);
   user-select: none;
   -webkit-user-select: none;
 }
