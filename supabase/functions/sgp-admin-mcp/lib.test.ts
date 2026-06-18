@@ -61,6 +61,11 @@ async function run() {
   const stalledSum = shapeProjectSummary(project(), [stage(1, "approved"), stage(2, "pending", { pending_since: old })], [], client) as any;
   check("stalled summary has overdue_days", typeof stalledSum.overdue_days === "number" && stalledSum.overdue_days >= 7);
 
+  // archived flag surfaces only when set (include_archived path); omitted otherwise
+  check("non-archived summary omits archived", sum.archived === undefined);
+  const archSum = shapeProjectSummary(project({ archived: true }), [stage(1, "approved")], [], client) as any;
+  eq("archived summary flags archived", archSum.archived, true);
+
   // detail includes every stage (even locked, unlike the client-facing server) + chase log
   const approvals: ApprovalRow[] = [{ stage_id: "s1", stage_name: "Stage 1", approved_at: "2026-06-02T10:00:00Z" }];
   const detail = shapeProjectDetail(
