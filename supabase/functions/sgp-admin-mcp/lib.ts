@@ -31,7 +31,7 @@ export type StageRow = {
 };
 export type ProjectRow = {
   id: string; title: string; status: string; created_at: string; completed_at: string | null;
-  client_id?: string;
+  client_id?: string; archived?: boolean;
 };
 export type ApprovalRow = { stage_id: string; stage_name: string; approved_at: string };
 export type NoteRow = { id?: string; body: string; created_at: string };
@@ -94,6 +94,7 @@ export function shapeProjectSummary(
     admin_link: projectDeepLink(project.id),
   };
   if (status === "stalled") out.overdue_days = overdueDays(stages);
+  if (project.archived) out.archived = true;
   return out;
 }
 

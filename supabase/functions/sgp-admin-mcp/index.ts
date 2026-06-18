@@ -165,7 +165,7 @@ type ProjectJoined = ProjectRow & {
   profiles?: { email?: string; display_name?: string | null; archived?: boolean } | null;
 };
 
-async function loadProjects(db: SupabaseClient, clientId?: string): Promise<ProjectJoined[]> {
+async function loadProjects(db: SupabaseClient, clientId?: string, includeArchived = false): Promise<ProjectJoined[]> {
   let q = db
     .from("projects")
     .select(`id, title, status, created_at, completed_at, client_id, archived,
@@ -176,13 +176,14 @@ async function loadProjects(db: SupabaseClient, clientId?: string): Promise<Proj
   if (clientId) q = q.eq("client_id", clientId);
   const { data, error } = await q;
   if (error) throw new Error(error.message);
-  // Mirror the admin panel's live view (admin/index.html loadData): hide
-  // projects that are themselves archived OR belong to an archived client, so
-  // the AI's queues/counts/attention match the web dashboard and don't resurface
-  // work Owen has deliberately put aside.
-  return (data ?? []).filter(
-    (p: ProjectJoined) => !p.archived && !p.profiles?.archived,
-  ) as unknown as ProjectJoined[];
+  // Mirror the admin panel's live view (admin/index.html loadData): by default
+  // hide projects that are themselves archived OR belong to an archived client,
+  // so the AI's queues/counts/attention match the web dashboard and don't
+  // resurface work Owen has deliberately put aside. Callers can opt in to
+  // archived rows (list_projects / get_client expose an include_archived flag).
+  const rows = (data ?? []) as unknown as ProjectJoined[];
+  if (includeArchived) return rows;
+  return rows.filter((p) => !p.archived && !p.profiles?.archived);
 }
 
 const TOOLS: Record<string, Tool> = {
@@ -223,10 +224,13 @@ const TOOLS: Record<string, Tool> = {
   },
 
   get_client: {
-    description: "One client's detail plus a summary of every project of theirs (status, progress, what's pending).",
+    description: "One client's detail plus a summary of every project of theirs (status, progress, what's pending). Archived projects are excluded unless include_archived is set.",
     inputSchema: {
       type: "object", additionalProperties: false,
-      properties: { client_id: { type: "string", description: "From list_clients." } },
+      properties: {
+        client_id: { type: "string", description: "From list_clients." },
+        include_archived: { type: "boolean", description: "Include this client's archived projects too. Default false." },
+      },
       required: ["client_id"],
     },
     run: async (db, args) => {
@@ -234,23 +238,24 @@ const TOOLS: Record<string, Tool> = {
       if (!id) return toolError("Provide client_id.");
       const { data: client } = await db.from("profiles").select(CLIENT_SELECT).eq("id", id).eq("role", "client").maybeSingle();
       if (!client) return toolError("No client found with that id.");
-      const projects = await loadProjects(db, id);
+      const projects = await loadProjects(db, id, !!args.include_archived);
       const out = projects.map((p) => shapeProjectSummary(p, p.stages ?? [], p.approvals ?? [], p.profiles));
       return ok(`${client.display_name || client.email} — ${out.length} project(s).`, { client: { id: client.id, email: client.email, name: client.display_name, archived: client.archived }, projects: out });
     },
   },
 
   list_projects: {
-    description: "List projects across all clients, optionally filtered by status (you/client/stalled/complete) or a text search on title/client.",
+    description: "List projects across all clients, optionally filtered by status (you/client/stalled/complete) or a text search on title/client. Archived projects (and projects of archived clients) are excluded unless include_archived is set.",
     inputSchema: {
       type: "object", additionalProperties: false,
       properties: {
         status: { type: "string", description: "you | client | stalled | complete — omit for all." },
         search: { type: "string", description: "Match against project title or client name/email." },
+        include_archived: { type: "boolean", description: "Include archived projects (and projects of archived clients) too. Default false." },
       },
     },
     run: async (db, args) => {
-      const projects = await loadProjects(db);
+      const projects = await loadProjects(db, undefined, !!args.include_archived);
       let out = projects.map((p) => ({ p, summary: shapeProjectSummary(p, p.stages ?? [], p.approvals ?? [], p.profiles) }));
       if (args.status) out = out.filter(({ p }) => statusOf(p, p.stages ?? []) === args.status);
       const search = String(args.search ?? "").trim().toLowerCase();
