@@ -159,23 +159,30 @@ type Tool = {
 
 type ProjectJoined = ProjectRow & {
   client_id: string;
+  archived?: boolean;
   stages: StageRow[];
   approvals: ApprovalRow[];
-  profiles?: { email?: string; display_name?: string | null } | null;
+  profiles?: { email?: string; display_name?: string | null; archived?: boolean } | null;
 };
 
 async function loadProjects(db: SupabaseClient, clientId?: string): Promise<ProjectJoined[]> {
   let q = db
     .from("projects")
-    .select(`id, title, status, created_at, completed_at, client_id,
-      profiles(email, display_name),
+    .select(`id, title, status, created_at, completed_at, client_id, archived,
+      profiles(email, display_name, archived),
       stages(${STAGE_SELECT}),
       approvals(stage_id, stage_name, approved_at)`)
     .order("created_at", { ascending: false });
   if (clientId) q = q.eq("client_id", clientId);
   const { data, error } = await q;
   if (error) throw new Error(error.message);
-  return (data ?? []) as unknown as ProjectJoined[];
+  // Mirror the admin panel's live view (admin/index.html loadData): hide
+  // projects that are themselves archived OR belong to an archived client, so
+  // the AI's queues/counts/attention match the web dashboard and don't resurface
+  // work Owen has deliberately put aside.
+  return (data ?? []).filter(
+    (p: ProjectJoined) => !p.archived && !p.profiles?.archived,
+  ) as unknown as ProjectJoined[];
 }
 
 const TOOLS: Record<string, Tool> = {

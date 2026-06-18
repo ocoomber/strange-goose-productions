@@ -72,14 +72,18 @@ async function resolveClient(token: string): Promise<Client | null> {
   const hash = await sha256Hex(token);
   const { data } = await admin
     .from("mcp_tokens")
-    .select("id, client_id, revoked_at, profiles!inner(email, role)")
+    .select("id, client_id, revoked_at, profiles!inner(email, role, archived)")
     .eq("token_hash", hash)
     .is("revoked_at", null)
     .maybeSingle();
   if (!data) return null;
-  const profile = (data as { profiles?: { email?: string; role?: string } }).profiles;
+  const profile = (data as { profiles?: { email?: string; role?: string; archived?: boolean } }).profiles;
   // This server is for clients only — an admin's key belongs on sgp-admin-mcp.
-  if (!profile?.email || profile.role !== "client") return null;
+  // Reject archived (offboarded) clients: archiving bans interactive login, but
+  // this server mints a session via the admin API, which would otherwise bypass
+  // that ban. RLS won't catch it (client-archive sets profiles.archived, not
+  // projects.archived), so the check has to be explicit here.
+  if (!profile?.email || profile.role !== "client" || profile.archived) return null;
   // best-effort last_used stamp
   admin.from("mcp_tokens").update({ last_used_at: new Date().toISOString() }).eq("id", data.id)
     .then(() => {}, () => {});

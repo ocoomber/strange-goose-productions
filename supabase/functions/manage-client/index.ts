@@ -104,6 +104,14 @@ Deno.serve(async (req) => {
     const { error: profErr } = await admin.from('profiles')
       .update({ archived }).eq('id', id);
     if (profErr) return json({ error: profErr.message }, 400);
+    // On archive, also revoke the client's MCP keys: the portal MCP mints a
+    // session via the admin API, so an offboarded client's key must be cut here
+    // (the server also refuses archived clients, this is belt-and-braces).
+    if (archived) {
+      await admin.from('mcp_tokens')
+        .update({ revoked_at: new Date().toISOString() })
+        .eq('client_id', id).is('revoked_at', null);
+    }
     return json({ ok: true });
   }
 
