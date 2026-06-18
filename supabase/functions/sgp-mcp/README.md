@@ -5,7 +5,7 @@
 dashboard, not the version below, which is kept here as a reference for the
 design. There is no public MCP server running for SGP right now. Rationale:
 "cold discovery" by unknown agents wasn't a real use case (see
-`MCP_HANDOVER.md`); the client portal MCP (`sgp-portal-mcp`) is the one that
+`MCP_SERVER_NOTES.md`); the client portal MCP (`sgp-portal-mcp`) is the one that
 stayed live. A future replacement may read from a Google Sheet **published to
 the web** (rather than gviz on a "Anyone with the link" share) — not yet built.
 
