@@ -1,100 +1,108 @@
-# MCP Server — Architecture & Operations Notes
+# SGP MCP Servers — Architecture & Operations
 
-SGP runs **two live** MCP servers today, both Supabase Edge Functions (Deno),
-stateless Streamable HTTP (spec `2025-11-25`):
+Two live MCP servers let an AI assistant work conversationally with the portal
+alongside the web UI. Both are Supabase Edge Functions (Deno), stateless
+Streamable HTTP (spec `2025-11-25`, JSON-RPC 2.0 over POST), deployed with
+`verify_jwt = false` (they do their own key auth). Portal context is in
+`PORTAL_NOTES.md`.
 
-| Server | Function | Audience | Auth | Data | Scope |
-|--------|----------|----------|------|------|-------|
-| **Client portal** | `sgp-portal-mcp` | An existing client's AI assistant | the client's own **MCP key** | the client's portal data (via RLS) | read-only |
-| **Admin panel** | `sgp-admin-mcp` | Owen's AI assistant | his own **MCP key** | all clients/projects (via `is_admin()` RLS) | read + safe writes |
-| ~~Public profile~~ | ~~`sgp-mcp`~~ | — | — | — | **decommissioned 2026-06-17** |
+| Server | Function | Audience | Data | Scope |
+|--------|----------|----------|------|-------|
+| **Client portal** | `sgp-portal-mcp` | a client's AI assistant | their own portal data (via RLS) | read-only |
+| **Admin panel** | `sgp-admin-mcp` | Owen's AI assistant | all clients/projects (via `is_admin()` RLS) | read + safe writes |
+| ~~Public profile~~ | ~~`sgp-mcp`~~ | — | — | **decommissioned** (returns 410) |
 
-> **Note on cold discovery:** the public `sgp-mcp` was built first for agents to
-> *discover* SGP, but in practice MCP needs deliberate per-user configuration —
-> that use case never materialized. It's been decommissioned (the deployed
-> function now returns `410 Gone`; site pointers in `index.html` and `llms.txt`
-> removed). There is no public MCP server right now. A future replacement may
-> read from a Google Sheet **published to the web**, instead of the
-> "Anyone with the link" + gviz approach used before — not yet built.
-> `sgp-portal-mcp` and `sgp-admin-mcp` are the two that stayed/went live — a
-> known client (or Owen) connecting their AI to their own portal data. See
-> `supabase/functions/sgp-portal-mcp/README.md` and
-> `supabase/functions/sgp-admin-mcp/README.md`.
+Endpoints: `https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/<name>`.
 
-## Auth transport: header or `?key=` query param
+## Auth model (both servers)
+1. The owner self-generates an **MCP key** in their portal (`#mcp` route). Only
+   its **SHA-256 hash** is stored in `mcp_tokens`; the plaintext is shown once.
+2. On each call the server hashes the presented key, finds the (non-revoked)
+   `mcp_tokens` row → the owning profile, and **checks the profile's `role`**
+   (`client` for the portal server, `admin` for the admin server) so a key can't
+   be used on the wrong server. The portal server also **rejects archived
+   clients** (archiving bans interactive login, but minting a session would
+   otherwise bypass that ban; RLS doesn't catch it because client-archive sets
+   `profiles.archived`, not `projects.archived`).
+3. It then **mints a real session for that profile** via the GoTrue admin API
+   (`generateLink` → `verifyOtp`), cached ~50 min, and runs every read/write
+   through that session. So the **portal's existing RLS / `is_admin()` is the
+   security boundary** — no hand-rolled scoping. The service role is used *only*
+   to look up the key and mint the session, never to read portal data.
 
-Both servers accept the MCP key either as `Authorization: Bearer <key>` (what
-Claude Code / most MCP clients send) **or** as a `?key=<key>` query param on
-the endpoint URL itself. The latter exists because Claude.ai's and ChatGPT's
-web/app "custom connector" settings only have a URL field, no header field —
-so the key has to be baked into the URL. Both portal UIs generate this
-URL-with-key form (alongside the plain header instructions) ready to copy.
-Tradeoff: a key embedded in a URL can end up in browser history/settings
-screens, slightly weaker than a header — acceptable here since revoking a key
-is one click in either portal.
+**Key transport:** `Authorization: Bearer <key>` (CLI clients) **or** a
+`?key=<key>` query param on the endpoint URL (for Claude.ai / ChatGPT web
+"custom connector" settings, which only have a URL field, no header field). Both
+portal UIs generate the ready-to-copy URL-with-key form. Tradeoff: a key in a
+URL can leak via browser history / connector screens / request logs — acceptable
+because revoking a key is one click in either portal.
 
-## sgp-admin-mcp (admin panel)
+**DB:** `mcp_tokens` table + `create_mcp_token(label)` / `revoke_mcp_token(id)`
+SECURITY DEFINER RPCs (in `schema.sql`). `create_mcp_token` permits
+`role in ('client','admin')`.
 
-Gives Owen an AI-conversational alternative to the admin web panel, in
-addition to it (not a replacement). Same `mcp_tokens` table and auth pattern
-as the client portal MCP — Owen generates his own key in the admin panel
-("MCP access"), the server hashes it, finds the owning profile, and mints a
-real admin session via the GoTrue admin API. The owning profile's `role`
-column is checked (`admin` here, `client` on the portal server) so a key
-minted on one side can't be used on the other.
+## Tools
+- **`sgp-portal-mcp` (7, read-only):** `get_account`, `list_projects`,
+  `get_project`, `get_pending_actions`, `list_deliverables`,
+  `get_approval_history`, `get_portal_link`. Approvals stay human: a pending
+  stage returns an `approve_in_portal` deep link.
+- **`sgp-admin-mcp` (8):** read-only `get_account`, `list_clients`,
+  `get_client`, `list_projects`, `get_project`, `get_attention_needed`; safe
+  writes `add_chase_note`, `update_stage_links`. `list_projects`/`get_client`
+  take an `include_archived` flag (default false; otherwise archived projects
+  are hidden to match the admin dashboard).
 
-**Deliberately out of scope** (kept admin-panel-only): advancing a stage,
-releasing deliverables, marking a project complete, reverting an approval,
-deleting a project, or any client account lifecycle change (create/archive/
-delete). The only writes available are adding a chase-log note and editing a
-stage's doc links / video id / note (refuses on an already-approved/frozen
-stage, never touches `state`). See
-`supabase/functions/sgp-admin-mcp/README.md` for the full tool list.
+**Admin scope deliberately stops** at read + those two safe writes. It cannot
+advance a stage, release deliverables, mark complete, revert an approval, delete
+a project, or touch a client account — anything that emails or unblocks a real
+client stays admin-panel-only. `update_stage_links` never touches `state` and
+refuses an already-approved (frozen) stage.
 
----
+**Status model is shared:** `statusOf` / `overdueDays` / `waitingSince` in
+`sgp-admin-mcp/lib.ts` are ported from `admin/index.html` — **keep both in sync.**
 
-## sgp-mcp (public profile) — DECOMMISSIONED
+## Working in this environment
+- **Sandbox egress is blocked** (`supabase.co`, `deno.land`, etc). To call a
+  live function, POST through the DB with `pg_net`: Supabase MCP `execute_sql` →
+  `select net.http_post(url, body::jsonb, headers:=…)`, then read the reply from
+  `net._http_response` (it runs on Supabase's network, which has egress). A
+  no-auth `tools/list` POST is a good smoke test.
+- **Deno can't be installed here.** Run the pure-logic tests with Node:
+  `node --experimental-strip-types <fn>/lib.test.ts`.
+- **Deploy** via the Supabase MCP `deploy_edge_function` (send `index.ts` **and**
+  `lib.ts`; keep `verify_jwt: false`). Apply SQL via `apply_migration`.
+- `get_logs` (service `edge-function`) shows request lines, not `console.error`
+  reliably — surface errors in tool responses when debugging.
 
-Lets visiting AI agents converse about Strange Goose Productions, answered live
-from the `SGP_AI_Profile` Google Sheet. Followed `MCP_SPREADSHEET_DESIGN.md`.
-Kept below for reference only — see the status note above.
+## Gotchas
+- **GoTrue magic-link tokens are single-use** → concurrent session mints for the
+  same user race ("Email link is invalid or has expired"). Mitigated with
+  in-flight promise dedup + backoff retry. If it ever proves flaky under real
+  load, the robust alternatives are signing a user JWT with `SUPABASE_JWT_SECRET`
+  or a DB-backed shared session cache.
+- **Hand-inserted `auth.users` break GoTrue** unless the token columns
+  (`confirmation_token`, `recovery_token`, `email_change`, …) are `''`, not
+  `NULL`. Bites when creating test clients via SQL.
+- The Deno Web-Crypto SHA-256 hash matches Postgres
+  `encode(digest(...,'sha256'),'hex')` (unit-tested) — that parity is what lets
+  the server look a key up by its stored hash.
 
-## What it is
-- A single **Supabase Edge Function** (Deno): `supabase/functions/sgp-mcp/`.
-- A public, **stateless** remote MCP server over **Streamable HTTP**
-  (spec `2025-11-25`, JSON-RPC 2.0 over POST). No sessions, no auth.
-- **Endpoint:** `https://zawrkuclsdqtvftfothj.supabase.co/functions/v1/sgp-mcp`
+## Deferred / future
+- **Direct AI approval** seam exists but is disabled: `ALLOW_DIRECT_APPROVAL`
+  flag + `performApproval()` in `sgp-portal-mcp/index.ts`. To enable: flip the
+  flag, add an additive `approvals.source` column, set it on insert, surface it
+  in the `notify` email. The MCP acts *as the client*, so `handle_approval()` +
+  the notify webhook already work for AI-made approvals.
+- **Client→SGP messaging** (a client-insertable table + reuse `notify` to email
+  Owen) — deferred.
+- **Public-profile MCP** — `sgp-mcp` was decommissioned (cold agent discovery
+  isn't a real MCP use case yet). Its code stays in `supabase/functions/sgp-mcp/`
+  for reference. A future rebuild would read a Google Sheet **published to the
+  web** rather than the old "Anyone with the link" + gviz approach.
 
-## How data flows
-```
-AI agent ──JSON-RPC──▶ sgp-mcp Edge Function ──gviz JSON──▶ SGP_AI_Profile (Google Sheet)
-                         │  (5-min per-tab cache)
-                         └─ Owen edits the sheet → reflected on next cache miss
-```
-- The function reads each tab via Google's keyless `gviz` endpoint
-  (`/gviz/tq?tqx=out:json&headers=1&sheet=<Tab>`), so **no Google Cloud project
-  or API key** is needed — the sheet just has to be shared *Anyone with the
-  link → Viewer*.
-- Reads are cached in-memory for 5 minutes per tab (warm instances). Edits to
-  the sheet appear within the TTL, or immediately with `?refresh=1`.
-
-## Tools (8)
-`get_company_overview`, `list_films`, `get_film`, `list_awards`,
-`get_services`, `get_team`, `get_faq`, `get_contact`. Each returns a short
-human summary plus the structured records as JSON. See the function README.
-
-## Discoverability (removed)
-- `llms.txt` (site root) no longer has a "Live data — MCP server" section.
-- `index.html` `<head>` no longer carries the `<link rel="mcp-server">` /
-  `<meta name="mcp-server">` pointers.
-
-## Decommission status (2026-06-17)
-- The deployed `sgp-mcp` Edge Function was redeployed with a stub that returns
-  `410 Gone` for every request — there was no MCP-tool path to delete the
-  function outright, so this is the kill switch. The original tool logic
-  (`index.ts`, `sheet.ts`) stays in the repo under
-  `supabase/functions/sgp-mcp/` for reference.
-- Site pointers (`llms.txt`, `index.html`) removed.
-- **Future:** a similar public-profile MCP may be rebuilt later reading from a
-  Google Sheet **published to the web** (File → Share → Publish to web),
-  rather than the "Anyone with the link" + gviz approach this version used.
+## Key files
+- `supabase/functions/sgp-portal-mcp/{index.ts,lib.ts,lib.test.ts,README.md}`
+- `supabase/functions/sgp-admin-mcp/{index.ts,lib.ts,lib.test.ts,README.md}`
+- `mcp_tokens` table + RPCs in `supabase/schema.sql`
+- `client/index.html` / `admin/index.html` — "MCP access" UI (generate/revoke)
+- Portal reference: `PORTAL_NOTES.md`, `admin/SETUP.md`
