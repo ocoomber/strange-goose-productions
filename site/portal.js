@@ -236,13 +236,20 @@ function ytEmbed(rawId) {
   return box;
 }
 
+/* Only allow safe link schemes — stored links come from the admin (incl. the
+   admin MCP's update_stage_links), so a javascript:/data: URL would otherwise
+   execute in the viewer's session on click. Anything else renders inert. */
+function safeUrl(u) {
+  return /^(https?:|mailto:)/i.test(String(u || '').trim()) ? u : '#';
+}
+
 /* Render a list of {label, url} links */
 function linkList(links, cls) {
   var ul = el('ul', cls || 'portal-links');
   (links || []).forEach(function (l) {
     var li = el('li');
     var a = el('a', null, l.label || l.url);
-    a.href = l.url;
+    a.href = safeUrl(l.url);
     a.target = '_blank';
     a.rel = 'noopener';
     li.appendChild(a);

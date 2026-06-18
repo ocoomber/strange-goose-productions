@@ -1459,7 +1459,7 @@
     links.forEach(function (l, i) {
       var li = el('li');
       var a = el('a', null, (l.label || l.url));
-      a.href = l.url; a.target = '_blank'; a.rel = 'noopener';
+      a.href = safeUrl(l.url); a.target = '_blank'; a.rel = 'noopener';
       li.appendChild(a);
       var rm = el('button', 'btn ghost sm', 'Remove');
       rm.type = 'button';
