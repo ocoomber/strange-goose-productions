@@ -69,9 +69,14 @@ A visiting AI can render `get_account` data as a small dashboard artifact
 in two parts so the common path stays cheap:
 
 1. **Advertisement** — `get_account`'s response carries a lightweight
-   `render_hint` block: `{ available, tool: "get_render_template", note }`. It's
-   a few hundred bytes, purely additive, and ignorable — it just tells the AI
-   the option exists and which tool to call. No component code here.
+   `render_hint` block of **structured fields** (not a prose note):
+   `{ suggest_to_user: true, action: "offer_to_user", tool: "get_render_template",
+   renders: "get_account", what, how }`. Directive (`suggest_to_user` / `action`)
+   is deliberately kept separate from explanation (`what` / `how`) so a model
+   pattern-matches the instruction reliably rather than parsing it out of a
+   sentence; there's intentionally no opt-out phrasing. It's a few hundred
+   bytes, purely additive, and an unaware client just ignores the extra key.
+   No component code here.
 2. **The template** — a separate read-only tool **`get_render_template`**
    returns the self-contained JSX as a string (`{ renders, template_jsx }`).
    The AI calls it only if it wants the visual, then drops the `get_account`
