@@ -46,9 +46,10 @@ SECURITY DEFINER RPCs (in `schema.sql`). `create_mcp_token` permits
   `get_project`, `get_pending_actions`, `list_deliverables`,
   `get_approval_history`, `get_portal_link`. Approvals stay human: a pending
   stage returns an `approve_in_portal` deep link.
-- **`sgp-admin-mcp` (8):** read-only `get_account`, `list_clients`,
-  `get_client`, `list_projects`, `get_project`, `get_attention_needed`; safe
-  writes `add_chase_note`, `update_stage_links`. `list_projects`/`get_client`
+- **`sgp-admin-mcp` (9):** read-only `get_account`, `list_clients`,
+  `get_client`, `list_projects`, `get_project`, `get_attention_needed`,
+  `get_render_template` (optional visual artifact template — see Render hints);
+  safe writes `add_chase_note`, `update_stage_links`. `list_projects`/`get_client`
   take an `include_archived` flag (default false; otherwise archived projects
   are hidden to match the admin dashboard).
 
@@ -61,22 +62,34 @@ refuses an already-approved (frozen) stage.
 **Status model is shared:** `statusOf` / `overdueDays` / `waitingSince` in
 `sgp-admin-mcp/lib.ts` are ported from `admin/index.html` — **keep both in sync.**
 
-## Render hints (optional visual templates)
+## Render hints (optional visual template)
 
-`sgp-admin-mcp`'s `get_account` response carries a `render_hint` block —
-`{ template_jsx, description }` — delivering a self-contained JSX dashboard
-**inline** as a string. A visiting AI that can render artifacts drops the live
-`get_account` numbers into the template's top `data` block (field names match
-the response exactly) and renders the four-token dashboard instead of a wall of
-text. The hint sits inside the returned JSON (so it reaches the model via the
-text content) and is purely additive — absent or unrecognised, nothing breaks.
-Only `get_account` carries it, since that's the response the template renders.
+A visiting AI can render `get_account` data as a small dashboard artifact
+(clients / projects / your-move / overdue) instead of a wall of text. Delivered
+in two parts so the common path stays cheap:
 
-**Why inline, not a hosted URL:** Claude's `web_fetch` only fetches URLs that
+1. **Advertisement** — `get_account`'s response carries a lightweight
+   `render_hint` block: `{ available, tool: "get_render_template", note }`. It's
+   a few hundred bytes, purely additive, and ignorable — it just tells the AI
+   the option exists and which tool to call. No component code here.
+2. **The template** — a separate read-only tool **`get_render_template`**
+   returns the self-contained JSX as a string (`{ renders, template_jsx }`).
+   The AI calls it only if it wants the visual, then drops the `get_account`
+   fields into the template's top `data` block (field names match exactly) and
+   renders it as an artifact.
+
+**Why a tool, not inline in `get_account`:** the JSX is ~5 KB and would sit in
+the context window of *every* `get_account` call whether used or not. Splitting
+it out keeps `get_account` lean and makes fetching the template an explicit,
+opt-in step.
+
+**Why a tool, not a hosted URL:** Claude's `web_fetch` only fetches URLs that
 came from a `web_search` result; a URL returned inside an MCP response is
 blocked unconditionally (a client-side security policy, not fixable
-server-side). So the component source is shipped in the response itself —
-no fetch step. The source of truth is
+server-side). So the component source is shipped in the tool response itself —
+no fetch step.
+
+Source of truth for the JSX is
 `supabase/functions/sgp-admin-mcp/template.ts` (`SGP_PORTAL_TEMPLATE_JSX`);
 edit the JSX there. The only escaping in that file is the two JSX template
 literals (backticks → `` \` ``, `${` → `\${`).

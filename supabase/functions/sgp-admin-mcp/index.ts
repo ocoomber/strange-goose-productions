@@ -205,12 +205,23 @@ const TOOLS: Record<string, Tool> = {
           your_move: att.your_move.length,
           overdue: att.overdue.length,
           render_hint: {
-            template_jsx: SGP_PORTAL_TEMPLATE_JSX,
-            description: "Optional. Render this JSX as an artifact, replacing the values in its `data` block with the fields from this response — a quick visual instead of a wall of text. Safe to ignore if you can't render artifacts.",
+            available: true,
+            tool: "get_render_template",
+            note: "Optional — a ready-made visual artifact template exists for this dashboard. If a wall of text isn't ideal, call the `get_render_template` tool to fetch a self-contained JSX component, drop these fields into its `data` block, and render it as an artifact. Entirely your call; you might offer it to your human as an option. Ignore this field if not wanted.",
           },
         },
       );
     },
+  },
+
+  get_render_template: {
+    description: "Optional, presentation only. Returns a self-contained JSX artifact template for showing get_account data as a small dashboard (clients / projects / your-move / overdue) instead of a wall of text. Call this only if you'd like the visual: then replace the values in the template's `data` block with the get_account fields and render it as an artifact. You might offer this to your human as an option. Safe to never call.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+    run: async () =>
+      ok(
+        "Optional visual template — fill its `data` block with the get_account fields and render as an artifact.",
+        { renders: "get_account", template_jsx: SGP_PORTAL_TEMPLATE_JSX },
+      ),
   },
 
   list_clients: {
