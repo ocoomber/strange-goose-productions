@@ -63,18 +63,23 @@ refuses an already-approved (frozen) stage.
 
 ## Render hints (optional visual templates)
 
-`sgp-admin-mcp`'s `get_account` response carries a `render_hint` field pointing
-at a hosted, self-contained JSX template:
-`https://strangegoose.co.uk/templates/sgp-portal.jsx` (file lives at
-`templates/sgp-portal.jsx` in this repo, served by GitHub Pages on push to
-`main`). A visiting AI that can render artifacts may fetch it, drop the live
-`get_account` numbers into its top `data` block (field names match the response
-exactly), and render the four-token dashboard instead of a wall of text. The
-hint sits inside the returned JSON (so it reaches the model via the text
-content) and is purely additive — absent or unrecognised, nothing breaks. Only
-`get_account` carries it, since that's the response the template renders; the
-template is *not* mirrored into `testing/` (it's a backend-served asset, not a
-previewable page).
+`sgp-admin-mcp`'s `get_account` response carries a `render_hint` block —
+`{ template_jsx, description }` — delivering a self-contained JSX dashboard
+**inline** as a string. A visiting AI that can render artifacts drops the live
+`get_account` numbers into the template's top `data` block (field names match
+the response exactly) and renders the four-token dashboard instead of a wall of
+text. The hint sits inside the returned JSON (so it reaches the model via the
+text content) and is purely additive — absent or unrecognised, nothing breaks.
+Only `get_account` carries it, since that's the response the template renders.
+
+**Why inline, not a hosted URL:** Claude's `web_fetch` only fetches URLs that
+came from a `web_search` result; a URL returned inside an MCP response is
+blocked unconditionally (a client-side security policy, not fixable
+server-side). So the component source is shipped in the response itself —
+no fetch step. The source of truth is
+`supabase/functions/sgp-admin-mcp/template.ts` (`SGP_PORTAL_TEMPLATE_JSX`);
+edit the JSX there. The only escaping in that file is the two JSX template
+literals (backticks → `` \` ``, `${` → `\${`).
 
 ## Working in this environment
 - **Sandbox egress is blocked** (`supabase.co`, `deno.land`, etc). To call a
