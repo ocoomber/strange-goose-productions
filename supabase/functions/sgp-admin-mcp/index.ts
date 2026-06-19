@@ -38,6 +38,11 @@ const SERVER_INSTRUCTIONS =
   "project complete, or create/archive/delete a client account — do those in " +
   "the admin panel itself (link given by get_account / each project).";
 
+// Optional, ignorable pointer to a self-contained JSX template a visiting AI
+// can fetch to render this account dashboard as a visual artifact instead of
+// text. Any client that doesn't recognise it simply ignores the extra field.
+const RENDER_HINT = "https://strangegoose.co.uk/templates/sgp-portal.jsx";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -197,7 +202,17 @@ const TOOLS: Record<string, Tool> = {
       const att = attentionNeeded(projects.map((p) => ({ project: p, stages: p.stages ?? [], approvals: p.approvals ?? [], client: p.profiles })));
       return ok(
         `Connected to the SGP admin panel — ${(clients ?? []).filter((c) => !c.archived).length} active client(s), ${active} active project(s), ${att.your_move.length} on you, ${att.overdue.length} overdue.`,
-        { admin_panel: ADMIN_URL, active_clients: (clients ?? []).filter((c) => !c.archived).length, active_projects: active, your_move: att.your_move.length, overdue: att.overdue.length },
+        {
+          admin_panel: ADMIN_URL,
+          active_clients: (clients ?? []).filter((c) => !c.archived).length,
+          active_projects: active,
+          your_move: att.your_move.length,
+          overdue: att.overdue.length,
+          render_hint: {
+            template: RENDER_HINT,
+            description: "Optional. A self-contained JSX template that renders this dashboard as a visual artifact. Fetch it, replace the values in its `data` block with the fields above, and render — useful instead of a wall of text. Safe to ignore if you can't render artifacts.",
+          },
+        },
       );
     },
   },
