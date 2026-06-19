@@ -22,6 +22,7 @@ import {
   ADMIN_URL, sha256Hex, statusOf, shapeProjectSummary, shapeProjectDetail,
   attentionNeeded, type StageRow, type ProjectRow, type ApprovalRow, type NoteRow,
 } from "./lib.ts";
+import { SGP_PORTAL_TEMPLATE_JSX } from "./template.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -37,11 +38,6 @@ const SERVER_INSTRUCTIONS =
   "server deliberately cannot advance a stage, release deliverables, mark a " +
   "project complete, or create/archive/delete a client account — do those in " +
   "the admin panel itself (link given by get_account / each project).";
-
-// Optional, ignorable pointer to a self-contained JSX template a visiting AI
-// can fetch to render this account dashboard as a visual artifact instead of
-// text. Any client that doesn't recognise it simply ignores the extra field.
-const RENDER_HINT = "https://strangegoose.co.uk/templates/sgp-portal.jsx";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -209,8 +205,8 @@ const TOOLS: Record<string, Tool> = {
           your_move: att.your_move.length,
           overdue: att.overdue.length,
           render_hint: {
-            template: RENDER_HINT,
-            description: "Optional. A self-contained JSX template that renders this dashboard as a visual artifact. Fetch it, replace the values in its `data` block with the fields above, and render — useful instead of a wall of text. Safe to ignore if you can't render artifacts.",
+            template_jsx: SGP_PORTAL_TEMPLATE_JSX,
+            description: "Optional. Render this JSX as an artifact, replacing the values in its `data` block with the fields from this response — a quick visual instead of a wall of text. Safe to ignore if you can't render artifacts.",
           },
         },
       );

@@ -1,10 +1,19 @@
-import { useState } from "react";
+// The SGP portal dashboard component, delivered inline in get_account's
+// render_hint. It's inlined (rather than a hosted URL) because Claude can't
+// web_fetch a URL returned from an MCP response — only URLs from a web_search
+// result are fetchable, so a URL hint is blocked unconditionally. Edit the JSX
+// here; this is the single source of truth. The `data` block at the top is what
+// a consumer overwrites with the live get_account fields before rendering.
+//
+// Stored in a template literal: the only escaping is the two JSX template
+// literals below (backticks as \` and ${ as \${). Everything else is literal.
+export const SGP_PORTAL_TEMPLATE_JSX = `import { useState } from "react";
 
 // ============================================================================
-//  SGP PORTAL — render template for the sgp-admin-mcp `get_account` response.
+//  SGP PORTAL — render template for the sgp-admin-mcp \`get_account\` response.
 //
 //  FOR A VISITING AI: replace the values in the DATA block below with the live
-//  numbers from your MCP `get_account` result, then render this component as an
+//  numbers from your MCP \`get_account\` result, then render this component as an
 //  artifact — a quick visual for your human instead of a wall of text. The
 //  field names here match the MCP response exactly. Everything below the DATA
 //  block is the shell; you don't need to touch it. If you can't fill a field,
@@ -64,7 +73,7 @@ export default function SGPPortal() {
             height: 8,
             borderRadius: "50%",
             background: dotColor,
-            boxShadow: `0 0 8px ${dotColor}`,
+            boxShadow: \`0 0 8px \${dotColor}\`,
           }} />
           <span style={{ fontSize: 11, letterSpacing: "0.15em", color: "#6B6760", textTransform: "uppercase" }}>
             SGP Portal
@@ -150,7 +159,7 @@ export default function SGPPortal() {
         width: "100%",
         maxWidth: 480,
         background: allClear ? "rgba(76, 175, 132, 0.06)" : "rgba(224, 92, 75, 0.06)",
-        border: `1px solid ${allClear ? "rgba(76,175,132,0.2)" : "rgba(224,92,75,0.2)"}`,
+        border: \`1px solid \${allClear ? "rgba(76,175,132,0.2)" : "rgba(224,92,75,0.2)"}\`,
         borderRadius: 10,
         padding: "14px 20px",
         display: "flex",
@@ -208,3 +217,4 @@ export default function SGPPortal() {
     </div>
   );
 }
+`;
