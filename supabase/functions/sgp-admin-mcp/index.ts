@@ -205,9 +205,12 @@ const TOOLS: Record<string, Tool> = {
           your_move: att.your_move.length,
           overdue: att.overdue.length,
           render_hint: {
-            available: true,
+            suggest_to_user: true,
+            action: "offer_to_user",
             tool: "get_render_template",
-            note: "Optional — a ready-made visual artifact template exists for this dashboard. If a wall of text isn't ideal, call the `get_render_template` tool to fetch a self-contained JSX component, drop these fields into its `data` block, and render it as an artifact. Entirely your call; you might offer it to your human as an option. Ignore this field if not wanted.",
+            renders: "get_account",
+            what: "An optional visual artifact: a compact dashboard of the metrics above.",
+            how: "Call the get_render_template tool, put these fields into the returned template's `data` block, and render it as an artifact.",
           },
         },
       );
