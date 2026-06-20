@@ -2,6 +2,8 @@
 
 Website for Strange Goose Productions. Static HTML/CSS, no build step, no dependencies. Hosted on GitHub Pages at strangegoose.co.uk. Pushing to main makes it live.
 
+@import .claude/principles-to-code-by.yaml
+
 > **Start of session:** First, read `Claude To-Do List.txt` in the repo root —
 > Owen edits it before a session as an opening brief of what to work on. It's a
 > local, personal file (not always present in a fresh clone); if it's missing,
