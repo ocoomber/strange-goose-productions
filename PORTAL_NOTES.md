@@ -22,10 +22,11 @@ enforced in the database (not just the UI).
   - `site/portal.js` — shared: Supabase init, auth, `STAGE_ACTIONS`, helpers
     (`el`, `fmtDate`, `ytEmbed`, `parseYouTubeId`, `linkList`, `safeUrl`)
   - `site/portal.css` — shared styles, extends tokens from `site/styles.css`
-  - The `client/preview.html` / `admin/preview.html` no-login demos were
-    dropped; `index.html` is the single source of truth. An inert
-    `DEMO_MODE`/`buildDemo()` block still sits in `admin/index.html` and can be
-    stripped next time that area is touched.
+  - No-login preview/demo files (`client/preview.html`, `admin/preview.html`)
+    were one-off standalone handoffs for the redesign and have been deleted;
+    `index.html` is the single source of truth for both. The admin's old inert
+    `DEMO_MODE`/`buildDemo()` block has likewise been stripped from
+    `admin/index.html`. Don't leave such handoff files committed once done.
 - **Backend:** Supabase free tier, project ref `zawrkuclsdqtvftfothj`.
   - `SUPABASE_URL` + anon/publishable key are hardcoded near the top of
     `site/portal.js` — **public by design; RLS is the boundary.**
@@ -167,5 +168,4 @@ migrated.**
   `node --experimental-strip-types --check` the TS Edge Functions; run the MCP
   unit suites with `node --experimental-strip-types <fn>/lib.test.ts`.
 - **Push to `main` deploys live.** If a push is rejected because the remote is
-  ahead, `git pull --rebase origin main` first. Never force-push. The old
-  `testing/` mirror was dropped early in dev.
+  ahead, `git pull --rebase origin main` first. Never force-push.
