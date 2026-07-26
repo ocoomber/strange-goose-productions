@@ -293,7 +293,7 @@ section.tight { padding: 48px 0; }
    ════════════════════════════════════════════════════════════ */
 
 /* film-grain overlay (on-brand, very subtle) */
-body::after {
+/* body::after {
   content: '';
   position: fixed;
   inset: 0;
@@ -301,7 +301,7 @@ body::after {
   pointer-events: none;
   opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
+} */
 
 /* shared display headline */
 .display {
@@ -763,7 +763,7 @@ body.theatre {
 }
 
 /* the grain overlay reads as film grain on dark — lift it a touch */
-body.theatre::after { opacity: 0.055; }
+/* body.theatre::after { opacity: 0.055; } */
 
 /* keyboard focus must survive near-black */
 body.theatre a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
