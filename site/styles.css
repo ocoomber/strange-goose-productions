@@ -330,8 +330,17 @@ section.tight { padding: 48px 0; }
 .txt-link { border-bottom: 1px solid rgba(20,18,15,0.25); padding-bottom: 1px; transition: color .15s, border-color .15s; }
 .txt-link:hover { color: var(--accent); border-color: var(--accent); }
 
-/* ── HOME HERO ── */
-.home-hero { padding: 64px 0 0; }
+/* ── HOME HERO (fullscreen ambient showreel background) ── */
+.home-hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #111;
+}
+.home-hero .wrap { position: relative; z-index: 2; }
 .home-hero h1 { max-width: 12ch; margin: 26px 0 30px; }
 .home-hero .lede {
   font-size: clamp(19px, 2vw, 23px);
@@ -732,7 +741,6 @@ footer.fork {
   .footer-main { grid-template-columns: 1fr 1fr; gap: 32px; }
 }
 @media (max-width: 600px) {
-  .home-hero { padding: 40px 0 0; }
   .reel-frame { margin-top: 40px; }
   .creds { margin-top: 56px; }
   .stats { grid-template-columns: 1fr; gap: 28px; }

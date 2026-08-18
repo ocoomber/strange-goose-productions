@@ -68,8 +68,8 @@
       "@type": "VideoObject",
       "name": "Strange Goose Productions — Commercial Reel",
       "description": "Showreel of commercial and branded content from Strange Goose Productions, Edinburgh.",
-      "thumbnailUrl": "https://i.ytimg.com/vi/XDqIPun8S-0/maxresdefault.jpg",
-      "embedUrl": "https://www.youtube-nocookie.com/embed/XDqIPun8S-0",
+      "thumbnailUrl": "https://strangegoose.co.uk/img/showreel-poster.jpg",
+      "contentUrl": "https://strangegoose.co.uk/video/sizzle.mp4",
       "uploadDate": "2026",
       "publisher": { "@id": "https://strangegoose.co.uk/#organization" }
     }
@@ -127,50 +127,34 @@
     .ai-aside { flex-direction: column; align-items: flex-start; gap: 18px; }
   }
 
-  /* reel embed */
-  .hero-reel { margin-top: 48px; }
-  .hero-reel-box {
-    position: relative;
-    width: 100%;
-    padding-bottom: 56.25%;
-    border-radius: 4px;
-    overflow: hidden;
-    background: #111;
-    cursor: pointer;
-  }
-  .hero-reel-box img {
+  /* fullscreen ambient showreel background */
+  .hero-bg,
+  .hero-bg video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
   }
-  .hero-reel-box .play {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 64px; height: 64px;
-    background: rgba(20,18,15,0.72);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-  .hero-reel-box .play::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 54%;
-    transform: translate(-50%, -50%);
-    border: 0 solid transparent;
-    border-left: 22px solid var(--paper);
-    border-top: 13px solid transparent;
-    border-bottom: 13px solid transparent;
-  }
-  .hero-reel-box iframe {
+  .hero-bg img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    border: 0;
+    object-fit: cover;
+  }
+  .hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10,9,8,0.62) 0%, rgba(10,9,8,0.28) 45%, rgba(10,9,8,0.66) 100%);
+    pointer-events: none;
+  }
+  .home-hero h1 { color: rgba(246,241,230,0.92); }
+  .home-hero h1 em { color: rgba(246,241,230,0.55); }
+  .home-hero .lede { color: rgba(246,241,230,0.92); }
+  .home-hero .body { color: rgba(246,241,230,0.72); }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bg video { display: none; }
   }
 </style>
 </head>
@@ -190,6 +174,13 @@
 
 <!-- ── HERO ── -->
 <section class="home-hero">
+  <div class="hero-bg">
+    <img src="img/showreel-poster.jpg" alt="" aria-hidden="true" loading="lazy">
+    <video autoplay muted loop playsinline preload="auto" poster="img/showreel-poster.jpg" aria-label="Strange Goose Productions — Commercial Reel">
+      <source src="video/sizzle.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="hero-scrim" aria-hidden="true"></div>
   <div class="wrap">
     <h1 class="display">Proper film.<br><em>Built differently.</em></h1>
     <p class="lede">Short film, music video, and commercial content. Award-winning craft. Edinburgh-based.</p>
@@ -197,13 +188,6 @@
     <div class="hero-actions">
       <a href="contact.html" class="btn primary lg">Talk to us about your project</a>
       <a href="work.html" class="arrow-link">See our work →</a>
-    </div>
-
-    <div class="hero-reel">
-      <div class="hero-reel-box" id="reel" data-yt="XDqIPun8S-0">
-        <img src="https://i.ytimg.com/vi/XDqIPun8S-0/maxresdefault.jpg" alt="Strange Goose Productions — Commercial Reel" loading="lazy">
-        <span class="play" aria-hidden="true"></span>
-      </div>
     </div>
   </div>
 </section>
@@ -382,19 +366,17 @@
 
 <script>
   (function () {
-    var box = document.getElementById('reel');
-    if (!box) return;
-    box.addEventListener('click', function () {
-      if (box.dataset.playing) return;
-      var id = box.getAttribute('data-yt');
-      var frame = document.createElement('iframe');
-      frame.src = 'https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0&modestbranding=1';
-      frame.title = 'Strange Goose Productions — Commercial Reel';
-      frame.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; web-share');
-      frame.setAttribute('allowfullscreen', '');
-      box.innerHTML = '';
-      box.appendChild(frame);
-      box.dataset.playing = '1';
+    var v = document.querySelector('.hero-bg video');
+    if (!v) return;
+    v.muted = true;
+    var tryPlay = function () {
+      var p = v.play();
+      if (p) p.catch(function () {});
+    };
+    tryPlay();
+    v.addEventListener('loadeddata', tryPlay);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) tryPlay();
     });
   })();
 </script>
