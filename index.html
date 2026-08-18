@@ -367,6 +367,20 @@
 
 <script>
   (function () {
+    var img = document.querySelector('.hero-bg img');
+    var vid = document.querySelector('.hero-bg video');
+    if (img && vid) {
+      var mq = window.matchMedia('(max-width: 767px)');
+      var applyPoster = function () {
+        var src = mq.matches ? 'img/showreel-poster-mobile.jpg' : 'img/showreel-poster.jpg';
+        img.src = src;
+        vid.poster = src;
+      };
+      applyPoster();
+      mq.addEventListener('change', applyPoster);
+    }
+  })();
+  (function () {
     var v = document.querySelector('.hero-bg video');
     if (!v) return;
     v.muted = true;
